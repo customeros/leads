@@ -26,7 +26,6 @@ type Contact struct {
 	// Engagement metrics
 	Stage                enum.CustomerJourneyStage `gorm:"column:stage;type:varchar(50);index;default:'target'"`
 	StageEngagementCount int                       `gorm:"column:stage_engagement_count;type:integer;default:0"`
-	EngagementScore      float64                   `gorm:"column:engagement_score;type:float;default:0"`
 	TotalSessionCount    int                       `gorm:"column:total_session_count;type:integer;default:0"`
 
 	// Marketing action data
