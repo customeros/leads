@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eo pipefail
 
-echo "Cleaning and updating dependencies..."
+echo "Updating dependencies..."
 go mod tidy
 
 echo "Generating GraphQL code..."
