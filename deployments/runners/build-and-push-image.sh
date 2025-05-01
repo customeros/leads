@@ -45,7 +45,6 @@ LATEST_ARCH_TAG="${REGISTRY}/${IMAGE_NAME}:latest-${ARCH}"
 # Use Docker buildx to create and push the latest tags
 docker buildx build \
 --push \
---platform ${PLATFORM} \
 --tag ${LATEST_TAG} \
 --tag ${LATEST_ARCH_TAG} \
 --provenance=false \
