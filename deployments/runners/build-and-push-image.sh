@@ -44,13 +44,20 @@ LATEST_TAG="${REGISTRY}/${IMAGE_NAME}:latest"
 LATEST_ARCH_TAG="${REGISTRY}/${IMAGE_NAME}:latest-${ARCH}"
   
 # Use Docker buildx to create and push the latest tags
-docker buildx build \
---push \
---tag ${LATEST_TAG} \
---tag ${LATEST_ARCH_TAG} \
---provenance=false \
---file ${CONTAINERFILE_PATH} \
-.
+echo "Building and pushing image with buildx..."
+if ! docker buildx build \
+  --push \
+  --platform ${PLATFORM} \
+  --tag ${LATEST_TAG} \
+  --tag ${LATEST_ARCH_TAG} \
+  --provenance=false \
+  --file ${CONTAINERFILE_PATH} \
+  .; then
+  echo "ERROR: Failed to build and push image"
+  echo "Checking Docker login status..."
+  docker login ${REGISTRY} --username ${GITHUB_ACTOR} --password-stdin <<< "${GITHUB_TOKEN}"
+  exit 1
+fi
 
 echo "Image build and push completed successfully"
 exit 0
