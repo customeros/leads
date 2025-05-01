@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - otter
-    paths:
-      - ./**
-      - .github/workflows/leads-*
+    paths-ignore:
+      - "**.md"
 
 env:
   REGISTRY: ghcr.io
