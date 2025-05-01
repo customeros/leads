@@ -2,12 +2,15 @@ name: Leads Build (PR)
 
 on:
   pull_request:
-    paths:
-      - ./**
-      - .github/workflows/leads-*
+    branches:
+      - otter
+    paths-ignore:
+      - "**.md"
 
 env:
   CGO_ENABLED: 0
+  LANG: C.UTF-8
+  LC_ALL: C.UTF-8
 
 permissions:
   pull-requests: read
