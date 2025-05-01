@@ -1,5 +1,5 @@
 # Build stage
-FROM --platform=$BUILDPLATFORM golang:1.23-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.24.2-alpine3.21 AS builder
 
 # Set the working directory
 WORKDIR /app
@@ -10,11 +10,11 @@ ENV CGO_ENABLED=0 \
     GOARCH=arm64
 
 # Copy go.mod and go.sum first to leverage Docker cache
-COPY packages/server/leads/go.mod packages/server/leads/go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy the source code
-COPY packages/server/leads/ ./
+COPY ./ ./
 
 # Build the application
 RUN go mod tidy && \
