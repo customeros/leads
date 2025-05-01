@@ -11,8 +11,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/customer-os-leads
-  GOMODCACHE: ${{ github.workspace }}/go/pkg/mod
-  GOBIN: ${{ github.workspace }}/go/bin
   CGO_ENABLED: 0
   LANG: C.UTF-8
   LC_ALL: C.UTF-8
@@ -71,7 +69,18 @@ jobs:
           name: Release ${{ env.VERSION }}
           generate_release_notes: true
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push container image
+        if: env.RELEASE_NEEDED == 'true'
         run: |
           ./deployments/runners/build-and-push-image.sh \
             ${{ env.REGISTRY }} \
