@@ -23,12 +23,7 @@ echo "- Version: $VERSION"
 echo "- Platform: $PLATFORM"
 echo "- Architecture: $ARCH"
 
-# Create tag combinations
-MAIN_TAG="${REGISTRY}/${IMAGE_NAME}:${VERSION}"
-ARCH_TAG="${REGISTRY}/${IMAGE_NAME}:${VERSION}-${ARCH}"
-
 echo "Checking Containerfile location..."
-
 # Verify the Containerfile exists
 if [ ! -f "$CONTAINERFILE_PATH" ]; then
   echo "ERROR: Containerfile not found at $CONTAINERFILE_PATH"
@@ -36,6 +31,12 @@ if [ ! -f "$CONTAINERFILE_PATH" ]; then
   echo "Listing possible locations:"
   find . -name "Containerfile" -type f | grep -i "lead" || echo "No Containerfile found"
   exit 1
+fi
+
+echo "Verifying registry login..."
+if ! docker buildx ls | grep -q "logged in"; then
+  echo "WARNING: You might not be logged in to the registry. Try running:"
+  echo "  echo \$GITHUB_TOKEN | docker login ${REGISTRY} -u \$GITHUB_ACTOR --password-stdin"
 fi
 
 echo "Tagging as latest..."
