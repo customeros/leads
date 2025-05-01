@@ -1,2 +1,3 @@
 # leads
-Qualified opportunity generation for CustomerOS
+
+Qualified opportunity generation for CustomerOS platform
