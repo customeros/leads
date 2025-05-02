@@ -50,11 +50,6 @@ func RegisterRoutes(ctx context.Context, r *gin.Engine, services *services.Servi
 		}
 	}
 
-	apiKeyMiddleware := middleware.APIKeyMiddleware(middleware.APIKeyConfig{
-		HeaderName:  "X-CUSTOMER-OS-API-KEY",
-		ValidAPIKey: config.APIKey,
-	})
-
 	// GraphQL API
 	graphqlHandler, playgroundHandler := SetupGraphQLServer(services)
 
@@ -64,7 +59,6 @@ func RegisterRoutes(ctx context.Context, r *gin.Engine, services *services.Servi
 	}
 
 	query := r.Group("/query")
-	query.Use(apiKeyMiddleware)
 	query.Use(middleware.TenantValidationMiddleware()) // Tenant header validation
 	query.Use(middleware.UserIdMiddleware())           // UserId header parsing
 	query.Use(middleware.CustomContextMiddleware())    // Add custom context
