@@ -47,14 +47,17 @@ VERSION_TAG="${REGISTRY}/customeros/${REPO}/${IMAGE_NAME}:${VERSION}"
 VERSION_ARCH_TAG="${REGISTRY}/customeros/${REPO}/${IMAGE_NAME}:${VERSION}-${ARCH}"
   
 # Use Docker buildx to create and push the latest tags
+docker buildx prune -a -f
+
+
 echo "Building and pushing image with buildx..."
 if ! docker buildx build \
   --push \
-  --platform ${PLATFORM} \
   --tag ${LATEST_TAG} \
   --tag ${LATEST_ARCH_TAG} \
   --tag ${VERSION_TAG} \
   --tag ${VERSION_ARCH_TAG} \
+  --no-cache \
   --provenance=false \
   --file ${CONTAINERFILE_PATH} \
   .; then
