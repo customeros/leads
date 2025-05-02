@@ -108,4 +108,4 @@ jobs:
       - name: Update cloud version
         if: env.RELEASE_NEEDED == 'true'
         run: |
-          ./deployments/runners/update-cloud.sh ${{ env.APP_NAME }}
+          ./deployments/runners/update-cloud.sh ${{ env.APP_NAME }} $${{ env.VERSION }}
