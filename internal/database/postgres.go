@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -34,70 +35,90 @@ type DbConnections struct {
 func NewConnection(dbConfig *DatabaseConfig) (*DbConnections, error) {
 	validateConfig(dbConfig)
 
-	// Create write connection
-	writeConnString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		dbConfig.Host, dbConfig.WritePort, dbConfig.User, dbConfig.Password, dbConfig.DBName, dbConfig.SSLMode)
+	writeConfig := postgres.Config{
+		DSN: fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+			dbConfig.Host, dbConfig.WritePort, dbConfig.User, dbConfig.Password,
+			dbConfig.DBName, dbConfig.SSLMode,
+		),
+		PreferSimpleProtocol: true,
+	}
 
-	writeDB, err := gorm.Open(postgres.Open(writeConnString), &gorm.Config{
+	// Open write connection with explicit error handling
+	writeDB, err := gorm.Open(postgres.New(writeConfig), &gorm.Config{
 		AllowGlobalUpdate: true,
 		Logger:            initLog(dbConfig.LogLevel),
 	})
 	if err != nil {
-		log.Printf("Error opening write DB: %v", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to open write database connection: %w", err)
 	}
 
-	// Configure connection pool for write DB
-	writeSQL, err := writeDB.DB()
+	// Configure write connection pool
+	writeSQLDB, err := writeDB.DB()
 	if err != nil {
-		log.Printf("Error getting write DB: %v", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to get write database connection: %w", err)
 	}
 
-	// Test the write connection
-	if err = writeSQL.Ping(); err != nil {
-		log.Printf("Error pinging write DB: %v", err)
-		return nil, err
+	// Configure connection pooling
+	writeSQLDB.SetMaxIdleConns(dbConfig.MaxIdleConn)
+	writeSQLDB.SetMaxOpenConns(dbConfig.MaxConn)
+	writeSQLDB.SetConnMaxLifetime(time.Duration(dbConfig.ConnMaxLifetime) * time.Hour)
+
+	// Test connection with timeout context
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err = writeSQLDB.PingContext(ctx); err != nil {
+		return nil, fmt.Errorf("write database connection test failed: %w", err)
 	}
 
-	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool
-	writeSQL.SetMaxIdleConns(dbConfig.MaxIdleConn)
-	// SetMaxOpenConns sets the maximum number of open connections to the database
-	writeSQL.SetMaxOpenConns(dbConfig.MaxConn)
-	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused
-	writeSQL.SetConnMaxLifetime(time.Duration(dbConfig.ConnMaxLifetime) * time.Hour)
+	// Use the same approach for read connection
+	readConfig := postgres.Config{
+		DSN: fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+			dbConfig.Host, dbConfig.ReadPort, dbConfig.User, dbConfig.Password,
+			dbConfig.DBName, dbConfig.SSLMode,
+		),
+		PreferSimpleProtocol: true,
+	}
 
-	// Create read connection
-	readConnString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		dbConfig.Host, dbConfig.ReadPort, dbConfig.User, dbConfig.Password, dbConfig.DBName, dbConfig.SSLMode)
-
-	readDB, err := gorm.Open(postgres.Open(readConnString), &gorm.Config{
+	readDB, err := gorm.Open(postgres.New(readConfig), &gorm.Config{
 		Logger: initLog(dbConfig.LogLevel),
 	})
 	if err != nil {
-		log.Printf("Error opening read DB: %v", err)
-		return nil, err
+		// Clean up the write connection before returning
+		if sqlDB, _ := writeDB.DB(); sqlDB != nil {
+			_ = sqlDB.Close()
+		}
+		return nil, fmt.Errorf("failed to open read database connection: %w", err)
 	}
 
-	// Configure connection pool for read DB
-	readSQL, err := readDB.DB()
+	// Configure read connection pool
+	readSQLDB, err := readDB.DB()
 	if err != nil {
-		log.Printf("Error getting read DB: %v", err)
-		return nil, err
+		// Clean up connections before returning
+		if sqlDB, _ := writeDB.DB(); sqlDB != nil {
+			_ = sqlDB.Close()
+		}
+		return nil, fmt.Errorf("failed to get read database connection: %w", err)
 	}
 
-	// Test the read connection
-	if err = readSQL.Ping(); err != nil {
-		log.Printf("Error pinging read DB: %v", err)
-		return nil, err
-	}
+	// Configure connection pooling for read DB
+	readSQLDB.SetMaxIdleConns(dbConfig.MaxIdleConn)
+	readSQLDB.SetMaxOpenConns(dbConfig.MaxConn)
+	readSQLDB.SetConnMaxLifetime(time.Duration(dbConfig.ConnMaxLifetime) * time.Hour)
 
-	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool
-	readSQL.SetMaxIdleConns(dbConfig.MaxIdleConn)
-	// SetMaxOpenConns sets the maximum number of open connections to the database
-	readSQL.SetMaxOpenConns(dbConfig.MaxConn)
-	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused
-	readSQL.SetConnMaxLifetime(time.Duration(dbConfig.ConnMaxLifetime) * time.Hour)
+	// Test read connection
+	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err = readSQLDB.PingContext(ctx); err != nil {
+		// Clean up connections before returning
+		if sqlDB, _ := writeDB.DB(); sqlDB != nil {
+			_ = sqlDB.Close()
+		}
+		return nil, fmt.Errorf("read database connection test failed: %w", err)
+	}
 
 	return &DbConnections{
 		ReadDB:  readDB,
