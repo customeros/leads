@@ -8,11 +8,13 @@ on:
       - "**.md"
 
 env:
-  REGISTRY: ghcr.io
+  APP_NAME: leads
   IMAGE_NAME: customer-os-leads
+  REGISTRY: ghcr.io
   CGO_ENABLED: 0
   LANG: C.UTF-8
   LC_ALL: C.UTF-8
+  CLOUD_REPO: customeros/cloud
 
 permissions:
   contents: write
@@ -92,4 +94,18 @@ jobs:
             ${{ env.VERSION }} \
             "linux/arm64" \
             "arm64" \
-            "leads"
+            ${{ env.APP_NAME }}
+
+      - name: Checkout cloud repo
+        if: env.RELEASE_NEEDED == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CLOUD_REPO }}
+          token: ${{ secrets.CLOUD_REPO_KEY }}
+          path: cloud-repo
+          fetch-depth: 1
+
+      - name: Update cloud version
+        if: env.RELEASE_NEEDED == 'true'
+        run: |
+          ./deployments/runners/update_cloud.sh ${{ env.APP_NAME }}
