@@ -86,4 +86,5 @@ jobs:
             ${{ env.IMAGE_NAME }} \
             ${{ env.VERSION }} \
             "linux/arm64" \
-            "arm64"
+            "arm64" \
+            "leads"
