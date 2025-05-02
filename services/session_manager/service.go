@@ -10,6 +10,7 @@ import (
 	"github.com/nats-io/nats.go"
 
 	"github.com/customeros/leads/interfaces"
+	"github.com/customeros/leads/internal/database"
 	"github.com/customeros/leads/internal/enum"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/repository"
@@ -19,15 +20,18 @@ import (
 
 type sessionManager struct {
 	natsConn     *nats_internal.NATSConnections
+	leadsDB      *database.DbConnections
 	repositories *repository.Repositories
 }
 
 func NewSessionManager(
 	natsConn *nats_internal.NATSConnections,
+	leadsDB *database.DbConnections,
 	repository *repository.Repositories,
 ) interfaces.NatsService {
 	return &sessionManager{
 		natsConn:     natsConn,
+		leadsDB:      leadsDB,
 		repositories: repository,
 	}
 }

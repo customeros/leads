@@ -6,7 +6,7 @@ option go_package = "github.com/customeros/leads/proto/pb";
 import "google/protobuf/timestamp.proto";
 import "schema/webtracker_event_type_enum.proto";
 
-message WebtrackerSessionNew {
+message WebtrackerSessionCreated {
   string session_id = 1;
   string tracker_id = 2;
   string visitor_id = 3;
