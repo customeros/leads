@@ -87,4 +87,4 @@ jobs:
             ${{ env.VERSION }} \
             "linux/arm64" \
             "arm64" \
-            ${{ github.event.repository.name }}
+            "leads"
