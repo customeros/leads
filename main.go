@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
 
 	"github.com/customeros/leads/internal/config"
 	"github.com/customeros/leads/internal/database"
@@ -12,14 +10,6 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run <command>")
-		fmt.Println("Commands:")
-		fmt.Println("  migrate   Run database migrations")
-		fmt.Println("  server    Start the application server")
-		os.Exit(1)
-	}
-
 	cfg, err := config.InitConfig()
 	if err != nil {
 		log.Fatalf("Config initialization failed: %v", err)

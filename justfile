@@ -20,11 +20,8 @@ gen-proto:
     --go-grpc_opt=module=github.com/customeros/leads/proto/pb \
     {} \;
 
-migrate:
-    go run main.go migrate
-
 run:
-    go run main.go server
+    go run main.go
 
 tidy:
     go mod tidy
