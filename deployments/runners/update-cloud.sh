@@ -17,5 +17,5 @@ sed -i "s|newTag: .*|newTag: ${VERSION}|" "${FILE_PATH}"
 
 # Commit and push changes
 git add $FILE_PATH
-git commit -m "Update leads version to ${{ env.VERSION }}"
+git commit -m "Update leads version to ${VERSION}"
 git push
