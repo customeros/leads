@@ -40,9 +40,11 @@ if ! docker buildx ls | grep -q "logged in"; then
   echo "  echo \$GITHUB_TOKEN | docker login ${REGISTRY} -u \$GITHUB_ACTOR --password-stdin"
 fi
 
-echo "Tagging as latest..."
+echo "Tagging image..."
 LATEST_TAG="${REGISTRY}/customeros/${REPO}/${IMAGE_NAME}:latest"
 LATEST_ARCH_TAG="${REGISTRY}/customeros/${REPO}/${IMAGE_NAME}:latest-${ARCH}"
+VERSION_TAG="${REGISTRY}/customeros/${REPO}/${IMAGE_NAME}:${VERSION}"
+VERSION_ARCH_TAG="${REGISTRY}/customeros/${REPO}/${IMAGE_NAME}:${VERSION}-${ARCH}"
   
 # Use Docker buildx to create and push the latest tags
 echo "Building and pushing image with buildx..."
@@ -51,6 +53,8 @@ if ! docker buildx build \
   --platform ${PLATFORM} \
   --tag ${LATEST_TAG} \
   --tag ${LATEST_ARCH_TAG} \
+  --tag ${VERSION_TAG} \
+  --tag ${VERSION_ARCH_TAG} \
   --provenance=false \
   --file ${CONTAINERFILE_PATH} \
   .; then
@@ -61,4 +65,8 @@ if ! docker buildx build \
 fi
 
 echo "Image build and push completed successfully"
+echo "- ${LATEST_TAG}"
+echo "- ${LATEST_ARCH_TAG}" 
+echo "- ${VERSION_TAG}"
+echo "- ${VERSION_ARCH_TAG}"
 exit 0
