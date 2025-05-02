@@ -21,7 +21,7 @@ RUN go mod tidy && \
     go build -ldflags="-s -w" -o /go/bin/app .
 
 # Final stage - using standard distroless (no debug variant needed)
-FROM --platform=linux/arm64 gcr.io/distroless/static:nonroot
+FROM gcr.io/distroless/static:nonroot
 
 # Set the working directory
 WORKDIR /app
