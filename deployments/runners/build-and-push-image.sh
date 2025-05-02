@@ -7,6 +7,7 @@ IMAGE_NAME=${2:-$IMAGE_NAME}
 VERSION=${3:-$VERSION}
 PLATFORM=${4:-"linux/arm64"}
 ARCH=${5:-"arm64"}
+REPO=$6
 
 CONTAINERFILE_PATH="./deployments/build/Containerfile"
 
@@ -40,8 +41,8 @@ if ! docker buildx ls | grep -q "logged in"; then
 fi
 
 echo "Tagging as latest..."
-LATEST_TAG="${REGISTRY}/${IMAGE_NAME}:latest"
-LATEST_ARCH_TAG="${REGISTRY}/${IMAGE_NAME}:latest-${ARCH}"
+LATEST_TAG="${REGISTRY}/customeros/${REPO}/${IMAGE_NAME}:latest"
+LATEST_ARCH_TAG="${REGISTRY}/customeros/${REPO}/${IMAGE_NAME}:latest-${ARCH}"
   
 # Use Docker buildx to create and push the latest tags
 echo "Building and pushing image with buildx..."
