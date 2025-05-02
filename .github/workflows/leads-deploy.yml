@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/customer-os-leads
+  IMAGE_NAME: customer-os-leads
   CGO_ENABLED: 0
   LANG: C.UTF-8
   LC_ALL: C.UTF-8
@@ -87,4 +87,4 @@ jobs:
             ${{ env.VERSION }} \
             "linux/arm64" \
             "arm64" \
-            "leads"
+            ${{ github.event.repository.name }}
