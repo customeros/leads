@@ -2,6 +2,7 @@
 set -eo pipefail
 
 APP=$1
+VERSION=$2
 
 # Set Git identity for the commit
 cd cloud-repo
@@ -12,7 +13,7 @@ git config user.email "actions@github.com"
 FILE_PATH="./deployments/${APP}/kustomization.yaml"
 
 # Update the version in the specified file
-sed -i "s|newTag: .*|newTag: ${{ env.VERSION }}|" $FILE_PATH
+sed -i "s|newTag: .*|newTag: ${VERSION}|" "${FILE_PATH}"
 
 # Commit and push changes
 git add $FILE_PATH
