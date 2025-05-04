@@ -3,7 +3,8 @@ package enum
 type LeadsService string
 
 const (
-	WebtrackerService LeadsService = "leads.webtracker_service"
-	WebEventProcessor LeadsService = "leads.web_event_processor"
+	ProxyManager      LeadsService = "leads.proxy_manager"
 	SessionManager    LeadsService = "leads.session_manager"
+	WebEventProcessor LeadsService = "leads.web_event_processor"
+	WebtrackerService LeadsService = "leads.webtracker_service"
 )

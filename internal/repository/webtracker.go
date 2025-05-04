@@ -28,6 +28,8 @@ type WebTrackerRepository interface {
 	UpdateLastEventAtWithTxn(ctx context.Context, txn *gorm.DB, trackerID string, timestamp time.Time) error
 	Archive(ctx context.Context, id string) error
 	Restore(ctx context.Context, id string) error
+	GetCNAMEChecks(ctx context.Context) ([]models.WebTracker, error)
+	CNAMEConfiguredWithTxn(ctx context.Context, txn *gorm.DB, id string) error
 }
 
 // GormWebTrackerRepository implements WebTrackerRepository using GORM
@@ -180,6 +182,14 @@ func (r *webTrackerRepository) Update(ctx context.Context, dto dto.WebTrackerUpd
 		updates["is_proxy_active"] = *dto.IsProxyActive
 	}
 
+	if dto.CNAMECheckCount != nil {
+		updates["cname_check_count"] = dto.CNAMECheckCount
+	}
+
+	if dto.CheckCNAMEAfter != nil {
+		updates["check_cname_after"] = dto.CheckCNAMEAfter
+	}
+
 	result := r.write.WithContext(ctx).
 		Model(&models.WebTracker{}).
 		Where("id = ?", dto.ID).
@@ -278,6 +288,44 @@ func (r *webTrackerRepository) Restore(ctx context.Context, id string) error {
 		Updates(map[string]interface{}{
 			"is_archived": false,
 			"updated_at":  now,
+		})
+
+	if result.RowsAffected == 0 {
+		return errors.New("webtracker not found")
+	}
+	return result.Error
+}
+
+func (r *webTrackerRepository) GetCNAMEChecks(ctx context.Context) ([]models.WebTracker, error) {
+	span, ctx := telemetry.StartPostgresSpan(ctx, "webTrackerRepository.GetPendingCNAMEChecks")
+	defer span.Finish()
+
+	var trackers []models.WebTracker
+
+	now := time.Now()
+
+	err := r.read.WithContext(ctx).
+		Where("is_cname_configured = ?", false).
+		Where("(check_cname_after <= ?)", now).
+		Where("is_archived = ?", false).
+		Find(&trackers).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return trackers, nil
+}
+
+func (r *webTrackerRepository) CNAMEConfiguredWithTxn(ctx context.Context, txn *gorm.DB, id string) error {
+	span, ctx := telemetry.StartPostgresSpan(ctx, "webTrackerRepository.CNAMEConfigured")
+	defer span.Finish()
+
+	result := txn.Model(&models.WebTracker{}).
+		Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"is_cname_configured": true,
+			"check_cname_after":   nil,
+			"cname_check_count":   nil,
 		})
 
 	if result.RowsAffected == 0 {

@@ -20,7 +20,7 @@ import (
 type Services struct {
 	IPDataService     *ipdata.IPDataService
 	OutboxProcessor   *outbox_processor.OutboxProcessor
-	ProxyManager      *proxy_manager.ProxyManager
+	ProxyManager      proxy_manager.ProxyManagerService
 	SessionManager    interfaces.NatsService
 	SnitcherService   *snitcher.SnitcherService
 	WebEventProcessor web_event_processor.WebEventProcessor

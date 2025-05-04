@@ -11,6 +11,8 @@ type WebTracker struct {
 	CNAMEHost         string     `gorm:"column:cname_host;type:varchar(255);not null"`
 	CNAMETarget       string     `gorm:"column:cname_target;type:varchar(255);not null"`
 	IsCNAMEConfigured bool       `gorm:"column:is_cname_configured;type:bool;default:false;not null"`
+	CheckCNAMEAfter   *time.Time `gorm:"column:check_cname_after;"`
+	CNAMECheckCount   uint       `gorm:"column:cname_check_count;type:uint;not null;default:0"`
 	IsProxyActive     bool       `gorm:"column:is_proxy_active;type:bool;default:false;not null"`
 	LastEventAt       *time.Time `gorm:"column:last_event_at;"`
 	CreatedAt         time.Time  `gorm:"column:created_at;autoCreateTime"`

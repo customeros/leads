@@ -7,4 +7,5 @@ var (
 	ErrUserIdMissing      = errors.New("UserID not set on context")
 	ErrWebtrackerNotFound = errors.New("Webtracker not found")
 	ErrWebtrackerExists   = errors.New("Webtracker already exists")
+	ErrCNAMERecordExists  = errors.New("CNAME record already exists")
 )
