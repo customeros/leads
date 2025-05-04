@@ -101,6 +101,7 @@ func (r *webTrackerRepository) GetByID(ctx context.Context, id string) (*models.
 	result := r.read.WithContext(ctx).
 		Where("id = ?", id).
 		Where("tenant = ?", tenant).
+		Where("is_archived = ?", false).
 		First(&tracker)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -133,8 +134,16 @@ func (r *webTrackerRepository) GetActiveTrackers(ctx context.Context) ([]models.
 	span, ctx := telemetry.StartPostgresSpan(ctx, "webTrackerRepository.GetActiveTrackers")
 	defer span.Finish()
 
+	tenant := utils.GetTenantFromContext(ctx)
+	if tenant == "" {
+		err := leads_errors.ErrTenantMissing
+		span.TraceError(err)
+		return nil, err
+	}
+
 	var trackers []models.WebTracker
 	result := r.read.WithContext(ctx).
+		Where("tenant = ?", tenant).
 		Where("is_archived = ?", false).
 		Where("is_proxy_active = ?", true).
 		Find(&trackers)
@@ -233,10 +242,18 @@ func (r *webTrackerRepository) Archive(ctx context.Context, id string) error {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "webTrackerRepository.Archive")
 	defer span.Finish()
 
+	tenant := utils.GetTenantFromContext(ctx)
+	if tenant == "" {
+		err := leads_errors.ErrTenantMissing
+		span.TraceError(err)
+		return err
+	}
+
 	now := time.Now()
 	result := r.write.WithContext(ctx).
 		Model(&models.WebTracker{}).
 		Where("id = ?", id).
+		Where("tenant = ?", tenant).
 		Updates(map[string]interface{}{
 			"is_archived":     true,
 			"is_proxy_active": false,

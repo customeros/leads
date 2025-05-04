@@ -66,7 +66,7 @@ func (r *mutationResolver) UpdateWebtracker(ctx context.Context, tracker graphql
 		}
 	}
 
-	updatedTracker, err := r.services.WebtrackerService.UpdateCNAMEHost(ctx, cnameHost)
+	updatedTracker, err := r.services.WebtrackerService.UpdateCNAMEHost(ctx, *tracker.ID, cnameHost)
 	if err != nil {
 		span.TraceError(err)
 		return nil, err
