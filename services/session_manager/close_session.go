@@ -2,12 +2,11 @@ package session_manager
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/nats-io/nats.go"
 	"go.uber.org/multierr"
 	"google.golang.org/protobuf/proto"
+	"gorm.io/gorm"
 
 	"github.com/customeros/leads/internal/enum"
 	"github.com/customeros/leads/internal/models"
@@ -21,7 +20,7 @@ const (
 	WebSessionTimeoutPageView = 30 * time.Minute
 )
 
-func (s *sessionManager) CloseSession(ctx context.Context, msg *nats.Msg) {
+func (s *sessionManager) ProcessActiveSessions(ctx context.Context) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.CloseSession")
 	defer span.Finish()
 
@@ -112,39 +111,24 @@ func (s *sessionManager) closeSession(ctx context.Context, session *models.WebSe
 	}
 
 	// Start a transaction
-	tx := s.leadsDB.WriteDB.Begin()
-	if tx.Error != nil {
-		span.TraceError(tx.Error)
-		return fmt.Errorf("failed to begin transaction: %w", tx.Error)
-	}
-
-	// Defer a rollback in case anything fails
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-			panic(r) // Re-throw panic after rollback
+	err = s.leadsDB.WriteDB.Transaction(func(tx *gorm.DB) error {
+		// update websession table
+		err = s.repositories.WebSessionRepository.CloseSessionWithTxn(ctx, tx, session.ID)
+		if err != nil {
+			span.TraceError(err)
+			return err
 		}
-	}()
 
-	// update websession table
-	err = s.repositories.WebSessionRepository.CloseSessionWithTxn(ctx, tx, session.ID)
+		err = s.repositories.Outbox.CreateWithTxn(ctx, tx, outbox)
+		if err != nil {
+			span.TraceError(err)
+			return err
+		}
+		return nil
+	})
 	if err != nil {
-		tx.Rollback()
 		span.TraceError(err)
 		return err
-	}
-
-	err = s.repositories.Outbox.CreateWithTxn(ctx, tx, outbox)
-	if err != nil {
-		tx.Rollback()
-		span.TraceError(err)
-		return err
-	}
-
-	err = tx.Commit().Error
-	if err != nil {
-		span.TraceError(err)
-		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return nil

@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 
-	"github.com/customeros/leads/interfaces"
 	"github.com/customeros/leads/internal/config"
 	"github.com/customeros/leads/internal/database"
 	nats_internal "github.com/customeros/leads/internal/nats"
@@ -21,7 +20,7 @@ type Services struct {
 	IPDataService     *ipdata.IPDataService
 	OutboxProcessor   *outbox_processor.OutboxProcessor
 	ProxyManager      proxy_manager.ProxyManagerService
-	SessionManager    interfaces.NatsService
+	SessionManager    session_manager.SessionManager
 	SnitcherService   *snitcher.SnitcherService
 	WebEventProcessor web_event_processor.WebEventProcessor
 	WebtrackerService webtracker.WebtrackerService

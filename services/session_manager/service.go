@@ -18,6 +18,11 @@ import (
 	"github.com/customeros/leads/internal/utils"
 )
 
+type SessionManager interface {
+	interfaces.NatsService
+	ProcessActiveSessions(ctx context.Context)
+}
+
 type sessionManager struct {
 	natsConn     *nats_internal.NATSConnections
 	leadsDB      *database.DbConnections
@@ -28,7 +33,7 @@ func NewSessionManager(
 	natsConn *nats_internal.NATSConnections,
 	leadsDB *database.DbConnections,
 	repository *repository.Repositories,
-) interfaces.NatsService {
+) SessionManager {
 	return &sessionManager{
 		natsConn:     natsConn,
 		leadsDB:      leadsDB,
@@ -36,7 +41,7 @@ func NewSessionManager(
 	}
 }
 
-var SUBSCRIBED_SUBJECT = "webtracker.session.>"
+var SUBSCRIBED_SUBJECT = enum.EventWebtrackerSessionCreated.String()
 
 const (
 	// queue group
@@ -140,9 +145,6 @@ func (s *sessionManager) routeMessage(ctx context.Context, msg *nats.Msg) {
 	switch {
 	case msg.Subject == enum.EventWebtrackerSessionCreated.String():
 		s.NewSession(ctx, msg)
-
-	case msg.Subject == enum.EventWebtrackerSessionClosed.String():
-		s.CloseSession(ctx, msg)
 
 	default:
 		spans.TraceError(errors.New("Unsupported event type"))

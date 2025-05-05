@@ -179,9 +179,16 @@ func (cm *CronManager) registerJobs(c *cronv3.Cron) {
 		},
 		{
 			Name:     "check cname",
-			Schedule: cronConfig.CronScheduleProcessOutboxEvents,
+			Schedule: cronConfig.CronScheduleCheckCNAME,
 			HandlerFunc: func(ctx context.Context) {
 				cm.services.ProxyManager.CheckCNAME(ctx)
+			},
+		},
+		{
+			Name:     "close web sessions",
+			Schedule: cronConfig.CronScheduleProcessWebSessions,
+			HandlerFunc: func(ctx context.Context) {
+				cm.services.SessionManager.ProcessActiveSessions(ctx)
 			},
 		},
 		{
