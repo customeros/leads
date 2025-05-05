@@ -87,7 +87,7 @@ func (s *proxyManagerService) isCNAMEActive(ctx context.Context, cnameHost, doma
 }
 
 func (s *proxyManagerService) handleCNAMEConfigured(ctx context.Context, tracker *models.WebTracker) error {
-	span, ctx := telemetry.StartServiceSpan(ctx, "proxyManagerService.handleCNAMENotConfigured")
+	span, ctx := telemetry.StartServiceSpan(ctx, "proxyManagerService.handleCNAMEConfigured")
 	defer span.Finish()
 
 	// create outbox event

@@ -33,7 +33,7 @@ type proxyManagerService struct {
 	repositories *repository.Repositories
 }
 
-func NewEmailStorageService(
+func NewProxyManagerService(
 	natsConn *nats_internal.NATSConnections,
 	leadsDB *database.DbConnections,
 	repositories *repository.Repositories,
@@ -94,7 +94,7 @@ func (s *proxyManagerService) Start(ctx context.Context) error {
 	return nil
 }
 
-// processRawEmailEvents continuously processes raw email events
+// processRawEvents continuously processes raw email events
 func (s *proxyManagerService) processRawEvents(ctx context.Context, sub *nats.Subscription) {
 	log.Println("Proxy Manager Service started")
 	for {
