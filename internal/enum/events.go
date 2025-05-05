@@ -26,6 +26,8 @@ const (
 
 	EventAskIPData   Events = "ipaddress.verify.ipdata"
 	EventAskSnitcher Events = "ipaddress.identify.snitcher"
+
+	EventLeadError Events = "lead.error"
 )
 
 func (e Events) String() string {

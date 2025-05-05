@@ -23,6 +23,7 @@ import (
 // CONSTANTS
 const (
 	GroupOutbox     = "outbox"
+	GroupProxy      = "proxy"
 	GroupWebSession = "webSession"
 
 	// LeaseDuration is how long a lease lasts before needing renewal
@@ -40,6 +41,7 @@ var jobLocks = struct {
 }{
 	locks: map[string]*sync.Mutex{
 		GroupOutbox:     {},
+		GroupProxy:      {},
 		GroupWebSession: {},
 	},
 }
@@ -173,6 +175,13 @@ func (cm *CronManager) registerJobs(c *cronv3.Cron) {
 			Schedule: cronConfig.CronScheduleHeartbeat,
 			HandlerFunc: func(ctx context.Context) {
 				cm.log.Infof("Cron heartbeat from pod: %s", podName)
+			},
+		},
+		{
+			Name:     "check cname",
+			Schedule: cronConfig.CronScheduleProcessOutboxEvents,
+			HandlerFunc: func(ctx context.Context) {
+				cm.services.ProxyManager.CheckCNAME(ctx)
 			},
 		},
 		{

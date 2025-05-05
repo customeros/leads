@@ -2,9 +2,10 @@ package webtracker
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"net"
 
+	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 
@@ -37,7 +38,11 @@ func (s *webtrackerService) CreateWebtracker(ctx context.Context, webtracker *mo
 		return nil, err
 	}
 
-	webTrackerRecord := buildWebTrackerRecord(webtracker)
+	webTrackerRecord, err := s.buildWebTrackerRecord(ctx, webtracker)
+	if err != nil {
+		span.TraceError(err)
+		return nil, err
+	}
 
 	// Use transaction
 	err = s.leadsWriteDB.Transaction(func(tx *gorm.DB) error {
@@ -56,7 +61,7 @@ func (s *webtrackerService) CreateWebtracker(ctx context.Context, webtracker *mo
 		}
 
 		event := &models.OutboxEvent{
-			ID:        utils.GenerateNanoIDWithPrefix("event", 21),
+			ID:        utils.GenerateEventID(),
 			EntityID:  webtracker.ID,
 			EventType: enum.EventWebtrackerCreated,
 			Tenant:    utils.GetTenantFromContext(ctx),
@@ -116,11 +121,19 @@ func (s *webtrackerService) buildOutboxEventPayload(ctx context.Context, webtrac
 	return data, nil
 }
 
-func buildWebTrackerRecord(webtracker *models.WebTracker) *models.WebTracker {
+func (s *webtrackerService) buildWebTrackerRecord(ctx context.Context, webtracker *models.WebTracker) (*models.WebTracker, error) {
+	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.buildWebTrackerRecord")
+	defer span.Finish()
+
 	var cnameHost string
 
 	if webtracker.CNAMEHost == "" {
-		cnameHost = DEFAULT_CNAME_HOST
+		host, err := s.generateCNAMEHost(ctx, webtracker.Domain)
+		if err != nil {
+			span.TraceError(err)
+			return nil, err
+		}
+		cnameHost = host
 	} else {
 		cnameHost = webtracker.CNAMEHost
 	}
@@ -136,10 +149,11 @@ func buildWebTrackerRecord(webtracker *models.WebTracker) *models.WebTracker {
 		CNAMEHost:         cnameHost,
 		CNAMETarget:       fmt.Sprintf("%s.%s", utils.GenerateNanoID(9), CNAME_TARGET_DOMAIN),
 		IsCNAMEConfigured: false,
+		CheckCNAMEAfter:   utils.NowPtr(),
 		IsProxyActive:     false,
 		IsArchived:        false,
 		CreatedAt:         utils.Now(),
-	}
+	}, nil
 }
 
 func validateCreateWebtrackerRequest(webtracker *models.WebTracker) error {
@@ -153,4 +167,24 @@ func validateCreateWebtrackerRequest(webtracker *models.WebTracker) error {
 	default:
 		return nil
 	}
+}
+
+func (s *webtrackerService) generateCNAMEHost(ctx context.Context, domain string) (string, error) {
+	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.generateCNAMEHost")
+	defer span.Finish()
+
+	defaultDomain := DEFAULT_CNAME_HOST + "." + domain
+
+	cname, err := net.LookupCNAME(defaultDomain)
+	if err != nil {
+		err := errors.Wrap(err, fmt.Sprintf("Error looking up CNAME for %s", domain))
+		span.TraceError(err)
+		return "", err
+	}
+
+	if cname != domain+"." {
+		return DEFAULT_CNAME_HOST + "-" + utils.GenerateNanoID(4), nil
+	}
+
+	return DEFAULT_CNAME_HOST, nil
 }
