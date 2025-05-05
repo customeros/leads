@@ -3,7 +3,7 @@ module github.com/customeros/leads
 go 1.24.2
 
 require (
-	github.com/99designs/gqlgen v0.17.72
+	github.com/99designs/gqlgen v0.17.73
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/coocood/freecache v1.2.4
 	github.com/customeros/mailsherpa v0.3.9
