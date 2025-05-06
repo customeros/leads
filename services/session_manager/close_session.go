@@ -21,34 +21,32 @@ const (
 )
 
 func (s *sessionManager) ProcessActiveSessions(ctx context.Context) {
-	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.CloseSession")
-	defer span.Finish()
+	spans, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.ProcessActiveSessions")
+	defer spans.Finish()
 
 	// get active sessions
 	cutoffTime := time.Now().Add(-WebSessionTimeoutPageExit)
 	active, err := s.repositories.WebSessionRepository.GetActiveSessionsWithLookback(ctx, cutoffTime)
 
 	if len(active) == 0 {
+		spans.LogKV("result", "No active sessions to process")
 		return
 	}
 
 	// find sessions to close
 	sessionsToClose := s.sessionsToClose(ctx, active)
 	if err != nil {
-		span.TraceError(err)
+		spans.TraceError(err)
 		return
 	}
+	spans.LogKV("result.sessionsToClose.count", len(sessionsToClose))
 
 	// close sessions
 	var errs error
 	for _, session := range sessionsToClose {
 		closeCtx := utils.SetTenantInContext(ctx, session.Tenant)
-		span, closeCtx := telemetry.StartServiceSpan(closeCtx, "sessionManager.CloseSession")
-		defer span.Finish()
-
-		err := s.closeSession(closeCtx, session)
+		err = s.closeSession(closeCtx, session)
 		if err != nil {
-			span.TraceError(err)
 			errs = multierr.Append(errs, err)
 		}
 	}
@@ -79,10 +77,10 @@ func (s *sessionManager) sessionsToClose(ctx context.Context, activeSessions []*
 }
 
 func (s *sessionManager) closeSession(ctx context.Context, session *models.WebSession) error {
-	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.closeSessions")
-	defer span.Finish()
+	spans, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.closeSession")
+	defer spans.Finish()
 
-	if session != nil {
+	if session == nil {
 		return nil
 	}
 
@@ -93,7 +91,7 @@ func (s *sessionManager) closeSession(ctx context.Context, session *models.WebSe
 
 	payload, err := proto.Marshal(event)
 	if err != nil {
-		span.TraceError(err)
+		spans.TraceError(err)
 		return err
 	}
 
@@ -115,19 +113,19 @@ func (s *sessionManager) closeSession(ctx context.Context, session *models.WebSe
 		// update websession table
 		err = s.repositories.WebSessionRepository.CloseSessionWithTxn(ctx, tx, session.ID)
 		if err != nil {
-			span.TraceError(err)
+			spans.TraceError(err)
 			return err
 		}
 
 		err = s.repositories.Outbox.CreateWithTxn(ctx, tx, outbox)
 		if err != nil {
-			span.TraceError(err)
+			spans.TraceError(err)
 			return err
 		}
 		return nil
 	})
 	if err != nil {
-		span.TraceError(err)
+		spans.TraceError(err)
 		return err
 	}
 
