@@ -7,6 +7,7 @@ package resolver
 import (
 	"context"
 	"errors"
+	"github.com/99designs/gqlgen/graphql"
 
 	"github.com/customeros/leads/api/graphql/graphql_model"
 	"github.com/customeros/leads/api/graphql/mappers"
@@ -17,8 +18,9 @@ import (
 
 // CreateWebtracker is the resolver for the createWebtracker field.
 func (r *mutationResolver) CreateWebtracker(ctx context.Context, tracker graphql_model.WebtrackerSaveInput) (*graphql_model.Webtracker, error) {
-	span, ctx := telemetry.StartGraphQLSpan(ctx, "graphQLResolvers.CreateWebtracker")
+	span, ctx := telemetry.StartGraphQLSpan(ctx, "mutationResolver.CreateWebtracker", graphql.GetOperationContext(ctx))
 	defer span.Finish()
+	span.LogObjectAsJson("request.input", tracker)
 
 	cnameHost := ""
 	if tracker.CnameHost != nil {
@@ -47,7 +49,7 @@ func (r *mutationResolver) CreateWebtracker(ctx context.Context, tracker graphql
 
 // UpdateWebtracker is the resolver for the updateWebtracker field.
 func (r *mutationResolver) UpdateWebtracker(ctx context.Context, tracker graphql_model.WebtrackerSaveInput) (*graphql_model.Webtracker, error) {
-	span, ctx := telemetry.StartGraphQLSpan(ctx, "graphQLResolvers.UpdateWebtracker")
+	span, ctx := telemetry.StartGraphQLSpan(ctx, "mutationResolver.UpdateWebtracker", graphql.GetOperationContext(ctx))
 	defer span.Finish()
 
 	if tracker.ID == nil || *tracker.ID == "" {
@@ -77,7 +79,7 @@ func (r *mutationResolver) UpdateWebtracker(ctx context.Context, tracker graphql
 
 // VerifyWebtrackerCname is the resolver for the verifyWebtrackerCname field.
 func (r *mutationResolver) VerifyWebtrackerCname(ctx context.Context, id string) (bool, error) {
-	span, ctx := telemetry.StartGraphQLSpan(ctx, "graphQLResolvers.VerifyWebtrackerCname")
+	span, ctx := telemetry.StartGraphQLSpan(ctx, "mutationResolver.VerifyWebtrackerCname", graphql.GetOperationContext(ctx))
 	defer span.Finish()
 
 	if id == "" {
@@ -91,7 +93,7 @@ func (r *mutationResolver) VerifyWebtrackerCname(ctx context.Context, id string)
 
 // ArchiveWebtracker is the resolver for the archiveWebtracker field.
 func (r *mutationResolver) ArchiveWebtracker(ctx context.Context, id string) (bool, error) {
-	span, ctx := telemetry.StartGraphQLSpan(ctx, "graphQLResolvers.VerifyWebtrackerCname")
+	span, ctx := telemetry.StartGraphQLSpan(ctx, "mutationResolver.VerifyWebtrackerCname", graphql.GetOperationContext(ctx))
 	defer span.Finish()
 
 	if id == "" {
@@ -110,7 +112,7 @@ func (r *mutationResolver) ArchiveWebtracker(ctx context.Context, id string) (bo
 
 // Webtracker is the resolver for the webtracker field.
 func (r *queryResolver) Webtracker(ctx context.Context, id string) (*graphql_model.Webtracker, error) {
-	span, ctx := telemetry.StartGraphQLSpan(ctx, "graphQLResolvers.Webtracker")
+	span, ctx := telemetry.StartGraphQLSpan(ctx, "queryResolver.Webtracker", graphql.GetOperationContext(ctx))
 	defer span.Finish()
 
 	if id == "" {
@@ -130,7 +132,7 @@ func (r *queryResolver) Webtracker(ctx context.Context, id string) (*graphql_mod
 
 // Webtrackers is the resolver for the webtrackers field.
 func (r *queryResolver) Webtrackers(ctx context.Context) ([]*graphql_model.Webtracker, error) {
-	span, ctx := telemetry.StartGraphQLSpan(ctx, "graphQLResolvers.Webtracker")
+	span, ctx := telemetry.StartGraphQLSpan(ctx, "queryResolver.Webtracker", graphql.GetOperationContext(ctx))
 	defer span.Finish()
 
 	webtrackers, err := r.services.WebtrackerService.GetActiveWebtrackers(ctx)

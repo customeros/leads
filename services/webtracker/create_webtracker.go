@@ -97,7 +97,7 @@ func (s *webtrackerService) validateWebtrackerDoesNotExist(ctx context.Context, 
 		return err
 	}
 	if record != nil {
-		err := leads_errors.ErrWebtrackerExists
+		err = leads_errors.ErrWebtrackerExists
 		span.TraceError(err)
 		return err
 	}
@@ -172,19 +172,14 @@ func validateCreateWebtrackerRequest(webtracker *models.WebTracker) error {
 func (s *webtrackerService) generateCNAMEHost(ctx context.Context, domain string) (string, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.generateCNAMEHost")
 	defer span.Finish()
+	span.LogKV("domain", domain)
 
 	defaultDomain := DEFAULT_CNAME_HOST + "." + domain
 
-	cname, err := net.LookupCNAME(defaultDomain)
+	_, err := net.LookupCNAME(defaultDomain)
 	if err != nil {
-		err := errors.Wrap(err, fmt.Sprintf("Error looking up CNAME for %s", domain))
-		span.TraceError(err)
-		return "", err
+		return DEFAULT_CNAME_HOST, nil
 	}
 
-	if cname != domain+"." {
-		return DEFAULT_CNAME_HOST + "-" + utils.GenerateNanoID(4), nil
-	}
-
-	return DEFAULT_CNAME_HOST, nil
+	return DEFAULT_CNAME_HOST + "-" + utils.GenerateNanoID(4), nil
 }
