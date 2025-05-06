@@ -34,6 +34,7 @@ func NewIPIntelligenceRepository(db *database.DbConnections) IPIntelligenceRepos
 func (r *ipIntelligenceRepository) Create(ctx context.Context, intel *models.IPIntelligence) error {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "ipIntelligenceRepository.Create")
 	defer span.Finish()
+	span.LogObjectAsJson("intel", intel)
 
 	return r.write.WithContext(ctx).Create(intel).Error
 }
