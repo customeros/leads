@@ -41,11 +41,12 @@ func (r *ipIntelligenceRepository) Create(ctx context.Context, intel *models.IPI
 func (r *ipIntelligenceRepository) FindByIP(ctx context.Context, ipAddress string) (*models.IPIntelligence, error) {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "ipIntelligenceRepository.FindByIP")
 	defer span.Finish()
+	span.LogKV("ipAddress", ipAddress)
 
 	var intel models.IPIntelligence
 	// specifically using write db connection here instead of read to ensure updates
 	// are captured in real-time as this is called right after an update in Session Manager
-	err := r.write.WithContext(ctx).
+	err := r.read.WithContext(ctx).
 		Where("ip_address = ?", ipAddress).
 		First(&intel).Error
 	if err != nil {

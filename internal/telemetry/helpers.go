@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/99designs/gqlgen/graphql"
 	"runtime/debug"
 	"time"
 
@@ -80,7 +81,7 @@ func startSpan(ctx context.Context, operationName string, opts ...SpanOptions) (
 		jaegerSpan, ctx = opentracing.StartSpanFromContext(ctx, operationName)
 	}
 
-	jaegerSpan.SetTag("service.name", "mailstack")
+	jaegerSpan.SetTag("service.name", "leads")
 	if tenant := utils.GetTenantFromContext(ctx); tenant != "" {
 		jaegerSpan.SetTag(SpanTagTenant, tenant)
 	}
@@ -89,7 +90,7 @@ func startSpan(ctx context.Context, operationName string, opts ...SpanOptions) (
 	}
 
 	// Start OpenTelemetry span
-	tracer := otel.Tracer("github.com/customeros/mailstack")
+	tracer := otel.Tracer("github.com/customeros/leads")
 	var otelCtx context.Context
 	var otelSpan trace.Span
 	if len(opts) > 0 && opts[0].NewRoot {
@@ -100,7 +101,7 @@ func startSpan(ctx context.Context, operationName string, opts ...SpanOptions) (
 	}
 
 	otelSpan.SetAttributes(
-		attribute.String("service.name", "mailstack"),
+		attribute.String("service.name", "leads"),
 	)
 	if tenant := utils.GetTenantFromContext(ctx); tenant != "" {
 		otelSpan.SetAttributes(attribute.String(SpanTagTenant, tenant))
@@ -151,10 +152,21 @@ func StartPostgresSpan(ctx context.Context, operationName string, opts ...SpanOp
 	return spans, ctx
 }
 
-func StartGraphQLSpan(ctx context.Context, operationName string, opts ...SpanOptions) (*Spans, context.Context) {
+func StartGraphQLSpan(ctx context.Context, operationName string, gqlCtx *graphql.OperationContext, opts ...SpanOptions) (*Spans, context.Context) {
 	spans, ctx := startSpan(ctx, operationName, opts...)
 	TagComponentGraphQL(spans)
 	SetSpanKindServer(spans)
+
+	// Add GraphQL operation details if available
+	if gqlCtx != nil {
+		if spans.OTel != nil {
+			spans.OTel.SetAttributes(
+				attribute.String("graphql.operation.name", gqlCtx.OperationName),
+				attribute.String("graphql.operation.type", string(gqlCtx.Operation.Operation)),
+			)
+		}
+	}
+
 	return spans, ctx
 }
 
@@ -604,7 +616,7 @@ func RecoverAndLog(ctx context.Context, spans *Spans, logger logger.Logger) {
 // GetDefaultServiceSpanAttributes returns default attributes for service spans
 func GetDefaultServiceSpanAttributes(ctx context.Context) []attribute.KeyValue {
 	attrs := []attribute.KeyValue{
-		attribute.String("service.name", "mailstack"),
+		attribute.String("service.name", "leads"),
 	}
 
 	if tenant := utils.GetTenantFromContext(ctx); tenant != "" {
