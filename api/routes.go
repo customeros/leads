@@ -8,7 +8,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.
 	"github.com/vektah/gqlparser/v2/ast"
 
 	"github.com/customeros/leads/api/graphql/generated"
@@ -31,6 +33,23 @@ func RegisterRoutes(ctx context.Context, r *gin.Engine, services *services.Servi
 
 	// Add recovery middlewares
 	r.Use(gin.Recovery()) // Gin's built-in recovery
+
+	// Configure CORS
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = []string{"*"}
+	corsConfig.AllowMethods = []string{"GET", "POST", "OPTIONS", "PUT", "DELETE"}
+	corsConfig.AllowHeaders = []string{
+		"Origin",
+		"Content-Type",
+		"Accept",
+		"Authorization",
+		"X-Requested-With",
+		"X-Tenant-ID",
+		"X-User-ID",
+	}
+	corsConfig.ExposeHeaders = []string{"Content-Length"}
+	corsConfig.AllowCredentials = true
+	r.Use(cors.New(corsConfig))
 
 	// setup handlers
 	apiHandlers := handlers.InitHandlers(services)
@@ -63,8 +82,11 @@ func RegisterRoutes(ctx context.Context, r *gin.Engine, services *services.Servi
 	query.Use(middleware.UserIdMiddleware())           // UserId header parsing
 	query.Use(middleware.CustomContextMiddleware())    // Add custom context
 	query.Use(middleware.TracingMiddleware(ctx))       // Add tracing with parent context
-	{
+		query.POST("", graphqlHandler)           // query
 		query.POST("", graphqlHandler) // query
+		query.OPTIONS("", func(c *gin.Context) { // Handle OPTIONS requests
+			c.Status(200)
+		})
 	}
 
 	return apiHandlers
@@ -89,6 +111,7 @@ func SetupGraphQLServer(services *services.Services) (graphqlHandler, playground
 	srv.AddTransport(transport.POST{})          // Support POST requests
 	srv.AddTransport(transport.GET{})           // Support GET requests
 	srv.AddTransport(transport.MultipartForm{}) // Support multipart form
+	srv.AddTransport(transport.Options{})       // Support OPTIONS requests
 	srv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
 
 	// Add extensions
