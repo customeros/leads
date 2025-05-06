@@ -73,7 +73,7 @@ func RegisterRoutes(ctx context.Context, r *gin.Engine, services *services.Servi
 
 	graphql := r.Group("/")
 	{
-		graphql.GET("/", playgroundHandler) // playground
+		graphql.GET("/playground", playgroundHandler) // playground
 	}
 
 	query := r.Group("/query")

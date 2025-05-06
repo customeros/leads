@@ -2,7 +2,6 @@ package config
 
 type AppConfig struct {
 	APIPort     string `env:"API_PORT,required" envDefault:"8080"`
-	APIKey      string `env:"API_KEY,required"`
 	Environment string `env:"ENVIRONMENT,required" envDefault:"dev"`
 }
 
