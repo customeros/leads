@@ -12,7 +12,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/matoous/go-nanoid/v2 v2.1.0
-	github.com/miekg/dns v1.1.63
+	github.com/miekg/dns v1.1.65
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nats-io/nats.go v1.42.0
 	github.com/opentracing/opentracing-go v1.2.0
