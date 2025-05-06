@@ -10,7 +10,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.
 	"github.com/vektah/gqlparser/v2/ast"
 
 	"github.com/customeros/leads/api/graphql/generated"
@@ -82,12 +81,10 @@ func RegisterRoutes(ctx context.Context, r *gin.Engine, services *services.Servi
 	query.Use(middleware.UserIdMiddleware())           // UserId header parsing
 	query.Use(middleware.CustomContextMiddleware())    // Add custom context
 	query.Use(middleware.TracingMiddleware(ctx))       // Add tracing with parent context
-		query.POST("", graphqlHandler)           // query
-		query.POST("", graphqlHandler) // query
-		query.OPTIONS("", func(c *gin.Context) { // Handle OPTIONS requests
-			c.Status(200)
-		})
-	}
+	query.POST("", graphqlHandler)                     // query
+	query.OPTIONS("", func(c *gin.Context) {           // Handle OPTIONS requests
+		c.Status(200)
+	})
 
 	return apiHandlers
 }
