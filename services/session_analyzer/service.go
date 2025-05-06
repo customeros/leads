@@ -1,11 +1,10 @@
-package proxy_manager
+package session_analyzer
 
 import (
 	"context"
 	"errors"
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/nats-io/nats.go"
@@ -13,7 +12,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/customeros/leads/interfaces"
-	"github.com/customeros/leads/internal/database"
 	"github.com/customeros/leads/internal/enum"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/repository"
@@ -22,37 +20,29 @@ import (
 	"github.com/customeros/leads/proto/pb"
 )
 
-type ProxyManagerService interface {
-	interfaces.NatsService
-	CheckCNAME(ctx context.Context)
-}
-
-type proxyManagerService struct {
+type sessionAnalyzer struct {
 	natsConn     *nats_internal.NATSConnections
-	leadsDB      *database.DbConnections
 	repositories *repository.Repositories
 }
 
-func NewProxyManagerService(
+func NewSessionAnalyzer(
 	natsConn *nats_internal.NATSConnections,
-	leadsDB *database.DbConnections,
-	repositories *repository.Repositories,
-) ProxyManagerService {
-	return &proxyManagerService{
+	repository *repository.Repositories,
+) interfaces.NatsService {
+	return &sessionAnalyzer{
 		natsConn:     natsConn,
-		leadsDB:      leadsDB,
-		repositories: repositories,
+		repositories: repository,
 	}
 }
 
-var SUBSCRIBED_SUBJECT = enum.EventWebtrackerCreated.String()
+var SUBSCRIBED_SUBJECT = enum.EventWebtrackerSessionClosed.String()
 
 const (
 	// queue group
-	QUEUE_GROUP = "proxy-manager-service"
+	QUEUE_GROUP = "session-analyzer"
 
 	// consumer config
-	CONSUMER_NAME         = "proxy-manager-consumer"
+	CONSUMER_NAME         = "session-analyzer-consumer"
 	ACK_WAIT              = 30 * time.Second
 	MAX_DELIVERY_ATTEMPTS = 5
 	MAX_ACK_PENDING       = 100
@@ -62,7 +52,7 @@ const (
 )
 
 // Start begins listening for raw email events and processing them
-func (s *proxyManagerService) Start(ctx context.Context) error {
+func (s *sessionAnalyzer) Start(ctx context.Context) error {
 	// Create durable consumer for processing emails
 	_, err := s.natsConn.JS.AddConsumer(nats_internal.LEADS_STREAM, &nats.ConsumerConfig{
 		Durable:       CONSUMER_NAME,
@@ -94,13 +84,13 @@ func (s *proxyManagerService) Start(ctx context.Context) error {
 	return nil
 }
 
-// processRawEvents continuously processes raw email events
-func (s *proxyManagerService) processRawEvents(ctx context.Context, sub *nats.Subscription) {
-	log.Println("Proxy Manager Service started")
+// processRawEmailEvents continuously processes raw email events
+func (s *sessionAnalyzer) processRawEvents(ctx context.Context, sub *nats.Subscription) {
+	log.Println("Session Analyzer started")
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("Proxy Manager Service shutting down")
+			log.Println("Session Analyzer shutting down")
 			return
 		default:
 			s.processBatch(ctx, sub)
@@ -109,7 +99,7 @@ func (s *proxyManagerService) processRawEvents(ctx context.Context, sub *nats.Su
 }
 
 // processBatch fetches and processes a batch of messages
-func (s *proxyManagerService) processBatch(ctx context.Context, sub *nats.Subscription) {
+func (s *sessionAnalyzer) processBatch(ctx context.Context, sub *nats.Subscription) {
 	// Fetch messages batch
 	msgs, err := sub.Fetch(FETCH_BATCH_SIZE, nats.MaxWait(MAX_FETCH_WAIT))
 	if err != nil {
@@ -119,13 +109,13 @@ func (s *proxyManagerService) processBatch(ctx context.Context, sub *nats.Subscr
 
 	for _, msg := range msgs {
 		msgCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		s.processMessage(msgCtx, msg)
+		s.routeMessage(msgCtx, msg)
 		cancel()
 	}
 }
 
 // handleFetchError handles errors that occur during message fetching
-func (s *proxyManagerService) handleFetchError(err error) {
+func (s *sessionAnalyzer) handleFetchError(err error) {
 	if errors.Is(err, nats.ErrTimeout) {
 		// No messages available, this is normal
 		return
@@ -134,10 +124,9 @@ func (s *proxyManagerService) handleFetchError(err error) {
 	time.Sleep(ERR_BACKOFF) // Small backoff on error
 }
 
-// processMessage processes a single email message
-func (s *proxyManagerService) processMessage(ctx context.Context, msg *nats.Msg) {
+func (s *sessionAnalyzer) routeMessage(ctx context.Context, msg *nats.Msg) {
 	ctx = utils.WithCustomContextFromNats(ctx, msg)
-	spans, ctx := telemetry.StartServiceSpan(ctx, "emailStorageService.processMessage")
+	spans, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.processMessage")
 	defer spans.Finish()
 
 	if msg == nil {
@@ -147,21 +136,9 @@ func (s *proxyManagerService) processMessage(ctx context.Context, msg *nats.Msg)
 	spans.TagString("nats.subject", msg.Subject)
 	spans.TagString("nats.reply", msg.Reply)
 
-	message := &pb.WebTrackerCreated{}
-	err := proto.Unmarshal(msg.Data, message)
+	err := s.AnalyzeSession(ctx, msg)
 	if err != nil {
-		err := errors.New("failed to parse message")
 		spans.TraceError(err)
-		s.handleProcessingError(ctx, msg, err)
-		return
-	}
-
-	// Process the email
-	err = s.handleNewTrackerCreated(ctx, message)
-	if err != nil {
-		if !strings.Contains(err.Error(), "skipping") {
-			spans.TraceError(err)
-		}
 		s.handleProcessingError(ctx, msg, err)
 		return
 	}
@@ -171,7 +148,7 @@ func (s *proxyManagerService) processMessage(ctx context.Context, msg *nats.Msg)
 }
 
 // handleProcessingError deals with errors during email processing
-func (s *proxyManagerService) handleProcessingError(ctx context.Context, msg *nats.Msg, err error) {
+func (s *sessionAnalyzer) handleProcessingError(ctx context.Context, msg *nats.Msg, err error) {
 	metadata, _ := msg.Metadata()
 
 	// Check if we should retry
@@ -186,14 +163,14 @@ func (s *proxyManagerService) handleProcessingError(ctx context.Context, msg *na
 }
 
 // Close gracefully shuts down the service
-func (s *proxyManagerService) Stop() {
+func (s *sessionAnalyzer) Stop() {
 	if s.natsConn != nil {
 		s.natsConn.Close()
 	}
 	return
 }
 
-func (s *proxyManagerService) publishError(ctx context.Context, msg *nats.Msg, err error) {
+func (s *sessionAnalyzer) publishError(ctx context.Context, msg *nats.Msg, err error) {
 	spans, ctx := telemetry.StartServiceSpan(ctx, "proxyManagerService.publishError")
 	defer spans.Finish()
 

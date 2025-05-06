@@ -1,22 +1,42 @@
-package session_manager
+package session_analyzer
 
 import (
 	"context"
 
 	"github.com/nats-io/nats.go"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/customeros/leads/internal/enum"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
+	"github.com/customeros/leads/proto/pb"
 )
 
-func (s *sessionManager) AnalyzeSession(ctx context.Context, msg *nats.Msg) error {
+func (s *sessionAnalyzer) AnalyzeSession(ctx context.Context, msg *nats.Msg) error {
+	span, ctx := telemetry.StartServiceSpan(ctx, "sessionAnalyzer.AnalyzeSession")
+	defer span.Finish()
+
+	message := s.getNatsMessage(ctx, msg)
+
 	return nil
 }
 
-func (s *sessionManager) determineLeadSource(ctx context.Context, href, referrer string) (LeadSource, error) {
-	spans, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.determineLeadSource")
-	defer spans.Finish()
+func (s *sessionAnalyzer) getNatsMessage(ctx context.Context, msg *nats.Msg) (*pb.WebTrackerSessionClosed, error) {
+	span, ctx := telemetry.StartServiceSpan(ctx, "sessionAnalyzer.getNatsMessage")
+	defer span.Finish()
+
+	message := &pb.WebTrackerSessionClosed{}
+	err := proto.Unmarshal(msg.Data, message)
+	if err != nil {
+		span.TraceError(err)
+		return nil, err
+	}
+	return message, nil
+}
+
+func (s *sessionAnalyzer) determineLeadSource(ctx context.Context, href, referrer string) (LeadSource, error) {
+	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.determineLeadSource")
+	defer span.Finish()
 
 	leadSource := LeadSource{}
 

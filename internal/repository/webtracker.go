@@ -325,7 +325,7 @@ func (r *webTrackerRepository) CNAMEConfiguredWithTxn(ctx context.Context, txn *
 		Updates(map[string]interface{}{
 			"is_cname_configured": true,
 			"check_cname_after":   nil,
-			"cname_check_count":   nil,
+			"cname_check_count":   0,
 		})
 
 	if result.RowsAffected == 0 {

@@ -66,12 +66,12 @@ func (s *sessionManager) sessionsToClose(ctx context.Context, activeSessions []*
 	sessionsToClose := make([]*models.WebSession, 0)
 
 	for _, session := range activeSessions {
-		if session.LastEvent == enum.EventWebtrackerPageExit {
+		if session.LastEventType == enum.EventWebtrackerPageExit {
 			sessionsToClose = append(sessionsToClose, session)
 		}
 
 		pageViewCutoffTime := time.Now().Add(-WebSessionTimeoutPageView)
-		if session.LastEvent != enum.EventWebtrackerPageExit && session.Timestamp.Before(pageViewCutoffTime) {
+		if session.LastEventType != enum.EventWebtrackerPageExit && session.LastEventAt.Before(pageViewCutoffTime) {
 			sessionsToClose = append(sessionsToClose, session)
 		}
 	}

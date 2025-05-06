@@ -1,4 +1,4 @@
-package session_manager
+package session_analyzer
 
 import (
 	"net/url"

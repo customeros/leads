@@ -102,7 +102,7 @@ func (s *webtrackerService) GetWebtracker(ctx context.Context, webtrackerID stri
 }
 
 func (s *webtrackerService) GetActiveWebtrackers(ctx context.Context) ([]models.WebTracker, error) {
-	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.GetWebtracker")
+	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.GetActiveWebtrackers")
 	defer span.Finish()
 
 	return s.repositories.WebTracker.GetActiveTrackers(ctx)
