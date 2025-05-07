@@ -17,7 +17,6 @@ import (
 
 // Define the interface for the repository
 func NewLoggingClient(repo repository.APICallLogRepository, vendor enum.APIVendor) *http.Client {
-	// TODO add timeout optionally
 	return &http.Client{
 		Transport: &dbLoggingTransport{
 			base:   http.DefaultTransport,
