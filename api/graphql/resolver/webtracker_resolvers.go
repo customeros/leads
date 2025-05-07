@@ -135,7 +135,7 @@ func (r *queryResolver) Webtrackers(ctx context.Context) ([]*graphql_model.Webtr
 	span, ctx := telemetry.StartGraphQLSpan(ctx, "queryResolver.Webtrackers", graphql.GetOperationContext(ctx))
 	defer span.Finish()
 
-	webtrackers, err := r.services.WebtrackerService.GetActiveWebtrackers(ctx)
+	webtrackers, err := r.services.WebtrackerService.GetWebtrackers(ctx)
 	if err != nil {
 		span.TraceError(err)
 		return nil, err
