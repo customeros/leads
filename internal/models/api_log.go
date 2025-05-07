@@ -17,7 +17,7 @@ type APICallLog struct {
 	Duration     int            `gorm:"column:duration;type:int;not null"`
 	StatusCode   *int           `gorm:"column:status_code;type:int;not null"`
 	ResponseBody *[]byte        `gorm:"column:response_body;type:bytea"`
-	ErrorMessage *string        `gorm:"column:error_message;type:text;not null"`
+	ErrorMessage *string        `gorm:"column:error_message;type:text"`
 }
 
 func (APICallLog) TableName() string {
