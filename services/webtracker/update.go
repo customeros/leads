@@ -48,24 +48,6 @@ func (s *webtrackerService) UpdateCNAMEHost(ctx context.Context, webtrackerID, c
 	return trackerRecord, nil
 }
 
-func (s *webtrackerService) IsCNAMEConfigured(ctx context.Context, webtrackerID string) (bool, error) {
-	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.IsCNAMEConfigured")
-	defer span.Finish()
-
-	trackerRecord, err := s.repositories.WebTracker.GetByID(ctx, webtrackerID)
-	if err != nil {
-		span.TraceError(err)
-		return false, err
-	}
-	if trackerRecord == nil {
-		err := errors.New("Cannot find webtracker")
-		span.TraceError(err)
-		return false, err
-	}
-
-	return trackerRecord.IsCNAMEConfigured, nil
-}
-
 func (s *webtrackerService) ArchiveWebtracker(ctx context.Context, webtrackerID string) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.ArchiveWebtracker")
 	defer span.Finish()
@@ -82,28 +64,4 @@ func (s *webtrackerService) ArchiveWebtracker(ctx context.Context, webtrackerID 
 	}
 
 	return s.repositories.WebTracker.Archive(ctx, webtrackerID)
-}
-
-func (s *webtrackerService) GetWebtracker(ctx context.Context, webtrackerID string) (*models.WebTracker, error) {
-	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.GetWebtracker")
-	defer span.Finish()
-
-	trackerRecord, err := s.repositories.WebTracker.GetByID(ctx, webtrackerID)
-	if err != nil {
-		span.TraceError(err)
-		return nil, err
-	}
-	if trackerRecord == nil {
-		err := errors.New("Cannot find webtracker")
-		span.TraceError(err)
-		return nil, err
-	}
-	return trackerRecord, nil
-}
-
-func (s *webtrackerService) GetActiveWebtrackers(ctx context.Context) ([]models.WebTracker, error) {
-	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.GetActiveWebtrackers")
-	defer span.Finish()
-
-	return s.repositories.WebTracker.GetActiveTrackers(ctx)
 }

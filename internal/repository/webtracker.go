@@ -22,6 +22,7 @@ type WebTrackerRepository interface {
 	CreateWithTxn(ctx context.Context, txn *gorm.DB, tracker *models.WebTracker) error
 	GetByID(ctx context.Context, id string) (*models.WebTracker, error)
 	GetByDomain(ctx context.Context, id string) (*models.WebTracker, error)
+	GetTrackers(ctx context.Context) ([]models.WebTracker, error)
 	GetActiveTrackers(ctx context.Context) ([]models.WebTracker, error)
 	Update(ctx context.Context, record dto.WebTrackerUpdate) error
 	UpdateLastEventAt(ctx context.Context, trackerID string, timestamp time.Time) error
@@ -131,6 +132,28 @@ func (r *webTrackerRepository) GetByDomain(ctx context.Context, domain string) (
 	return &tracker, nil
 }
 
+func (r *webTrackerRepository) GetTrackers(ctx context.Context) ([]models.WebTracker, error) {
+	span, ctx := telemetry.StartPostgresSpan(ctx, "webTrackerRepository.GetTrackers")
+	defer span.Finish()
+
+	tenant := utils.GetTenantFromContext(ctx)
+	if tenant == "" {
+		err := leads_errors.ErrTenantMissing
+		span.TraceError(err)
+		return nil, err
+	}
+
+	var trackers []models.WebTracker
+	result := r.read.WithContext(ctx).
+		Where("tenant = ?", tenant).
+		Where("is_archived = ?", false).
+		Order("domain").
+		Find(&trackers)
+
+	span.LogKV("result.count", len(trackers))
+	return trackers, result.Error
+}
+
 // GetActiveTrackers retrieves all active non-archived WebTrackers
 func (r *webTrackerRepository) GetActiveTrackers(ctx context.Context) ([]models.WebTracker, error) {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "webTrackerRepository.GetActiveTrackers")
@@ -148,7 +171,10 @@ func (r *webTrackerRepository) GetActiveTrackers(ctx context.Context) ([]models.
 		Where("tenant = ?", tenant).
 		Where("is_archived = ?", false).
 		Where("is_proxy_active = ?", true).
+		Order("domain").
 		Find(&trackers)
+
+	span.LogKV("result.count", len(trackers))
 	return trackers, result.Error
 }
 

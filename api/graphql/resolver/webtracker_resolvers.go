@@ -132,7 +132,7 @@ func (r *queryResolver) Webtracker(ctx context.Context, id string) (*graphql_mod
 
 // Webtrackers is the resolver for the webtrackers field.
 func (r *queryResolver) Webtrackers(ctx context.Context) ([]*graphql_model.Webtracker, error) {
-	span, ctx := telemetry.StartGraphQLSpan(ctx, "queryResolver.Webtracker", graphql.GetOperationContext(ctx))
+	span, ctx := telemetry.StartGraphQLSpan(ctx, "queryResolver.Webtrackers", graphql.GetOperationContext(ctx))
 	defer span.Finish()
 
 	webtrackers, err := r.services.WebtrackerService.GetActiveWebtrackers(ctx)
