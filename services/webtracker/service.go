@@ -16,6 +16,7 @@ type WebtrackerService interface {
 	ArchiveWebtracker(ctx context.Context, webtrackerID string) error
 	GetWebtracker(ctx context.Context, webtrackerID string) (*models.WebTracker, error)
 	GetWebtrackerByOrigin(ctx context.Context, origin string) (*models.WebTracker, error)
+	GetWebtrackers(ctx context.Context) ([]models.WebTracker, error)
 	GetActiveWebtrackers(ctx context.Context) ([]models.WebTracker, error)
 	IsCNAMEConfigured(ctx context.Context, webtrackerID string) (bool, error)
 }
