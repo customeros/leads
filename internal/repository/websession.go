@@ -18,6 +18,7 @@ import (
 // WebSessionRepository defines the interface for web session operations
 type WebSessionRepository interface {
 	Save(ctx context.Context, session *models.WebSession) error
+	SaveWithTxn(ctx context.Context, tx *gorm.DB, session *models.WebSession) error
 	GetActiveSessionsWithLookback(ctx context.Context, olderThan time.Time) ([]*models.WebSession, error)
 	GetInactiveSessions(ctx context.Context) ([]*models.WebSession, error)
 	UpdateLastEvent(ctx context.Context, sessionID string, event enum.Events, timestamp time.Time) error
@@ -55,6 +56,8 @@ func (r *webSessionRepository) Save(ctx context.Context, session *models.WebSess
 		return ErrTrackerIdMissing
 	}
 
+	spans.TagEntity(session.ID)
+
 	session.Tenant = utils.GetTenantFromContext(ctx)
 
 	// Use context with DB
@@ -72,13 +75,57 @@ func (r *webSessionRepository) Save(ctx context.Context, session *models.WebSess
 	// Create or update
 	if count == 0 {
 		// Create
-		err := tx.Create(session).Error
+		err = tx.Create(session).Error
 		if err != nil {
 			return fmt.Errorf("failed to create session: %w", err)
 		}
 	} else {
 		// Update
-		err := tx.Model(&models.WebSession{}).
+		err = tx.Model(&models.WebSession{}).
+			Where("id = ?", session.ID).
+			Updates(session).Error
+		if err != nil {
+			return fmt.Errorf("failed to update session: %w", err)
+		}
+	}
+	return nil
+}
+
+func (r *webSessionRepository) SaveWithTxn(ctx context.Context, tx *gorm.DB, session *models.WebSession) error {
+	span, ctx := telemetry.StartPostgresSpan(ctx, "webSessionRepository.SaveWithTxn")
+	defer span.Finish()
+
+	if session == nil || session.ID == "" {
+		return ErrInvalidSession
+	}
+	if session.TrackerID == "" {
+		return ErrTrackerIdMissing
+	}
+	span.TagEntity(session.ID)
+
+	session.Tenant = utils.GetTenantFromContext(ctx)
+
+	// Check if the session exists
+	var count int64
+	err := tx.Model(&models.WebSession{}).
+		Where("id = ?", session.ID).
+		Count(&count).Error
+	if err != nil {
+		span.TraceError(err)
+		return fmt.Errorf("failed to check session existence: %w", err)
+	}
+
+	// Create or update
+	if count == 0 {
+		// Create
+		err = tx.Create(session).Error
+		if err != nil {
+			span.TraceError(err)
+			return fmt.Errorf("failed to create session: %w", err)
+		}
+	} else {
+		// Update
+		err = tx.Model(&models.WebSession{}).
 			Where("id = ?", session.ID).
 			Updates(session).Error
 		if err != nil {

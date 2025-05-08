@@ -8,18 +8,18 @@ import (
 
 type WebSession struct {
 	// Primary identification
-	ID        string `gorm:"column:id;primaryKey;type:uuid;default:gen_random_uuid()"`
-	TrackerID string `gorm:"column:lead_id;type:varchar(255);index;not null"`
+	ID        string `gorm:"column:id;primaryKey;type:varchar(255)"`
+	TrackerID string `gorm:"column:tracker_id;type:varchar(255);index;not null"`
 	Tenant    string `gorm:"column:tenant;type:varchar(255);index;not null"`
-	VisitorID string `gorm:"column:lead_id;type:varchar(255);index;not null"`
-	ContactID string `gorm:"column:lead_id;type:varchar(255);index;not null"`
-	CompanyID string `gorm:"column:lead_id;type:varchar(255);index;not null"`
-	SessionID string `gorm:"column:session_id;type:varchar(255);uniqueIndex"`
+	VisitorID string `gorm:"column:visitor_id;type:varchar(255);index;not null"`
+	ContactID string `gorm:"column:contact_id;type:varchar(255);index;not null"`
+	CompanyID string `gorm:"column:company_id;type:varchar(255);index;not null"`
+	IP        string `gorm:"column:ip;type:varchar(255)"`
 
 	// Session timing
-	StartedAt       time.Time  `gorm:"column:session_started_at;type:timestamptz;not null;index"`
-	LastEventAt     *time.Time `gorm:"column:session_started_at;type:timestamptz;not null;index"`
-	EndedAt         *time.Time `gorm:"column:session_ended_at;type:timestamptz"`
+	StartedAt       time.Time  `gorm:"column:started_at;type:timestamptz;not null;index"`
+	LastEventAt     *time.Time `gorm:"column:last_event_at;type:timestamptz;index"`
+	EndedAt         *time.Time `gorm:"column:ended_at;type:timestamptz"`
 	SessionDuration int        `gorm:"column:session_duration;type:integer"` // in seconds
 
 	// Session metrics
@@ -55,4 +55,8 @@ type WebSession struct {
 
 	// System fields
 	CreatedAt time.Time `gorm:"column:created_at;type:timestamptz;not null;default:now()"`
+}
+
+func (WebSession) TableName() string {
+	return "web_sessions"
 }
