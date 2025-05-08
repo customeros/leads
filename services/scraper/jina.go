@@ -10,17 +10,21 @@ import (
 	"time"
 
 	"github.com/customeros/mailsherpa/domaincheck"
+	"google.golang.org/protobuf/proto"
+	"gorm.io/gorm"
 
 	"github.com/customeros/leads/internal/clients"
 	"github.com/customeros/leads/internal/enum"
 	"github.com/customeros/leads/internal/models"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
+	"github.com/customeros/leads/proto/pb"
 )
 
 var (
 	ErrPaymentRequired = errors.New("jina balance requires topup")
 	ErrUnprocessable   = errors.New("jina cannot process webpage")
+	ErrUrlNotReachable = errors.New("url is not reachable")
 )
 
 func (s *scraperService) ScrapeWithJina(ctx context.Context, url string) (string, error) {
@@ -40,27 +44,26 @@ func (s *scraperService) ScrapeWithJina(ctx context.Context, url string) (string
 		return cachedData, nil
 	}
 
+	isReachable := checkUrlIsReachable(url)
+	if !isReachable {
+		return "", ErrUrlNotReachable
+	}
+
 	// fetch page contents
+	_, primaryDomain := domaincheck.PrimaryDomainCheck(utils.ExtractDomain(url))
+
 	contents, err := s.fetchPageWithJina(ctx, url)
 	if err != nil {
-		switch err {
-		case ErrPaymentRequired:
-			spans.TraceError(err)
-			return "", nil
-
-		case ErrUnprocessable:
-			spans.LogKV("error", ErrUnprocessable)
-			return "", err
-
-		default:
+		spans.TraceError(err)
+		err := s.handleScraperError(ctx, primaryDomain, cleanUrl, err.Error())
+		if err != nil {
 			spans.TraceError(err)
 			return "", err
 		}
+		return "", err
 	}
 
-	// write scraped content to db
-	_, primaryDomain := domaincheck.PrimaryDomainCheck(utils.ExtractDomain(url))
-
+	// evaluate scraped content
 	switch {
 	case strings.Contains(contents, "403 Forbidden") || strings.Contains(contents, "Robot Challenge"):
 		err := s.handleScraperError(ctx, primaryDomain, cleanUrl, ErrUnprocessable.Error())
@@ -80,27 +83,76 @@ func (s *scraperService) ScrapeWithJina(ctx context.Context, url string) (string
 
 	default:
 		content, links := processWebContent(ctx, contents)
+		err := s.handleScrapesSuccess(ctx, primaryDomain, cleanUrl, content, links)
+		if err != nil {
+			spans.TraceError(err)
+			return "", err
+		}
+		return content, nil
+	}
+}
 
-		err := s.repositories.ContentRepository.Create(ctx, &models.Content{
-			Domain:  primaryDomain,
+func (s *scraperService) handleScrapesSuccess(ctx context.Context, domain, url, content string, links []string) error {
+	span, ctx := telemetry.StartServiceSpan(ctx, "scraperService.handlScraperSuccess")
+	defer span.Finish()
+
+	event := &pb.WebsiteScraped{
+		Domain: domain,
+		Url:    url,
+	}
+
+	payload, err := proto.Marshal(event)
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	// create outbox event
+	outbox := &models.OutboxEvent{
+		ID:        utils.GenerateEventID(),
+		EventType: enum.EventWebpageScraped,
+		EntityID:  domain,
+		Publisher: enum.ScraperService,
+		Payload:   payload,
+		Status:    enum.OutboxPending,
+		CreatedAt: utils.Now(),
+	}
+
+	err = s.leadsDB.WriteDB.Transaction(func(tx *gorm.DB) error {
+		// create content record
+		err := s.repositories.Content.Create(ctx, &models.Content{
+			Domain:  domain,
 			Url:     url,
 			Content: content,
 			Links:   links,
 		})
 		if err != nil {
-			spans.TraceError(err)
-			return "", err
+			span.TraceError(err)
+			return err
 		}
 
-		return contents, nil
+		// write outbox event
+		err = s.repositories.Outbox.CreateWithTxn(ctx, tx, outbox)
+		if err != nil {
+			span.TraceError(err)
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		span.TraceError(err)
+		return err
 	}
+
+	return nil
 }
 
 func (s *scraperService) handleScraperError(ctx context.Context, domain, url, errMsg string) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "scraperService.handleScraperError")
 	defer span.Finish()
 
-	err := s.repositories.ContentRepository.Create(ctx, &models.Content{
+	err := s.repositories.Content.Create(ctx, &models.Content{
 		Domain:       domain,
 		Url:          url,
 		ErrorMessage: errMsg,
@@ -158,7 +210,7 @@ func (s *scraperService) fetchPageWithJina(ctx context.Context, url string) (str
 
 	// Add a timeout
 	clientTimeout := 15 * time.Second
-	httpClient := clients.NewLoggingClient(s.repositories.APICallLogRepository, enum.VendorJina, &clientTimeout)
+	httpClient := clients.NewLoggingClient(s.repositories.APICallLog, enum.VendorJina, &clientTimeout)
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
@@ -196,7 +248,7 @@ func (s *scraperService) checkCache(ctx context.Context, url string) (string, er
 	spans, ctx := telemetry.StartServiceSpan(ctx, "webscraperService.checkCache")
 	defer spans.Finish()
 
-	record, err := s.repositories.ContentRepository.GetByUrl(ctx, url)
+	record, err := s.repositories.Content.GetByUrl(ctx, url)
 	if err != nil {
 		spans.TraceError(err)
 		return "", err
@@ -215,4 +267,18 @@ func cleanUrl(url string) string {
 		url = "https://" + url
 	}
 	return url
+}
+
+func checkUrlIsReachable(url string) bool {
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Head(url)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	return resp.StatusCode >= 200 && resp.StatusCode < 300
 }

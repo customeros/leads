@@ -26,7 +26,7 @@ func (s *sessionManager) ProcessActiveSessions(ctx context.Context) {
 
 	// get active sessions
 	cutoffTime := time.Now().Add(-WebSessionTimeoutPageExit)
-	active, err := s.repositories.WebSessionRepository.GetActiveSessionsWithLookback(ctx, cutoffTime)
+	active, err := s.repositories.WebSession.GetActiveSessionsWithLookback(ctx, cutoffTime)
 
 	if len(active) == 0 {
 		spans.LogKV("result", "No active sessions to process")
@@ -111,7 +111,7 @@ func (s *sessionManager) closeSession(ctx context.Context, session *models.WebSe
 	// Start a transaction
 	err = s.leadsDB.WriteDB.Transaction(func(tx *gorm.DB) error {
 		// update websession table
-		err = s.repositories.WebSessionRepository.CloseSessionWithTxn(ctx, tx, session.ID)
+		err = s.repositories.WebSession.CloseSessionWithTxn(ctx, tx, session.ID)
 		if err != nil {
 			spans.TraceError(err)
 			return err

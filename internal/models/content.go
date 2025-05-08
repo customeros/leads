@@ -15,13 +15,14 @@ type Content struct {
 	Links   pq.StringArray `gorm:"column:links;type:text[]"`
 
 	// Content classification
-	PrimaryTopic     string         `gorm:"column:primary_topic;type:varchar(255)"`
-	SecondaryTopics  pq.StringArray `gorm:"column:secondary_topics;type:text[]"`
-	SolutionFocus    pq.StringArray `gorm:"column:solution_focus;type:text[];index"`
-	ContentType      string         `gorm:"column:content_type;type:varchar(255)"`
-	IndustryVertical string         `gorm:"column:industry_vertical;type:varchar(255)"`
-	KeyPainPoints    pq.StringArray `gorm:"column:key_pain_points;type:text[]"`
-	ValueProposition string         `gorm:"column:value_proposition;type:varchar(255)"`
+	PrimaryTopic        string         `gorm:"column:primary_topic;type:varchar(255)"`
+	SecondaryTopics     pq.StringArray `gorm:"column:secondary_topics;type:text[]"`
+	SolutionFocus       pq.StringArray `gorm:"column:solution_focus;type:text[];index"`
+	ContentType         string         `gorm:"column:content_type;type:varchar(255)"`
+	IndustryVertical    string         `gorm:"column:industry_vertical;type:varchar(255)"`
+	KeyPainPoints       pq.StringArray `gorm:"column:key_pain_points;type:text[]"`
+	ValueProposition    string         `gorm:"column:value_proposition;type:varchar(255)"`
+	ReferencedCustomers pq.StringArray `gorm:"column:referencedCustomers;type:text[]"`
 
 	// Intent signals - using integer scoring (1-4)
 	ProblemRecognitionScore int `gorm:"column:problem_recognition_score;type:smallint"`

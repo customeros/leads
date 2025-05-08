@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"log"
 	"time"
 
 	"gorm.io/gorm"
@@ -11,25 +12,42 @@ import (
 )
 
 type Repositories struct {
-	APICallLogRepository APICallLogRepository
-	ContentRepository    ContentRepository
-	IPIntelligence       IPIntelligenceRepository
-	Outbox               OutboxRepository
-	WebSessionRepository WebSessionRepository
-	WebTrackerEvent      WebTrackerEventRepository
-	WebTracker           WebTrackerRepository
+	APICallLog      APICallLogRepository
+	Content         ContentRepository
+	IPIntelligence  IPIntelligenceRepository
+	Outbox          OutboxRepository
+	ScraperEvent    ScraperEventRepository
+	WebSession      WebSessionRepository
+	WebTrackerEvent WebTrackerEventRepository
+	WebTracker      WebTrackerRepository
 }
 
 func InitRepositories(leadsDB, warehouseDB *database.DbConnections) *Repositories {
+	InitTimescaleTables(warehouseDB.WriteDB)
 	return &Repositories{
-		ContentRepository:    NewContentRepository(leadsDB),
-		IPIntelligence:       NewIPIntelligenceRepository(leadsDB),
-		Outbox:               NewOutboxRepository(leadsDB),
-		WebSessionRepository: NewWebSessionRepository(leadsDB),
-		WebTracker:           NewWebTrackerRepository(leadsDB),
+		APICallLog:      NewAPICallLogRepository(warehouseDB),
+		Content:         NewContentRepository(leadsDB),
+		IPIntelligence:  NewIPIntelligenceRepository(leadsDB),
+		Outbox:          NewOutboxRepository(leadsDB),
+		ScraperEvent:    NewScraperEventRepository(warehouseDB),
+		WebSession:      NewWebSessionRepository(leadsDB),
+		WebTrackerEvent: NewWebTrackerEventRepository(warehouseDB),
+		WebTracker:      NewWebTrackerRepository(leadsDB),
+	}
+}
 
-		APICallLogRepository: NewAPICallLogRepository(warehouseDB),
-		WebTrackerEvent:      NewWebTrackerEventRepository(warehouseDB),
+func InitTimescaleTables(db *gorm.DB) {
+	err := (&models.APICallLog{}).CreateTable(db)
+	if err != nil {
+		log.Fatalf("Unable to create WebTrackerEvent table in Warehouse")
+	}
+	err = (&models.ScraperEvent{}).CreateTable(db)
+	if err != nil {
+		log.Fatalf("Unable to create ScraperEvent table in Warehouse")
+	}
+	err = (&models.WebTrackerEvent{}).CreateTable(db)
+	if err != nil {
+		log.Fatalf("Unable to create WebTrackerEvent table in Warehouse")
 	}
 }
 
@@ -42,10 +60,11 @@ func MigrateLeadsDB(dbConfig *config.LeadsDatabaseConfig, leadsDB *gorm.DB) erro
 	db.SetMaxOpenConns(5)
 
 	err = leadsDB.AutoMigrate(
+		&models.Content{},
 		&models.IPIntelligence{},
 		&models.OutboxEvent{},
-		&models.WebTracker{},
 		&models.WebSession{},
+		&models.WebTracker{},
 	)
 
 	db.SetMaxIdleConns(dbConfig.MaxIdleConn)
@@ -65,6 +84,7 @@ func MigrateDataWarehouse(dbConfig *config.DataWarehouseConfig, warehouseDB *gor
 
 	err = warehouseDB.AutoMigrate(
 		&models.APICallLog{},
+		&models.ScraperEvent{},
 		&models.WebTrackerEvent{},
 	)
 

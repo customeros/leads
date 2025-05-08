@@ -36,7 +36,7 @@ func (s *webEventProcessor) Process(ctx context.Context, webtrackerID string, ev
 
 	// get active web session
 	sessionID := ""
-	webSession, err := s.repositories.WebSessionRepository.GetActiveSessionByTrackerAndVisitor(ctx, webtrackerID, event.VisitorId)
+	webSession, err := s.repositories.WebSession.GetActiveSessionByTrackerAndVisitor(ctx, webtrackerID, event.VisitorId)
 	if err != nil {
 		span.TraceError(err)
 		return
@@ -140,7 +140,7 @@ func (s *webEventProcessor) newSession(ctx context.Context, webtrackerID string,
 			LastEventAt: &now,
 		}
 
-		err = s.repositories.WebSessionRepository.CreateWithTxn(ctx, tx, &webSession)
+		err = s.repositories.WebSession.CreateWithTxn(ctx, tx, &webSession)
 		if err != nil {
 			span.TraceError(err)
 			return err

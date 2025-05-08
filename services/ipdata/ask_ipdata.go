@@ -48,7 +48,7 @@ func (s *IPDataService) AskIPData(ctx context.Context, ipAddress string) *pb.IPA
 
 	// Create HTTP client
 	clientTimeout := 30 * time.Second
-	httpClient := clients.NewLoggingClient(s.repositories.APICallLogRepository, enum.VendorIPData, &clientTimeout)
+	httpClient := clients.NewLoggingClient(s.repositories.APICallLog, enum.VendorIPData, &clientTimeout)
 
 	// Perform the request
 	resp, err := httpClient.Do(req)

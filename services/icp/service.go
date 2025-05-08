@@ -1,4 +1,4 @@
-package scraper
+package icp
 
 import (
 	"context"
@@ -6,59 +6,48 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/customeros/leads/internal/config"
-	"github.com/customeros/leads/internal/database"
+	"github.com/customeros/leads/interfaces"
 	"github.com/customeros/leads/internal/enum"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/repository"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
 	"github.com/customeros/leads/proto/pb"
+	"github.com/customeros/leads/services/scraper"
 )
 
-type ScraperService interface {
-	Crawl(ctx context.Context, domain string) error
+type icpService struct {
+	natsConn       *nats_internal.NATSConnections
+	repositories   *repository.Repositories
+	scraperService scraper.ScraperService
 }
 
-type scraperService struct {
-	config       *config.JinaConfig
-	natsConn     *nats_internal.NATSConnections
-	leadsDB      *database.DbConnections
-	repositories *repository.Repositories
-	visitedURLs  sync.Map
-	limiter      chan struct{}
-}
-
-func NewScraperService(
-	config *config.JinaConfig,
+func NewICPService(
 	natsConn *nats_internal.NATSConnections,
-	leadsDB *database.DbConnections,
 	repositories *repository.Repositories,
-) ScraperService {
-	return &scraperService{
-		config:       config,
-		natsConn:     natsConn,
-		leadsDB:      leadsDB,
-		repositories: repositories,
-		limiter:      make(chan struct{}, 5),
+	scraperService scraper.ScraperService,
+) interfaces.NatsService {
+	return &icpService{
+		natsConn:       natsConn,
+		repositories:   repositories,
+		scraperService: scraperService,
 	}
 }
 
-var SUBSCRIBED_SUBJECT = enum.EventWebtrackerCreated.String()
+var SUBSCRIBED_SUBJECT = enum.EventRequestICPProfile.String()
 
 const (
 	// queue group
-	QUEUE_GROUP = "scraper-service"
+	QUEUE_GROUP = "icp-service"
 
 	// consumer config
-	CONSUMER_NAME         = "scraper-consumer"
+	CONSUMER_NAME         = "icp-consumer"
 	ACK_WAIT              = 30 * time.Second
 	MAX_DELIVERY_ATTEMPTS = 5
 	MAX_ACK_PENDING       = 100
@@ -68,7 +57,7 @@ const (
 )
 
 // Start begins listening for raw email events and processing them
-func (s *scraperService) Start(ctx context.Context) error {
+func (s *icpService) Start(ctx context.Context) error {
 	// Create durable consumer for processing emails
 	_, err := s.natsConn.JS.AddConsumer(nats_internal.LEADS_STREAM, &nats.ConsumerConfig{
 		Durable:       CONSUMER_NAME,
@@ -101,12 +90,12 @@ func (s *scraperService) Start(ctx context.Context) error {
 }
 
 // processRawEvents continuously processes raw email events
-func (s *scraperService) processRawEvents(ctx context.Context, sub *nats.Subscription) {
-	log.Println("Scraper Service started")
+func (s *icpService) processRawEvents(ctx context.Context, sub *nats.Subscription) {
+	log.Println("Proxy Manager Service started")
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("Scraper Service shutting down")
+			log.Println("Proxy Manager Service shutting down")
 			return
 		default:
 			s.processBatch(ctx, sub)
@@ -115,7 +104,7 @@ func (s *scraperService) processRawEvents(ctx context.Context, sub *nats.Subscri
 }
 
 // processBatch fetches and processes a batch of messages
-func (s *scraperService) processBatch(ctx context.Context, sub *nats.Subscription) {
+func (s *icpService) processBatch(ctx context.Context, sub *nats.Subscription) {
 	// Fetch messages batch
 	msgs, err := sub.Fetch(FETCH_BATCH_SIZE, nats.MaxWait(MAX_FETCH_WAIT))
 	if err != nil {
@@ -131,7 +120,7 @@ func (s *scraperService) processBatch(ctx context.Context, sub *nats.Subscriptio
 }
 
 // handleFetchError handles errors that occur during message fetching
-func (s *scraperService) handleFetchError(err error) {
+func (s *icpService) handleFetchError(err error) {
 	if errors.Is(err, nats.ErrTimeout) {
 		// No messages available, this is normal
 		return
@@ -141,9 +130,9 @@ func (s *scraperService) handleFetchError(err error) {
 }
 
 // processMessage processes a single email message
-func (s *scraperService) processMessage(ctx context.Context, msg *nats.Msg) {
+func (s *icpService) processMessage(ctx context.Context, msg *nats.Msg) {
 	ctx = utils.WithCustomContextFromNats(ctx, msg)
-	spans, ctx := telemetry.StartServiceSpan(ctx, "scraperService.processMessage")
+	spans, ctx := telemetry.StartServiceSpan(ctx, "icpService.processMessage")
 	defer spans.Finish()
 
 	if msg == nil {
@@ -153,7 +142,7 @@ func (s *scraperService) processMessage(ctx context.Context, msg *nats.Msg) {
 	spans.TagString("nats.subject", msg.Subject)
 
 	// Process the email
-	err := s.handleNewTrackerCreated(ctx, msg)
+	err := s.handleICPProfileRequest(ctx, msg)
 	if err != nil {
 		if !strings.Contains(err.Error(), "skipping") {
 			spans.TraceError(err)
@@ -167,7 +156,7 @@ func (s *scraperService) processMessage(ctx context.Context, msg *nats.Msg) {
 }
 
 // handleProcessingError deals with errors during email processing
-func (s *scraperService) handleProcessingError(ctx context.Context, msg *nats.Msg, err error) {
+func (s *icpService) handleProcessingError(ctx context.Context, msg *nats.Msg, err error) {
 	metadata, _ := msg.Metadata()
 
 	// Check if we should retry
@@ -182,15 +171,15 @@ func (s *scraperService) handleProcessingError(ctx context.Context, msg *nats.Ms
 }
 
 // Close gracefully shuts down the service
-func (s *scraperService) Stop() {
+func (s *icpService) Stop() {
 	if s.natsConn != nil {
 		s.natsConn.Close()
 	}
 	return
 }
 
-func (s *scraperService) publishError(ctx context.Context, msg *nats.Msg, err error) {
-	spans, ctx := telemetry.StartServiceSpan(ctx, "scraperService.publishError")
+func (s *icpService) publishError(ctx context.Context, msg *nats.Msg, err error) {
+	spans, ctx := telemetry.StartServiceSpan(ctx, "icpService.publishError")
 	defer spans.Finish()
 
 	errorEvent := &pb.ErrorEvent{
