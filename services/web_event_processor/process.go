@@ -2,6 +2,7 @@ package web_event_processor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -22,6 +23,12 @@ const IP_DATA_LOOKBACK_DAYS = -90 // days
 func (s *webEventProcessor) Process(ctx context.Context, webtrackerID string, event *pb.WebTrackerEvent) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "webEventProcessor.Process")
 	defer span.Finish()
+	span.TagEntity(webtrackerID)
+
+	if event == nil {
+		span.TraceError(errors.New("nil event"))
+		return
+	}
 
 	tenant := utils.GetTenantFromContext(ctx)
 	if tenant == "" {
@@ -77,7 +84,7 @@ func (s *webEventProcessor) newSession(ctx context.Context, webtrackerID string,
 	span, ctx := telemetry.StartServiceSpan(ctx, "webEventProcessor.newSession")
 	defer span.Finish()
 
-	sessionID, err := s.createNewSession(ctx, webtrackerID, event)
+	sessionID, err := s.createNewSessionID(ctx, event)
 	if err != nil {
 		span.TraceError(err)
 		return "", err
@@ -165,8 +172,8 @@ func (s *webEventProcessor) createWebtrackerEvent(ctx context.Context, webtracke
 	return nil
 }
 
-func (s *webEventProcessor) createNewSession(ctx context.Context, webtrackerID string, event *pb.WebTrackerEvent) (string, error) {
-	span, ctx := telemetry.StartServiceSpan(ctx, "webEventProcessor.createNewSession")
+func (s *webEventProcessor) createNewSessionID(ctx context.Context, event *pb.WebTrackerEvent) (string, error) {
+	span, ctx := telemetry.StartServiceSpan(ctx, "webEventProcessor.createNewSessionID")
 	defer span.Finish()
 
 	// generate new ID

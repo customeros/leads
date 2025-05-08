@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/leads/internal/telemetry"
 	"time"
 
 	"gorm.io/gorm"
@@ -44,6 +45,9 @@ func NewWebSessionRepository(leadsDB *database.DbConnections) WebSessionReposito
 
 // Save stores a web session
 func (r *webSessionRepository) Save(ctx context.Context, session *models.WebSession) error {
+	spans, ctx := telemetry.StartPostgresSpan(ctx, "webSessionRepository.Save")
+	defer spans.Finish()
+
 	if session == nil || session.ID == "" {
 		return ErrInvalidSession
 	}
