@@ -55,27 +55,27 @@ const REQUEST_TIMEOUT = 60 * time.Second
 
 func (h *WebsiteEventsHandler) Handle() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		spans, ctx := telemetry.StartRestSpan(c.Request.Context(), "WebsiteTrackerEventsHandler.RevealWebsiteVisitors")
-		defer spans.Finish()
+		span, ctx := telemetry.StartRestSpan(c.Request.Context(), "WebsiteEventsHandler.Handle")
+		defer span.Finish()
 
-		if err := h.validateHeaders(c); err != nil {
-			spans.TraceError(err)
+		if err := h.validateHeaders(c, ctx); err != nil {
+			span.TraceError(err)
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
 
 		tenant, webtrackerID, err := h.getTenantAndTrackerID(ctx, c.GetHeader("Origin"))
 		if err != nil {
-			spans.TraceError(err)
+			span.TraceError(err)
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
 		ctx = utils.SetTenantInContext(ctx, tenant)
 
-		trackerData := h.parsePayload(c, tenant)
+		trackerData := h.parsePayload(c, ctx, tenant)
 		if trackerData == nil {
 			err = fmt.Errorf("unable to build tracking record")
-			spans.TraceError(err)
+			span.TraceError(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 			return
 		}
@@ -99,8 +99,8 @@ func (h *WebsiteEventsHandler) Handle() gin.HandlerFunc {
 	}
 }
 
-func (h *WebsiteEventsHandler) validateHeaders(c *gin.Context) error {
-	span, _ := telemetry.StartRestSpan(c.Request.Context(), "WebsiteEventsHandler.validateHeaders")
+func (h *WebsiteEventsHandler) validateHeaders(c *gin.Context, ctx context.Context) error {
+	span, ctx := telemetry.StartRestSpan(ctx, "WebsiteEventsHandler.validateHeaders")
 	defer span.Finish()
 
 	origin := c.GetHeader("Origin")
@@ -130,7 +130,7 @@ func (h *WebsiteEventsHandler) validateHeaders(c *gin.Context) error {
 }
 
 func (h *WebsiteEventsHandler) getTenantAndTrackerID(ctx context.Context, origin string) (string, string, error) {
-	span, _ := telemetry.StartRestSpan(ctx, "WebsiteEventsHandler.getTenantAndTrackerID")
+	span, ctx := telemetry.StartRestSpan(ctx, "WebsiteEventsHandler.getTenantAndTrackerID")
 	defer span.Finish()
 	span.LogKV("origin", origin)
 
@@ -139,6 +139,7 @@ func (h *WebsiteEventsHandler) getTenantAndTrackerID(ctx context.Context, origin
 	tenant, webtrackerID, err := h.cache.GetDataForOrigin(cleanedOrigin)
 	if tenant != "" {
 		span.LogKV("result.tenant.cached", tenant)
+		span.LogKV("result.webtrackerID.cached", webtrackerID)
 		return tenant, webtrackerID, nil
 	}
 
@@ -148,16 +149,23 @@ func (h *WebsiteEventsHandler) getTenantAndTrackerID(ctx context.Context, origin
 		return "", "", err
 	}
 
+	span.LogKV("result.tenant", tenant)
+	span.LogKV("result.webtrackerID", webtrackerID)
 	return tenant, webtrackerID, err
 }
 
 func (h *WebsiteEventsHandler) findTrackerIDForOrigin(ctx context.Context, cleanedOrigin string) (string, string, error) {
-	span, _ := telemetry.StartRestSpan(ctx, "WebsiteEventsHandler.findTrackerIDForOrigin")
+	span, ctx := telemetry.StartRestSpan(ctx, "WebsiteEventsHandler.findTrackerIDForOrigin")
 	defer span.Finish()
+	span.LogKV("cleanedOrigin", cleanedOrigin)
 
 	webtracker, err := h.services.WebtrackerService.GetWebtrackerByOrigin(ctx, cleanedOrigin)
 	if err != nil {
 		span.TraceError(err)
+		return "", "", err
+	}
+	if webtracker == nil {
+		err = fmt.Errorf("webtracker not found for origin: %s", cleanedOrigin)
 		return "", "", err
 	}
 
@@ -169,9 +177,10 @@ func (h *WebsiteEventsHandler) findTrackerIDForOrigin(ctx context.Context, clean
 	return webtracker.Tenant, webtracker.ID, nil
 }
 
-func (h *WebsiteEventsHandler) parsePayload(c *gin.Context, tenant string) *WebTrackerEvent {
-	span, _ := telemetry.StartRestSpan(c.Request.Context(), "WebsiteEventsHandler.parsePayload")
+func (h *WebsiteEventsHandler) parsePayload(c *gin.Context, ctx context.Context, tenant string) *WebTrackerEvent {
+	span, _ := telemetry.StartRestSpan(ctx, "WebsiteEventsHandler.parsePayload")
 	defer span.Finish()
+	span.TagTenant(tenant)
 
 	tracking := WebTrackerEvent{}
 

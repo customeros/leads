@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/customeros/leads/internal/clients"
 	"github.com/customeros/leads/internal/enum"
@@ -33,8 +34,9 @@ func (s *SnitcherService) AskSnitcher(ctx context.Context, ip string) *pb.IPAddr
 		return response
 	}
 
-	// Create HTTP client with timeout
-	client := clients.NewLoggingClient(s.repositories.APICallLogRepository, enum.VendorSnitcher)
+	// Create HTTP client
+	clientTimeout := 30 * time.Second
+	client := clients.NewLoggingClient(s.repositories.APICallLogRepository, enum.VendorSnitcher, &clientTimeout)
 
 	// Create POST request with context
 	req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("%s/company/find?ip=%s", s.config.Url, ip), nil)
