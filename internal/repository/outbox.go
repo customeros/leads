@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/customeros/leads/internal/utils"
 	"time"
 
 	"gorm.io/gorm"
@@ -52,6 +53,7 @@ func (r *outboxRepository) CreateWithTxn(ctx context.Context, txn *gorm.DB, even
 func (r *outboxRepository) GetPendingEvents(ctx context.Context, limit int) ([]*models.OutboxEvent, error) {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "outboxRepository.GetPendingEvents")
 	defer span.Finish()
+	span.LogKV("limit", limit)
 
 	var events []*models.OutboxEvent
 
@@ -61,13 +63,19 @@ func (r *outboxRepository) GetPendingEvents(ctx context.Context, limit int) ([]*
 		Order("created_at ASC").
 		Limit(limit).
 		Find(&events).Error
+	if err != nil {
+		span.TraceError(err)
+		return nil, err
+	}
 
+	span.LogKV("result.count", len(events))
 	return events, err
 }
 
 func (r *outboxRepository) MarkAsProcessing(ctx context.Context, id string, lockDuration time.Duration) error {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "outboxRepository.MarkAsProcessing")
 	defer span.Finish()
+	span.LogKV("id", id)
 
 	lockUntil := time.Now().Add(lockDuration)
 
@@ -80,6 +88,7 @@ func (r *outboxRepository) MarkAsProcessing(ctx context.Context, id string, lock
 		})
 
 	if result.Error != nil {
+		span.TraceError(result.Error)
 		return result.Error
 	}
 
@@ -93,10 +102,11 @@ func (r *outboxRepository) MarkAsProcessing(ctx context.Context, id string, lock
 func (r *outboxRepository) MarkAsCompleted(ctx context.Context, id string) error {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "outboxRepository.MarkAsCompleted")
 	defer span.Finish()
+	span.LogKV("id", id)
 
-	now := time.Now()
+	now := utils.Now()
 
-	return r.write.WithContext(ctx).
+	err := r.write.WithContext(ctx).
 		Model(&models.OutboxEvent{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
@@ -104,13 +114,21 @@ func (r *outboxRepository) MarkAsCompleted(ctx context.Context, id string) error
 			"processed_at": now,
 			"lock_until":   nil,
 		}).Error
+
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *outboxRepository) MarkAsFailed(ctx context.Context, id string, errorMessage string) error {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "outboxRepository.MarkAsFailed")
 	defer span.Finish()
+	span.LogKV("errorMessage", errorMessage, "id", id)
 
-	return r.write.WithContext(ctx).
+	err := r.write.WithContext(ctx).
 		Model(&models.OutboxEvent{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
@@ -118,6 +136,12 @@ func (r *outboxRepository) MarkAsFailed(ctx context.Context, id string, errorMes
 			"error_message": errorMessage,
 			"lock_until":    nil,
 		}).Error
+
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+	return nil
 }
 
 func (r *outboxRepository) IncrementRetryCount(ctx context.Context, id string) error {

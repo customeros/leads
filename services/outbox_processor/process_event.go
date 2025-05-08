@@ -38,7 +38,7 @@ func (s *OutboxProcessor) processEvent(ctx context.Context, event *models.Outbox
 }
 
 func (s *OutboxProcessor) processWebTrackerEvent(ctx context.Context, event *models.OutboxEvent) error {
-	span, ctx := telemetry.StartServiceSpan(ctx, "OutboxProcessor.processOutboxEvent")
+	span, ctx := telemetry.StartServiceSpan(ctx, "OutboxProcessor.processWebTrackerEvent")
 	defer span.Finish()
 
 	// write event to data warehouse
@@ -61,7 +61,7 @@ func (s *OutboxProcessor) processWebTrackerEvent(ctx context.Context, event *mod
 
 	// determine if event needs to be published
 	if !strings.HasPrefix(event.EventType.String(), "webtracker.event") {
-		err := s.publishEvent(ctx, event)
+		err = s.publishEvent(ctx, event)
 		if err != nil {
 			span.TraceError(err)
 			return err

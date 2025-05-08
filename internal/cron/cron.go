@@ -195,7 +195,7 @@ func (cm *CronManager) registerJobs(c *cronv3.Cron) {
 			Name:     "outbox",
 			Schedule: cronConfig.CronScheduleProcessOutboxEvents,
 			HandlerFunc: func(ctx context.Context) {
-				cm.services.OutboxProcessor.ProcessBatch(ctx)
+				_ = cm.services.OutboxProcessor.ProcessBatch(ctx)
 			},
 		},
 		// Add more jobs here following the same pattern

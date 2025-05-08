@@ -37,7 +37,7 @@ func (s *webEventProcessor) Process(ctx context.Context, webtrackerID string, ev
 	}
 
 	// get SessionID
-	sessionID, err := s.natsConn.SessionCache.Get(ctx, event.VisitorId)
+	sessionID, err := s.natsConn.SessionCache.Get(ctx, webtrackerID, event.VisitorId)
 	if err != nil {
 		span.TraceError(err)
 		return
@@ -84,7 +84,7 @@ func (s *webEventProcessor) newSession(ctx context.Context, webtrackerID string,
 	span, ctx := telemetry.StartServiceSpan(ctx, "webEventProcessor.newSession")
 	defer span.Finish()
 
-	sessionID, err := s.createNewSessionID(ctx, event)
+	sessionID, err := s.createNewSessionID(ctx, webtrackerID, event)
 	if err != nil {
 		span.TraceError(err)
 		return "", err
@@ -172,13 +172,14 @@ func (s *webEventProcessor) createWebtrackerEvent(ctx context.Context, webtracke
 	return nil
 }
 
-func (s *webEventProcessor) createNewSessionID(ctx context.Context, event *pb.WebTrackerEvent) (string, error) {
+func (s *webEventProcessor) createNewSessionID(ctx context.Context, webtrackerID string, event *pb.WebTrackerEvent) (string, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "webEventProcessor.createNewSessionID")
 	defer span.Finish()
+	span.LogKV("webtrackerID", webtrackerID)
 
 	// generate new ID
 	sessionID := utils.GenerateNanoIDWithPrefix("sess", 21)
-	err := s.natsConn.SessionCache.Set(ctx, event.VisitorId, sessionID)
+	err := s.natsConn.SessionCache.Set(ctx, webtrackerID, event.VisitorId, sessionID)
 	if err != nil {
 		span.TraceError(err)
 		return "", err
