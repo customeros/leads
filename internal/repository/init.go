@@ -44,6 +44,7 @@ func MigrateLeadsDB(dbConfig *config.LeadsDatabaseConfig, leadsDB *gorm.DB) erro
 		&models.IPIntelligence{},
 		&models.OutboxEvent{},
 		&models.WebTracker{},
+		&models.WebSession{},
 	)
 
 	db.SetMaxIdleConns(dbConfig.MaxIdleConn)

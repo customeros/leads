@@ -273,6 +273,13 @@ func SetSpanKindDatabase(spans *Spans) {
 }
 
 // Tagging Methods
+func (s *Spans) TagTenant(tenant string) {
+	if s == nil || tenant == "" {
+		return
+	}
+	s.TagString(SpanTagTenant, tenant)
+}
+
 func (s *Spans) TagString(key, value string) {
 	if s == nil {
 		return

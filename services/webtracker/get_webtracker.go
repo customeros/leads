@@ -2,6 +2,7 @@ package webtracker
 
 import (
 	"context"
+	"github.com/customeros/leads/internal/utils"
 	"github.com/pkg/errors"
 
 	"github.com/customeros/leads/internal/models"
@@ -29,8 +30,12 @@ func (s *webtrackerService) IsCNAMEConfigured(ctx context.Context, webtrackerID 
 func (s *webtrackerService) GetWebtrackerByOrigin(ctx context.Context, origin string) (*models.WebTracker, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.GetWebtrackerByOrigin")
 	defer span.Finish()
+	span.LogKV("origin", origin)
 
-	return s.repositories.WebTracker.GetByDomain(ctx, origin)
+	// extract domain from origin
+	domain := utils.ExtractDomain(origin)
+
+	return s.repositories.WebTracker.GetByDomain(ctx, domain)
 }
 
 func (s *webtrackerService) GetWebtracker(ctx context.Context, webtrackerID string) (*models.WebTracker, error) {

@@ -16,14 +16,20 @@ import (
 )
 
 // Define the interface for the repository
-func NewLoggingClient(repo repository.APICallLogRepository, vendor enum.APIVendor) *http.Client {
-	return &http.Client{
+func NewLoggingClient(repo repository.APICallLogRepository, vendor enum.APIVendor, timeout *time.Duration) *http.Client {
+	client := http.Client{
 		Transport: &dbLoggingTransport{
 			base:   http.DefaultTransport,
 			vendor: vendor,
 			repo:   repo,
 		},
 	}
+
+	if timeout != nil {
+		client.Timeout = *timeout
+	}
+
+	return &client
 }
 
 type dbLoggingTransport struct {

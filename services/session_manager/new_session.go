@@ -65,13 +65,13 @@ func (s *sessionManager) NewSession(ctx context.Context, msg *nats.Msg) {
 }
 
 func (s *sessionManager) processNewSession(ctx context.Context, message *pb.WebtrackerSessionNew) error {
-	spans, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.processNewSession")
-	defer spans.Finish()
+	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.processNewSession")
+	defer span.Finish()
 
 	// check if known IP
 	ipRecord, err := s.checkForExistingIPRecord(ctx, message.Ip)
 	if err != nil {
-		spans.TraceError(err)
+		span.TraceError(err)
 		return err
 	}
 
@@ -83,7 +83,7 @@ func (s *sessionManager) processNewSession(ctx context.Context, message *pb.Webt
 	// process new IP
 	ipRecord, err = s.processNewIP(ctx, message)
 	if err != nil {
-		spans.TraceError(err)
+		span.TraceError(err)
 		return nil
 	}
 	if ipRecord == nil || ipRecord.Domain == "" {

@@ -118,6 +118,7 @@ func (r *webTrackerRepository) GetByID(ctx context.Context, id string) (*models.
 func (r *webTrackerRepository) GetByDomain(ctx context.Context, domain string) (*models.WebTracker, error) {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "webTrackerRepository.GetByDomain")
 	defer span.Finish()
+	span.LogKV("domain", domain)
 
 	var tracker models.WebTracker
 	result := r.read.WithContext(ctx).
@@ -125,10 +126,13 @@ func (r *webTrackerRepository) GetByDomain(ctx context.Context, domain string) (
 		First(&tracker)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			span.LogKV("result.found", false)
 			return nil, nil
 		}
+		span.TraceError(result.Error)
 		return nil, result.Error
 	}
+	span.LogKV("result.found", true)
 	return &tracker, nil
 }
 

@@ -20,6 +20,54 @@ var domainExceptions = []string{
 	"sch.uk",
 }
 
+func isDomainException(hostname string) bool {
+	for _, ex := range domainExceptions {
+		if hostname == ex {
+			return true
+		}
+		if strings.HasSuffix(hostname, "."+ex) {
+			return true
+		}
+	}
+	return false
+}
+
+func tldPlusOneException(hostname string) string {
+	for _, ex := range domainExceptions {
+		// If exactly the exception
+		if hostname == ex {
+			return ex
+		}
+		// If it ends with our exception (e.g. "my.sub.nhs.uk" ends with ".nhs.uk")
+		if strings.HasSuffix(hostname, "."+ex) {
+			// Remove the ".nhs.uk" part
+			label := strings.TrimSuffix(hostname, "."+ex)
+			parts := strings.Split(label, ".")
+			// If there's only one label before the exception, e.g., "sub.nhs.uk"
+			if len(parts) == 1 {
+				return parts[0] + "." + ex // → "sub.nhs.uk"
+			}
+			// If multiple labels, e.g. "my.sub.nhs.uk", keep the last label + ex
+			lastPart := parts[len(parts)-1]
+			return lastPart + "." + ex // → "sub.nhs.uk"
+		}
+	}
+	return ""
+}
+
+// GetDomainWithoutTLD returns everything before the last dot in the domain
+func GetDomainWithoutTLD(domain string) string {
+	// Split the domain by dots
+	parts := strings.Split(domain, ".")
+	// Return all but last part
+	if len(parts) > 1 {
+		return strings.Join(parts[:len(parts)-1], ".")
+	} else if len(parts) == 1 {
+		return parts[0]
+	}
+	return domain
+}
+
 func ExtractDomain(input string) string {
 	if !strings.Contains(input, ".") {
 		return ""
@@ -84,37 +132,21 @@ func IsValidTLD(input string) bool {
 	return false
 }
 
-func tldPlusOneException(hostname string) string {
-	for _, ex := range domainExceptions {
-		// If exactly the exception
-		if hostname == ex {
-			return ex
-		}
-		// If it ends with our exception (e.g. "my.sub.nhs.uk" ends with ".nhs.uk")
-		if strings.HasSuffix(hostname, "."+ex) {
-			// Remove the ".nhs.uk" part
-			label := strings.TrimSuffix(hostname, "."+ex)
-			parts := strings.Split(label, ".")
-			// If there's only one label before the exception, e.g., "sub.nhs.uk"
-			if len(parts) == 1 {
-				return parts[0] + "." + ex // → "sub.nhs.uk"
-			}
-			// If multiple labels, e.g. "my.sub.nhs.uk", keep the last label + ex
-			lastPart := parts[len(parts)-1]
-			return lastPart + "." + ex // → "sub.nhs.uk"
-		}
+func IsValidDomain(input string) bool {
+	// Quick reject if input looks like a URL with paths or queries
+	if strings.ContainsAny(input, "/?&") {
+		return false
 	}
-	return ""
-}
+	// Reject if starting with "www."
+	if strings.HasPrefix(input, "www.") {
+		return false
+	}
 
-func isDomainException(hostname string) bool {
-	for _, ex := range domainExceptions {
-		if hostname == ex {
-			return true
-		}
-		if strings.HasSuffix(hostname, "."+ex) {
-			return true
-		}
+	_, err := publicsuffix.EffectiveTLDPlusOne(input)
+	if err == nil {
+		// PSL was happy
+		return true
 	}
-	return false
+	// PSL errored; check the exception
+	return isDomainException(input)
 }
