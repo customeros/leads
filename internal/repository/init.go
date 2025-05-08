@@ -22,13 +22,14 @@ type Repositories struct {
 
 func InitRepositories(leadsDB, warehouseDB *database.DbConnections) *Repositories {
 	return &Repositories{
-		APICallLogRepository: NewAPICallLogRepository(warehouseDB),
 		ContentRepository:    NewContentRepository(leadsDB),
 		IPIntelligence:       NewIPIntelligenceRepository(leadsDB),
 		Outbox:               NewOutboxRepository(leadsDB),
 		WebSessionRepository: NewWebSessionRepository(leadsDB),
-		WebTrackerEvent:      NewWebTrackerEventRepository(warehouseDB),
 		WebTracker:           NewWebTrackerRepository(leadsDB),
+
+		APICallLogRepository: NewAPICallLogRepository(warehouseDB),
+		WebTrackerEvent:      NewWebTrackerEventRepository(warehouseDB),
 	}
 }
 

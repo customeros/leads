@@ -18,8 +18,6 @@ import (
 	"github.com/customeros/leads/proto/pb"
 )
 
-const IP_DATA_LOOKBACK_DAYS = -90 // days
-
 func (s *webEventProcessor) Process(ctx context.Context, webtrackerID string, event *pb.WebTrackerEvent) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "webEventProcessor.Process")
 	defer span.Finish()
@@ -110,6 +108,8 @@ func (s *webEventProcessor) newSession(ctx context.Context, webtrackerID string,
 		return "", err
 	}
 
+	now := time.Now()
+
 	// Create outbox entry
 	outboxEvent := &models.OutboxEvent{
 		ID:        utils.GenerateEventID(),
@@ -120,10 +120,32 @@ func (s *webEventProcessor) newSession(ctx context.Context, webtrackerID string,
 		EventType: enum.EventWebtrackerCreated,
 		Payload:   payload,
 		Status:    enum.OutboxPending,
-		CreatedAt: time.Now(),
+		CreatedAt: now,
 	}
 
-	err = s.repositories.Outbox.Create(ctx, outboxEvent)
+	err = s.leadsWriteDB.Transaction(func(tx *gorm.DB) error {
+		err = s.repositories.Outbox.CreateWithTxn(ctx, tx, outboxEvent)
+		if err != nil {
+			return err
+		}
+
+		webSession := models.WebSession{
+			ID:          sessionID,
+			IP:          event.Ip,
+			VisitorID:   event.VisitorId,
+			TrackerID:   webtrackerID,
+			StartedAt:   now,
+			LastEventAt: &now,
+		}
+
+		err = s.repositories.WebSessionRepository.SaveWithTxn(ctx, tx, &webSession)
+		if err != nil {
+			span.TraceError(err)
+			return err
+		}
+
+		return nil
+	})
 	if err != nil {
 		span.TraceError(err)
 		return "", err
