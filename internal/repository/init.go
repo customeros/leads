@@ -12,6 +12,7 @@ import (
 
 type Repositories struct {
 	APICallLogRepository APICallLogRepository
+	ContentRepository    ContentRepository
 	IPIntelligence       IPIntelligenceRepository
 	Outbox               OutboxRepository
 	WebSessionRepository WebSessionRepository
@@ -22,6 +23,7 @@ type Repositories struct {
 func InitRepositories(leadsDB, warehouseDB *database.DbConnections) *Repositories {
 	return &Repositories{
 		APICallLogRepository: NewAPICallLogRepository(warehouseDB),
+		ContentRepository:    NewContentRepository(leadsDB),
 		IPIntelligence:       NewIPIntelligenceRepository(leadsDB),
 		Outbox:               NewOutboxRepository(leadsDB),
 		WebSessionRepository: NewWebSessionRepository(leadsDB),

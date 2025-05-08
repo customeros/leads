@@ -19,6 +19,7 @@ type Config struct {
 	DataWarehouseConfig *DataWarehouseConfig
 	IPDataConfig        *IPDataConfig
 	SnitcherConfig      *SnitcherConfig
+	JinaConfig          *JinaConfig
 }
 
 func InitConfig() (*Config, error) {
@@ -31,6 +32,7 @@ func InitConfig() (*Config, error) {
 		DataWarehouseConfig: &DataWarehouseConfig{},
 		IPDataConfig:        &IPDataConfig{},
 		SnitcherConfig:      &SnitcherConfig{},
+		JinaConfig:          &JinaConfig{},
 	}
 
 	err := godotenv.Load()

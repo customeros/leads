@@ -47,3 +47,8 @@ type SnitcherConfig struct {
 	Url    string `env:"SNITCHER_API_URL" required:"true" envDefault:"https://app.snitcher.com/api"`
 	ApiKey string `env:"SNITCHER_API_KEY" `
 }
+
+type JinaConfig struct {
+	Url    string `env:"JiNA_URL" required:"true" envDefault:"https://r.jina.ai/"`
+	ApiKey string `env:"JINA_API_KEY"`
+}
