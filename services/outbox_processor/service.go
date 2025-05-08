@@ -2,6 +2,7 @@ package outbox_processor
 
 import (
 	"context"
+	"github.com/customeros/leads/internal/telemetry"
 	"time"
 
 	nats_internal "github.com/customeros/leads/internal/nats"
@@ -29,15 +30,19 @@ const (
 )
 
 func (p *OutboxProcessor) ProcessBatch(ctx context.Context) error {
+	span, ctx := telemetry.StartCronSpan(ctx, "OutboxProcessor.ProcessBatch")
+	defer span.Finish()
+
 	// Get pending events
 	events, err := p.repositories.Outbox.GetPendingEvents(ctx, MAX_MESSAGES_PER_BATCH)
 	if err != nil {
+		span.TraceError(err)
 		return err
 	}
 
 	for _, event := range events {
 		// Lock the event
-		err := p.repositories.Outbox.MarkAsProcessing(ctx, event.ID, EVENT_LOCK_TIMEOUT)
+		err = p.repositories.Outbox.MarkAsProcessing(ctx, event.ID, EVENT_LOCK_TIMEOUT)
 		if err != nil {
 			// Another worker might have picked it up
 			continue
@@ -52,7 +57,7 @@ func (p *OutboxProcessor) ProcessBatch(ctx context.Context) error {
 			continue
 		}
 
-		// Mark as processed
+		// Mark as completed
 		p.repositories.Outbox.MarkAsCompleted(ctx, event.ID)
 	}
 

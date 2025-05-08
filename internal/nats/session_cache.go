@@ -44,12 +44,12 @@ func NewSessionCache(js nats.JetStreamContext) (*SessionCache, error) {
 	}, nil
 }
 
-func (c *SessionCache) Get(ctx context.Context, visitorID string) (string, error) {
+func (c *SessionCache) Get(ctx context.Context, webtrackerID, visitorID string) (string, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "SessionCache.Get")
 	defer span.Finish()
-	span.LogKV("visitorID", visitorID)
+	span.LogKV("visitorID", visitorID, "webtrackerID", webtrackerID)
 
-	entry, err := c.kv.Get(visitorID)
+	entry, err := c.kv.Get(webtrackerID + "." + visitorID)
 	if err != nil {
 		if errors.Is(err, nats.ErrKeyNotFound) {
 			span.LogKV("result.found", false)
@@ -70,12 +70,12 @@ func (c *SessionCache) Get(ctx context.Context, visitorID string) (string, error
 	return sessionID, nil
 }
 
-func (c *SessionCache) Set(ctx context.Context, visitorID, sessionID string) error {
+func (c *SessionCache) Set(ctx context.Context, webtrackerID, visitorID, sessionID string) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "SessionCache.Set")
 	defer span.Finish()
-	span.LogKV("visitorID", visitorID, "sessionID", sessionID)
+	span.LogKV("webtrackerID", webtrackerID, "visitorID", visitorID, "sessionID", sessionID)
 
-	if visitorID == "" || sessionID == "" {
+	if visitorID == "" || sessionID == "" || webtrackerID == "" {
 		return errors.New("visitorID and sessionID cannot be empty")
 	}
 
@@ -85,7 +85,7 @@ func (c *SessionCache) Set(ctx context.Context, visitorID, sessionID string) err
 		return err
 	}
 
-	_, err = c.kv.Put(visitorID, value)
+	_, err = c.kv.Put(webtrackerID+"."+visitorID, value)
 	return err
 }
 
