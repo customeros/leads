@@ -72,7 +72,7 @@ func (h *WebsiteEventsHandler) Handle() gin.HandlerFunc {
 		}
 		ctx = utils.SetTenantInContext(ctx, tenant)
 
-		trackerData := h.parsePayload(c, ctx, tenant)
+		trackerData := h.parsePayload(c, ctx)
 		if trackerData == nil {
 			err = fmt.Errorf("unable to build tracking record")
 			span.TraceError(err)
@@ -177,10 +177,9 @@ func (h *WebsiteEventsHandler) findTrackerIDForOrigin(ctx context.Context, clean
 	return webtracker.Tenant, webtracker.ID, nil
 }
 
-func (h *WebsiteEventsHandler) parsePayload(c *gin.Context, ctx context.Context, tenant string) *WebTrackerEvent {
+func (h *WebsiteEventsHandler) parsePayload(c *gin.Context, ctx context.Context) *WebTrackerEvent {
 	span, _ := telemetry.StartRestSpan(ctx, "WebsiteEventsHandler.parsePayload")
 	defer span.Finish()
-	span.TagTenant(tenant)
 
 	tracking := WebTrackerEvent{}
 
@@ -192,12 +191,12 @@ func (h *WebsiteEventsHandler) parsePayload(c *gin.Context, ctx context.Context,
 	span.LogFields(log.String("rawJSON", string(rawJSON)))
 
 	var inputMap map[string]any
-	if err := json.Unmarshal(rawJSON, &inputMap); err != nil {
+	if err = json.Unmarshal(rawJSON, &inputMap); err != nil {
 		span.TraceError(err)
 		return nil
 	}
 
-	if err := utils.Decode(inputMap, &tracking); err != nil {
+	if err = utils.Decode(inputMap, &tracking); err != nil {
 		span.TraceError(err)
 		return nil
 	}
@@ -205,6 +204,10 @@ func (h *WebsiteEventsHandler) parsePayload(c *gin.Context, ctx context.Context,
 	tracking.Referrer = utils.SanitizeUTF8(tracking.Referrer)
 	tracking.Href = utils.SanitizeUTF8(tracking.Href)
 	tracking.VisitorID = utils.SanitizeUTF8(tracking.VisitorID)
+	tracking.Origin = utils.SanitizeUTF8(tracking.Origin)
+	tracking.Search = utils.SanitizeUTF8(tracking.Search)
+	tracking.Hostname = utils.SanitizeUTF8(tracking.Hostname)
+	tracking.Pathname = utils.SanitizeUTF8(tracking.Pathname)
 
 	return &tracking
 }

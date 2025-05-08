@@ -147,6 +147,7 @@ func (s *sessionManager) checkForExistingIPRecord(ctx context.Context, ipAddress
 func (s *sessionManager) processNewIP(ctx context.Context, message *pb.WebtrackerSessionNew) (*models.IPIntelligence, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.processNewIP")
 	defer span.Finish()
+	span.LogKV("ipAddress", message.Ip)
 
 	// check if bot, return early if not trusted IP
 	userAgent := utils.ParseUserAgent(message.UserAgent)
@@ -160,6 +161,9 @@ func (s *sessionManager) processNewIP(ctx context.Context, message *pb.Webtracke
 
 	if ipProfile != nil {
 		if ipProfile.IsThreat || userAgent.IsBot || isSuspicious {
+			span.LogKV("ip.isThreat", ipProfile.IsThreat)
+			span.LogKV("ip.isBot", userAgent.IsBot)
+			span.LogKV("ip.isSuspicious", isSuspicious)
 			return nil, nil
 		}
 	}
@@ -223,8 +227,9 @@ func (s *sessionManager) identifyIP(ctx context.Context, ipAddress string) (stri
 }
 
 func (s *sessionManager) profileIP(ctx context.Context, ipAddress string) (*pb.IPAddressVerifyResponse, error) {
-	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.isTrustedIP")
+	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.profileIP")
 	defer span.Finish()
+	span.LogKV("ipAddress", ipAddress)
 
 	request := &pb.IPAddressVerifyRequest{
 		IpAddress: ipAddress,

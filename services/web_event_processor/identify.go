@@ -26,6 +26,7 @@ type IdentifyData struct {
 func (s *webEventProcessor) handleIdentifyEvent(ctx context.Context, webtrackerID string, event *pb.WebTrackerEvent) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "webEventProcessor.handleIdentifyEvent")
 	defer span.Finish()
+	span.LogKV("webtrackerID", webtrackerID)
 
 	// parse email from event payload
 	email, domain, err := s.parseEmailFromIdentifyEvent(ctx, event.EventData)

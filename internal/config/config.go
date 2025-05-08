@@ -38,7 +38,7 @@ type DataWarehouseConfig struct {
 }
 
 type IPDataConfig struct {
-	ApiUrl             string `env:"IPDATA_API_URL"`
+	ApiUrl             string `env:"IPDATA_API_URL" envDefault:"https://api.ipdata.co"`
 	ApiKey             string `env:"IPDATA_API_KEY"`
 	IpDataCacheTtlDays int    `env:"IPDATA_CACHE_TTL_DAYS" envDefault:"90"`
 }
