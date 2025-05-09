@@ -140,7 +140,7 @@ func (s *webEventProcessor) newSession(ctx context.Context, webtrackerID string,
 			LastEventAt: &now,
 		}
 
-		err = s.repositories.WebSessionRepository.SaveWithTxn(ctx, tx, &webSession)
+		err = s.repositories.WebSessionRepository.CreateWithTxn(ctx, tx, &webSession)
 		if err != nil {
 			span.TraceError(err)
 			return err
