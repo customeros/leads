@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type WebsiteScraped struct {
+type WebpageScraped struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Domain        string                 `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
 	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
@@ -29,20 +29,20 @@ type WebsiteScraped struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *WebsiteScraped) Reset() {
-	*x = WebsiteScraped{}
+func (x *WebpageScraped) Reset() {
+	*x = WebpageScraped{}
 	mi := &file_schema_webpage_scraped_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *WebsiteScraped) String() string {
+func (x *WebpageScraped) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*WebsiteScraped) ProtoMessage() {}
+func (*WebpageScraped) ProtoMessage() {}
 
-func (x *WebsiteScraped) ProtoReflect() protoreflect.Message {
+func (x *WebpageScraped) ProtoReflect() protoreflect.Message {
 	mi := &file_schema_webpage_scraped_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -54,19 +54,19 @@ func (x *WebsiteScraped) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use WebsiteScraped.ProtoReflect.Descriptor instead.
-func (*WebsiteScraped) Descriptor() ([]byte, []int) {
+// Deprecated: Use WebpageScraped.ProtoReflect.Descriptor instead.
+func (*WebpageScraped) Descriptor() ([]byte, []int) {
 	return file_schema_webpage_scraped_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *WebsiteScraped) GetDomain() string {
+func (x *WebpageScraped) GetDomain() string {
 	if x != nil {
 		return x.Domain
 	}
 	return ""
 }
 
-func (x *WebsiteScraped) GetUrl() string {
+func (x *WebpageScraped) GetUrl() string {
 	if x != nil {
 		return x.Url
 	}
@@ -78,7 +78,7 @@ var File_schema_webpage_scraped_proto protoreflect.FileDescriptor
 const file_schema_webpage_scraped_proto_rawDesc = "" +
 	"\n" +
 	"\x1cschema/webpage.scraped.proto\x12\x05leads\":\n" +
-	"\x0eWebsiteScraped\x12\x16\n" +
+	"\x0eWebpageScraped\x12\x16\n" +
 	"\x06domain\x18\x01 \x01(\tR\x06domain\x12\x10\n" +
 	"\x03url\x18\x02 \x01(\tR\x03urlB&Z$github.com/customeros/leads/proto/pbb\x06proto3"
 
@@ -96,7 +96,7 @@ func file_schema_webpage_scraped_proto_rawDescGZIP() []byte {
 
 var file_schema_webpage_scraped_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_schema_webpage_scraped_proto_goTypes = []any{
-	(*WebsiteScraped)(nil), // 0: leads.WebsiteScraped
+	(*WebpageScraped)(nil), // 0: leads.WebpageScraped
 }
 var file_schema_webpage_scraped_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type

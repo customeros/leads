@@ -39,7 +39,7 @@ func NewContentProfiler(
 	}
 }
 
-var SUBSCRIBED_SUBJECT = enum.EventWebtrackerCreated.String()
+var SUBSCRIBED_SUBJECT = enum.EventWebpageScraped.String()
 
 const (
 	// queue group
