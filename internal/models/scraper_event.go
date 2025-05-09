@@ -43,7 +43,7 @@ func (e *ScraperEvent) CreateTable(db *gorm.DB) error {
 
 	// Create table if it doesn't exist
 	if !tableExists {
-		if err := db.AutoMigrate(&ScraperEvent{}); err != nil {
+		if err = db.AutoMigrate(&ScraperEvent{}); err != nil {
 			return fmt.Errorf("failed to create scraper_events table: %w", err)
 		}
 	}

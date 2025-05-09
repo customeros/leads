@@ -11,7 +11,7 @@ import (
 
 type WebTrackerEvent struct {
 	ID           string            `gorm:"column:id;type:varchar(50);primaryKey;not null" json:"id"`
-	Timestamp    time.Time         `gorm:"column:timestamp;primaryKey;type:timestamptz;not null"`
+	Timestamp    time.Time         `gorm:"column:timestamp;primaryKey;type:timestamptz;not null" json:"timestamp"`
 	Event        enum.Events       `gorm:"column:event;type:varchar(50);index;not null" json:"event"`
 	Publisher    enum.LeadsService `gorm:"column:publisher;type:varchar(50);index;not null" json:"publisher"`
 	Tenant       string            `gorm:"column:tenant;type:varchar(50);index;not null" json:"tenant"`
@@ -52,7 +52,7 @@ func (e *WebTrackerEvent) CreateTable(db *gorm.DB) error {
 	}
 
 	// Set up TimescaleDB features
-	if err := initWebTrackerEventTable(db); err != nil {
+	if err = initWebTrackerEventTable(db); err != nil {
 		return fmt.Errorf("failed to setup TimescaleDB for webtracker_events: %w", err)
 	}
 
@@ -80,7 +80,7 @@ func initWebTrackerEventTable(db *gorm.DB) error {
 			session_id,
 			has_error,
 			count(*) AS event_count
-		FROM web_events_source
+		FROM webtracker_events
 		GROUP BY hour, tenant, publisher, event, session_id, has_error
 	`).Error; err != nil {
 		return err
@@ -99,9 +99,9 @@ func initWebTrackerEventTable(db *gorm.DB) error {
 
 	// Create additional indexes for common query patterns
 	if err := db.Exec(`
-		CREATE INDEX IF NOT EXISTS idx_web_events_has_error_timestamp ON web_events_source (has_error, timestamp DESC);
-		CREATE INDEX IF NOT EXISTS idx_web_events_publisher_event ON web_events_source (publisher, event);
-		CREATE INDEX IF NOT EXISTS idx_web_events_session_timestamp ON web_events_source (session_id, timestamp DESC);
+		CREATE INDEX IF NOT EXISTS idx_web_events_has_error_timestamp ON webtracker_events (has_error, timestamp DESC);
+		CREATE INDEX IF NOT EXISTS idx_web_events_publisher_event ON webtracker_events (publisher, event);
+		CREATE INDEX IF NOT EXISTS idx_web_events_session_timestamp ON webtracker_events (session_id, timestamp DESC);
 	`).Error; err != nil {
 		return err
 	}
