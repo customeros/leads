@@ -343,6 +343,7 @@ func (r *webTrackerRepository) GetCNAMEChecks(ctx context.Context) ([]models.Web
 		return nil, err
 	}
 
+	span.LogKV("result.count", len(trackers))
 	return trackers, nil
 }
 
