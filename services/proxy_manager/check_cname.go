@@ -62,11 +62,11 @@ func (s *proxyManagerService) CheckCNAME(ctx context.Context) {
 func (s *proxyManagerService) isCNAMEActive(ctx context.Context, cnameHost, domain, cnameTarget string) (bool, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "proxyManagerService.isCNAMEActive")
 	defer span.Finish()
+	span.LogKV("cnameHost", cnameHost, "domain", domain, "cnameTarget", cnameTarget)
 
 	dnsRecord, err := s.getDNSRecord(ctx, cnameHost, domain)
 	if err != nil {
-		span.TraceError(err)
-		return false, err
+		return false, nil
 	}
 
 	// Look for CNAME records in the answer
@@ -159,12 +159,14 @@ func (s *proxyManagerService) handleCNAMENotConfigured(ctx context.Context, trac
 func (s *proxyManagerService) getDNSRecord(ctx context.Context, cnameHost, domain string) ([]dns.RR, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "proxyManagerService.getCNAMERecord")
 	defer span.Finish()
+	span.LogKV("cnameHost", cnameHost, "domain", domain)
 
 	c := dns.Client{}
 	m := dns.Msg{}
 
 	// Ensure subdomain ends with a dot
 	host := fmt.Sprintf("%s.%s.", cnameHost, domain)
+	span.LogKV("host", host)
 
 	// Set up the DNS query for CNAME
 	m.SetQuestion(host, dns.TypeCNAME)
@@ -177,10 +179,9 @@ func (s *proxyManagerService) getDNSRecord(ctx context.Context, cnameHost, domai
 		return nil, fmt.Errorf("DNS query failed: %w", err)
 	}
 
-	// Check response code
+	span.LogKV("result.Rcode", r.Rcode)
 	if r.Rcode != dns.RcodeSuccess {
-		err := fmt.Errorf("DNS query returned non-success code: %d", r.Rcode)
-		span.TraceError(err)
+		err = fmt.Errorf("DNS query returned non-success code: %d", r.Rcode)
 		return nil, err
 	}
 
