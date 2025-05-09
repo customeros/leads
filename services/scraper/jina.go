@@ -96,7 +96,7 @@ func (s *scraperService) handleScrapesSuccess(ctx context.Context, domain, url, 
 	span, ctx := telemetry.StartServiceSpan(ctx, "scraperService.handlScraperSuccess")
 	defer span.Finish()
 
-	event := &pb.WebsiteScraped{
+	event := &pb.WebpageScraped{
 		Domain: domain,
 		Url:    url,
 	}
