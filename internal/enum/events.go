@@ -22,7 +22,7 @@ const (
 	EventProxyWebtrackerActivated          Events = "proxy.webtracker.activated"
 	EventProxyWebtrackerDeactivated        Events = "proxy.webtracker.deactivated"
 
-	EventLeadCreated                  Events = "lead.created"
+	EventLeadCreated                  Events = "lead.created" // TODO switch to identified
 	EventLeadStageUpdate              Events = "lead.update.stage"
 	EventLeadInitialTargetListCreated Events = "lead.initial_target_list.created"
 	EventLeadError                    Events = "lead.error"
