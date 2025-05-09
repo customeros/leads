@@ -16,7 +16,7 @@ import (
 	"github.com/customeros/leads/internal/enum"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
-	"github.com/customeros/leads/proto/mappers"
+	proto_mappers "github.com/customeros/leads/proto/mappers"
 	"github.com/customeros/leads/proto/pb"
 	"github.com/customeros/leads/services"
 )
@@ -51,8 +51,6 @@ type WebTrackerEvent struct {
 	ScreenResolution string               `json:"screenResolution"`
 }
 
-const REQUEST_TIMEOUT = 60 * time.Second
-
 func (h *WebsiteEventsHandler) Handle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		span, ctx := telemetry.StartRestSpan(c.Request.Context(), "WebsiteEventsHandler.Handle")
@@ -67,6 +65,11 @@ func (h *WebsiteEventsHandler) Handle() gin.HandlerFunc {
 		tenant, webtrackerID, err := h.getTenantAndTrackerID(ctx, c.GetHeader("Origin"))
 		if err != nil {
 			span.TraceError(err)
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
+		if tenant == "" || webtrackerID == "" {
+			span.TraceError(errors.New("tenant or webtrackerID not found"))
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}

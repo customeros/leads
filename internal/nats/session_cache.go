@@ -12,6 +12,7 @@ import (
 )
 
 // SessionCache provides visitor lookup caching using NATS KV
+// Deprecated
 type SessionCache struct {
 	kv nats.KeyValue
 }
