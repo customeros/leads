@@ -11,9 +11,9 @@ import (
 
 type WebTrackerEvent struct {
 	ID           string            `gorm:"column:id;type:varchar(50);primaryKey;not null" json:"id"`
+	Timestamp    time.Time         `gorm:"column:timestamp;primaryKey;type:timestamptz;not null"`
 	Event        enum.Events       `gorm:"column:event;type:varchar(50);index;not null" json:"event"`
 	Publisher    enum.LeadsService `gorm:"column:publisher;type:varchar(50);index;not null" json:"publisher"`
-	Timestamp    time.Time         `gorm:"not null;index"`
 	Tenant       string            `gorm:"column:tenant;type:varchar(50);index;not null" json:"tenant"`
 	TrackerID    string            `gorm:"column:tracker_id;type:varchar(50);index;not null" json:"trackerId"`
 	SessionID    string            `gorm:"column:session_id;type:varchar(50);index" json:"sessionId"`
@@ -62,7 +62,7 @@ func (e *WebTrackerEvent) CreateTable(db *gorm.DB) error {
 // SetupTimescaleDB initializes the TimescaleDB specifics for this model
 func initWebTrackerEventTable(db *gorm.DB) error {
 	// Convert to hypertable - this only needs to be done once
-	if err := db.Exec(`SELECT create_hypertable('web_events_source', 'timestamp', 
+	if err := db.Exec(`SELECT create_hypertable('webtracker_events', 'timestamp', 
 		chunk_time_interval => INTERVAL '1 day',
 		if_not_exists => TRUE)`).Error; err != nil {
 		return err
