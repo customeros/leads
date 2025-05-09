@@ -3,7 +3,7 @@ package web_event_processor
 import (
 	"gorm.io/gorm"
 
-	interfaces "github.com/customeros/leads/interfaces"
+	"github.com/customeros/leads/interfaces"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/repository"
 )
