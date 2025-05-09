@@ -11,9 +11,9 @@ import (
 
 type ScraperEvent struct {
 	ID           string            `gorm:"column:id;type:varchar(50);primaryKey;not null" json:"id"`
+	Timestamp    time.Time         `gorm:"column:timestamp;primaryKey;type:timestamptz;not null"`
 	Event        enum.Events       `gorm:"column:event;type:varchar(50);index;not null" json:"event"`
 	Publisher    enum.LeadsService `gorm:"column:publisher;type:varchar(50);index;not null" json:"publisher"`
-	Timestamp    time.Time         `gorm:"not null;index"`
 	Domain       string            `gorm:"column:domain;type:varchar(50);index;not null" json:"domain"`
 	Url          string            `gorm:"column:url;type:varchar(50);index" json:"url"`
 	Payload      []byte            `gorm:"column:payload;type:bytea" json:"-"`
