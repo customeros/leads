@@ -11,6 +11,7 @@ import (
 	"github.com/customeros/leads/services/ipdata"
 	"github.com/customeros/leads/services/outbox_processor"
 	"github.com/customeros/leads/services/proxy_manager"
+	"github.com/customeros/leads/services/scraper"
 	"github.com/customeros/leads/services/session_manager"
 	"github.com/customeros/leads/services/snitcher"
 	"github.com/customeros/leads/services/web_event_processor"
@@ -21,6 +22,7 @@ type Services struct {
 	IPDataService     *ipdata.IPDataService
 	OutboxProcessor   *outbox_processor.OutboxProcessor
 	ProxyManager      proxy_manager.ProxyManagerService
+	ScraperService    scraper.ScraperService
 	SessionManager    session_manager.SessionManager
 	SnitcherService   *snitcher.SnitcherService
 	WebEventProcessor interfaces.WebEventProcessor
@@ -40,6 +42,7 @@ func InitServices(config *config.Config, leadsDB *database.DbConnections, natsCo
 		IPDataService:     ipdata.NewIPDataService(config.IPDataConfig, natsConn, repositories),
 		OutboxProcessor:   outbox_processor.NewOutboxProcessor(natsConn, repositories),
 		ProxyManager:      proxy_manager.NewProxyManagerService(natsConn, leadsDB, repositories),
+		ScraperService:    scraper.NewScraperService(config.JinaConfig, natsConn, leadsDB, repositories),
 		SessionManager:    session_manager.NewSessionManager(natsConn, leadsDB, repositories),
 		SnitcherService:   snitcher.NewSnitcherService(config.SnitcherConfig, repositories, natsConn),
 		WebEventProcessor: web_event_processor.NewWebEventProcessor(natsConn, leadsDB.WriteDB, repositories),

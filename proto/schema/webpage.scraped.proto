@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package leads;
+
+option go_package = "github.com/customeros/leads/proto/pb";
+
+message WebsiteScraped {
+  string domain = 1;
+  string url = 2;
+}

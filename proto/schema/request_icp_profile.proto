@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package leads;
+
+option go_package = "github.com/customeros/leads/proto/pb";
+
+message ICPProfileRequest { string domain = 1; }

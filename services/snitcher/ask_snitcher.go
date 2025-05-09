@@ -36,7 +36,7 @@ func (s *SnitcherService) AskSnitcher(ctx context.Context, ip string) *pb.IPAddr
 
 	// Create HTTP client
 	clientTimeout := 30 * time.Second
-	client := clients.NewLoggingClient(s.repositories.APICallLogRepository, enum.VendorSnitcher, &clientTimeout)
+	client := clients.NewLoggingClient(s.repositories.APICallLog, enum.VendorSnitcher, &clientTimeout)
 
 	// Create POST request with context
 	req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("%s/company/find?ip=%s", s.config.Url, ip), nil)

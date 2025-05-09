@@ -15,7 +15,7 @@ func (s *scraperService) linksToCrawl(ctx context.Context, content string, works
 
 	var urls []string
 
-	webpages, err := s.repositories.ContentRepository.GetByDomains(ctx, workspaceDomains)
+	webpages, err := s.repositories.Content.GetByDomains(ctx, workspaceDomains)
 	if err != nil {
 		spans.TraceError(err)
 		return nil, err

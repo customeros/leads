@@ -7,11 +7,6 @@ const (
 	EventWebtrackerUpdated  Events = "webtracker.updated"
 	EventWebtrackerArchived Events = "webtracker.archived"
 
-	EventProxyWebtrackerCnameConfigured    Events = "proxy.webtracker.cname.configured"
-	EventProxyWebtrackerCnameNotConfigured Events = "proxy.webtracker.cname.not_configured"
-	EventProxyWebtrackerActivated          Events = "proxy.webtracker.activated"
-	EventProxyWebtrackerDeactivated        Events = "proxy.webtracker.deactivated"
-
 	EventWebtrackerSessionCreated  Events = "webtracker.session.created"
 	EventWebtrackerSessionClosed   Events = "webtracker.session.closed"
 	EventWebtrackerSessionAnalyzed Events = "webtracker.session.analyzed"
@@ -22,12 +17,26 @@ const (
 	EventWebtrackerPageExit Events = "webtracker.event.page_exited"
 	EventWebtrackerClick    Events = "webtracker.event.clicked"
 
-	EventLeadCreated Events = "lead.created"
+	EventProxyWebtrackerCnameConfigured    Events = "proxy.webtracker.cname.configured"
+	EventProxyWebtrackerCnameNotConfigured Events = "proxy.webtracker.cname.not_configured"
+	EventProxyWebtrackerActivated          Events = "proxy.webtracker.activated"
+	EventProxyWebtrackerDeactivated        Events = "proxy.webtracker.deactivated"
 
-	EventAskIPData   Events = "ipaddress.verify.ipdata"
-	EventAskSnitcher Events = "ipaddress.identify.snitcher"
+	EventLeadCreated                  Events = "lead.created"
+	EventLeadStageUpdate              Events = "lead.update.stage"
+	EventLeadInitialTargetListCreated Events = "lead.initial_target_list.created"
+	EventLeadError                    Events = "lead.error"
 
-	EventLeadError Events = "lead.error"
+	EventAskIPData   Events = "request.verify_ipaddress.ipdata"
+	EventAskSnitcher Events = "request.identify_ipaddress.snitcher"
+
+	EventRequestICPProfile Events = "request.icp_profile"
+	EventICPProfileCreated Events = "icp_profile.created"
+
+	EventWebsiteCrawled Events = "website.crawled"
+
+	EventWebpageScraped  Events = "webpage.scraped"
+	EventWebpageProfiled Events = "webpage.profiled"
 )
 
 func (e Events) String() string {

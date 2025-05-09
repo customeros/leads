@@ -20,7 +20,7 @@ func (s *scraperService) handleNewTrackerCreated(ctx context.Context, msg *nats.
 		return err
 	}
 
-	_, err = s.Crawl(ctx, message.Domain)
+	err = s.Crawl(ctx, message.Domain)
 	if err != nil {
 		span.TraceError(err)
 		return err

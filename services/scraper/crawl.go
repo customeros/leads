@@ -18,8 +18,7 @@ const (
 	MaxPagesToCrawl = 100
 )
 
-func (s *scraperService) Crawl(ctx context.Context, domain string) ([]string, error) {
-	// timeout
+func (s *scraperService) Crawl(ctx context.Context, domain string) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancel()
 
@@ -30,7 +29,7 @@ func (s *scraperService) Crawl(ctx context.Context, domain string) ([]string, er
 	if primaryDomain == "" {
 		err := errors.New("Not a valid domain")
 		spans.TraceError(err)
-		return nil, err
+		return err
 	}
 
 	startUrl := fmt.Sprintf("https://%s", primaryDomain)
@@ -51,13 +50,7 @@ func (s *scraperService) Crawl(ctx context.Context, domain string) ([]string, er
 		close(results)
 	}()
 
-	// Collect results
-	var allUrls []string
-	for url := range results {
-		allUrls = append(allUrls, url)
-	}
-
-	return allUrls, nil
+	return nil
 }
 
 func (s *scraperService) crawlRecursive(

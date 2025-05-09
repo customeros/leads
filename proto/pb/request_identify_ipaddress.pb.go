@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: schema/ipaddress_identify.proto
+// source: schema/request_identify_ipaddress.proto
 
 package pb
 
@@ -30,7 +30,7 @@ type IPAddressIdentifyRequest struct {
 
 func (x *IPAddressIdentifyRequest) Reset() {
 	*x = IPAddressIdentifyRequest{}
-	mi := &file_schema_ipaddress_identify_proto_msgTypes[0]
+	mi := &file_schema_request_identify_ipaddress_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *IPAddressIdentifyRequest) String() string {
 func (*IPAddressIdentifyRequest) ProtoMessage() {}
 
 func (x *IPAddressIdentifyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_ipaddress_identify_proto_msgTypes[0]
+	mi := &file_schema_request_identify_ipaddress_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *IPAddressIdentifyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IPAddressIdentifyRequest.ProtoReflect.Descriptor instead.
 func (*IPAddressIdentifyRequest) Descriptor() ([]byte, []int) {
-	return file_schema_ipaddress_identify_proto_rawDescGZIP(), []int{0}
+	return file_schema_request_identify_ipaddress_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *IPAddressIdentifyRequest) GetIpAddress() string {
@@ -76,7 +76,7 @@ type IPAddressIdentifyResponse struct {
 
 func (x *IPAddressIdentifyResponse) Reset() {
 	*x = IPAddressIdentifyResponse{}
-	mi := &file_schema_ipaddress_identify_proto_msgTypes[1]
+	mi := &file_schema_request_identify_ipaddress_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -88,7 +88,7 @@ func (x *IPAddressIdentifyResponse) String() string {
 func (*IPAddressIdentifyResponse) ProtoMessage() {}
 
 func (x *IPAddressIdentifyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_ipaddress_identify_proto_msgTypes[1]
+	mi := &file_schema_request_identify_ipaddress_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -101,7 +101,7 @@ func (x *IPAddressIdentifyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IPAddressIdentifyResponse.ProtoReflect.Descriptor instead.
 func (*IPAddressIdentifyResponse) Descriptor() ([]byte, []int) {
-	return file_schema_ipaddress_identify_proto_rawDescGZIP(), []int{1}
+	return file_schema_request_identify_ipaddress_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *IPAddressIdentifyResponse) GetIpAddress() string {
@@ -125,11 +125,11 @@ func (x *IPAddressIdentifyResponse) GetErrorMessage() string {
 	return ""
 }
 
-var File_schema_ipaddress_identify_proto protoreflect.FileDescriptor
+var File_schema_request_identify_ipaddress_proto protoreflect.FileDescriptor
 
-const file_schema_ipaddress_identify_proto_rawDesc = "" +
+const file_schema_request_identify_ipaddress_proto_rawDesc = "" +
 	"\n" +
-	"\x1fschema/ipaddress_identify.proto\x12\x05leads\"9\n" +
+	"'schema/request_identify_ipaddress.proto\x12\x05leads\"9\n" +
 	"\x18IPAddressIdentifyRequest\x12\x1d\n" +
 	"\n" +
 	"ip_address\x18\x01 \x01(\tR\tipAddress\"v\n" +
@@ -140,23 +140,23 @@ const file_schema_ipaddress_identify_proto_rawDesc = "" +
 	"\ferrorMessage\x18\x03 \x01(\tR\ferrorMessageB&Z$github.com/customeros/leads/proto/pbb\x06proto3"
 
 var (
-	file_schema_ipaddress_identify_proto_rawDescOnce sync.Once
-	file_schema_ipaddress_identify_proto_rawDescData []byte
+	file_schema_request_identify_ipaddress_proto_rawDescOnce sync.Once
+	file_schema_request_identify_ipaddress_proto_rawDescData []byte
 )
 
-func file_schema_ipaddress_identify_proto_rawDescGZIP() []byte {
-	file_schema_ipaddress_identify_proto_rawDescOnce.Do(func() {
-		file_schema_ipaddress_identify_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_ipaddress_identify_proto_rawDesc), len(file_schema_ipaddress_identify_proto_rawDesc)))
+func file_schema_request_identify_ipaddress_proto_rawDescGZIP() []byte {
+	file_schema_request_identify_ipaddress_proto_rawDescOnce.Do(func() {
+		file_schema_request_identify_ipaddress_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_request_identify_ipaddress_proto_rawDesc), len(file_schema_request_identify_ipaddress_proto_rawDesc)))
 	})
-	return file_schema_ipaddress_identify_proto_rawDescData
+	return file_schema_request_identify_ipaddress_proto_rawDescData
 }
 
-var file_schema_ipaddress_identify_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_schema_ipaddress_identify_proto_goTypes = []any{
+var file_schema_request_identify_ipaddress_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_schema_request_identify_ipaddress_proto_goTypes = []any{
 	(*IPAddressIdentifyRequest)(nil),  // 0: leads.IPAddressIdentifyRequest
 	(*IPAddressIdentifyResponse)(nil), // 1: leads.IPAddressIdentifyResponse
 }
-var file_schema_ipaddress_identify_proto_depIdxs = []int32{
+var file_schema_request_identify_ipaddress_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -164,26 +164,26 @@ var file_schema_ipaddress_identify_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_schema_ipaddress_identify_proto_init() }
-func file_schema_ipaddress_identify_proto_init() {
-	if File_schema_ipaddress_identify_proto != nil {
+func init() { file_schema_request_identify_ipaddress_proto_init() }
+func file_schema_request_identify_ipaddress_proto_init() {
+	if File_schema_request_identify_ipaddress_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_ipaddress_identify_proto_rawDesc), len(file_schema_ipaddress_identify_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_request_identify_ipaddress_proto_rawDesc), len(file_schema_request_identify_ipaddress_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_schema_ipaddress_identify_proto_goTypes,
-		DependencyIndexes: file_schema_ipaddress_identify_proto_depIdxs,
-		MessageInfos:      file_schema_ipaddress_identify_proto_msgTypes,
+		GoTypes:           file_schema_request_identify_ipaddress_proto_goTypes,
+		DependencyIndexes: file_schema_request_identify_ipaddress_proto_depIdxs,
+		MessageInfos:      file_schema_request_identify_ipaddress_proto_msgTypes,
 	}.Build()
-	File_schema_ipaddress_identify_proto = out.File
-	file_schema_ipaddress_identify_proto_goTypes = nil
-	file_schema_ipaddress_identify_proto_depIdxs = nil
+	File_schema_request_identify_ipaddress_proto = out.File
+	file_schema_request_identify_ipaddress_proto_goTypes = nil
+	file_schema_request_identify_ipaddress_proto_depIdxs = nil
 }
