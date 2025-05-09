@@ -23,6 +23,7 @@ type WebSessionRepository interface {
 	GetInactiveSessions(ctx context.Context) ([]*models.WebSession, error)
 	UpdateLastEvent(ctx context.Context, sessionID string, event enum.Events, timestamp time.Time) error
 	CloseSessionWithTxn(ctx context.Context, tx *gorm.DB, sessionID string) error
+	GetActiveSessionByTrackerAndVisitor(ctx context.Context, trackerID, visitorID string) (*models.WebSession, error)
 }
 
 // Implementation errors
@@ -196,4 +197,31 @@ func (r *webSessionRepository) UpdateLastEvent(ctx context.Context, sessionID st
 	}
 
 	return nil
+}
+
+func (r *webSessionRepository) GetActiveSessionByTrackerAndVisitor(ctx context.Context, trackerID, visitorID string) (*models.WebSession, error) {
+	span, ctx := telemetry.StartPostgresSpan(ctx, "webSessionRepository.GetActiveSessionByTrackerAndVisitor")
+	defer span.Finish()
+	span.LogKV("trackerID", trackerID, "visitorID", visitorID)
+
+	tenant := utils.GetTenantFromContext(ctx)
+
+	var session models.WebSession
+
+	err := r.read.WithContext(ctx).
+		Where("tracker_id = ? AND visitor_id = ? AND tenant = ? AND is_active = ?",
+			trackerID, visitorID, tenant, true).
+		First(&session).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			span.LogKV("result.found", false)
+			return nil, nil
+		}
+		span.TraceError(err)
+		return nil, fmt.Errorf("failed to get active session: %w", err)
+	}
+
+	span.LogKV("result.ID", session.ID)
+	return &session, nil
 }

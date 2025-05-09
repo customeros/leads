@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/customeros/mailsherpa/domaincheck"
 
@@ -156,9 +157,10 @@ func (s *scraperService) fetchPageWithJina(ctx context.Context, url string) (str
 	req.Header.Set("X-With-Links-Summary", "true") // Include links summary
 
 	// Add a timeout
-	client := clients.NewLoggingClient(s.repositories.APICallLogRepository, enum.VendorJina)
+	clientTimeout := 15 * time.Second
+	httpClient := clients.NewLoggingClient(s.repositories.APICallLogRepository, enum.VendorJina, &clientTimeout)
 
-	resp, err := client.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		spans.TraceError(err)
 		return "", err

@@ -557,24 +557,6 @@ func LogDebug(ctx context.Context, msg string, fields ...log.Field) {
 	}
 }
 
-// Error Handling
-func TagError(span opentracing.Span, err error) {
-	if err != nil {
-		// Add standard error tags
-		span.SetTag("error", true)
-
-		// Add OpenTelemetry specific tags
-		span.SetTag("otel.status_code", "error")
-		span.SetTag("otel.status_message", err.Error())
-
-		span.LogFields(
-			log.Error(err),
-			log.String("event", "error"),
-			log.String("time", time.Now().Format(time.RFC3339)),
-		)
-	}
-}
-
 func (s *Spans) TraceError(err error) {
 	if s == nil || err == nil {
 		return

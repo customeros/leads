@@ -47,7 +47,7 @@ func (s *sessionAnalyzer) determineLeadSource(ctx context.Context, href, referre
 
 	parsedReferrer, err := utils.ParseURL(referrer)
 	if err != nil {
-		spans.TraceError(err)
+		span.TraceError(err)
 		return leadSource, nil
 	}
 
@@ -57,7 +57,7 @@ func (s *sessionAnalyzer) determineLeadSource(ctx context.Context, href, referre
 
 	parsedHref, err := utils.ParseURL(href)
 	if err != nil {
-		spans.TraceError(err)
+		span.TraceError(err)
 		return leadSource, nil
 	}
 

@@ -16,6 +16,9 @@ type WebSession struct {
 	CompanyID string `gorm:"column:company_id;type:varchar(255);index;not null"`
 	IP        string `gorm:"column:ip;type:varchar(255)"`
 
+	// Session metadata
+	Active bool `gorm:"column:is_active;type:boolean;default:true"`
+
 	// Session timing
 	StartedAt       time.Time  `gorm:"column:started_at;type:timestamptz;not null;index"`
 	LastEventAt     *time.Time `gorm:"column:last_event_at;type:timestamptz;index"`
@@ -55,6 +58,7 @@ type WebSession struct {
 
 	// System fields
 	CreatedAt time.Time `gorm:"column:created_at;type:timestamptz;not null;default:now()"`
+	UpdatedAt time.Time `gorm:"column:updated_at;type:timestamptz;not null;default:now()"`
 }
 
 func (WebSession) TableName() string {

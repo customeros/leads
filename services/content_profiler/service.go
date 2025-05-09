@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/nats-io/nats.go"
@@ -152,14 +151,15 @@ func (s *contentProfiler) processMessage(ctx context.Context, msg *nats.Msg) {
 	}
 
 	// Process the email
-	err = s.handleNewTrackerCreated(ctx, message)
-	if err != nil {
-		if !strings.Contains(err.Error(), "skipping") {
-			spans.TraceError(err)
-		}
-		s.handleProcessingError(ctx, msg, err)
-		return
-	}
+	// TODO implement this
+	// err = s.handleNewTrackerCreated(ctx, message)
+	// if err != nil {
+	// 	if !strings.Contains(err.Error(), "skipping") {
+	// 		spans.TraceError(err)
+	// 	}
+	// 	s.handleProcessingError(ctx, msg, err)
+	// 	return
+	// }
 
 	msg.Ack()
 	return
