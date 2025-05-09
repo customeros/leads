@@ -52,7 +52,7 @@ func (a *APICallLog) CreateTable(db *gorm.DB) error {
 	}
 
 	// Set up TimescaleDB features
-	if err := initAPICallLogTable(db); err != nil {
+	if err = initAPICallLogTable(db); err != nil {
 		return fmt.Errorf("failed to setup TimescaleDB for api_call_logs: %w", err)
 	}
 
