@@ -47,7 +47,7 @@ func (r *ipIntelligenceRepository) FindByIP(ctx context.Context, ipAddress strin
 	var intel models.IPIntelligence
 	// specifically using write db connection here instead of read to ensure updates
 	// are captured in real-time as this is called right after an update in Session Manager
-	err := r.read.WithContext(ctx).
+	err := r.write.WithContext(ctx).
 		Where("ip_address = ?", ipAddress).
 		First(&intel).Error
 	if err != nil {
@@ -78,7 +78,7 @@ func (r *ipIntelligenceRepository) SetDomain(ctx context.Context, id uint, domai
 	return r.write.WithContext(ctx).
 		Model(&models.IPIntelligence{}).
 		Where("id = ?", id).
-		Updates(map[string]interface{}{
+		Updates(map[string]any{
 			"domain":     domain,
 			"updated_at": now,
 		}).Error
@@ -92,7 +92,7 @@ func (r *ipIntelligenceRepository) SetEmailAddress(ctx context.Context, id uint,
 	return r.write.WithContext(ctx).
 		Model(&models.IPIntelligence{}).
 		Where("id = ?", id).
-		Updates(map[string]interface{}{
+		Updates(map[string]any{
 			"email_address": emailAddress,
 			"updated_at":    now,
 		}).Error
