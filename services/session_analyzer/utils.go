@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/customeros/leads/internal/enum"
+	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/utils"
 )
 

@@ -8,7 +8,7 @@ import (
 	"github.com/customeros/mailsherpa/mailvalidate"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/customeros/leads/internal/enum"
+	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/models"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"

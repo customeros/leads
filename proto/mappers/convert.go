@@ -1,7 +1,7 @@
 package proto_mappers
 
 import (
-	"github.com/customeros/leads/internal/enum"
+	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/proto/pb"
 )
 
