@@ -30,7 +30,7 @@ func (s *webtrackerService) IsCNAMEConfigured(ctx context.Context, webtrackerID 
 func (s *webtrackerService) GetWebtrackerByOrigin(ctx context.Context, origin string) (*models.WebTracker, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "webtrackerService.GetWebtrackerByOrigin")
 	defer span.Finish()
-	span.LogKV("origin", origin) // dashb...
+	span.LogKV("origin", origin)
 
 	// step 1: get web tracker by origin
 	tracker, err := s.repositories.WebTracker.GetByDomain(ctx, origin)

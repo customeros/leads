@@ -8,7 +8,7 @@ import (
 
 type WebSession struct {
 	// Primary identification
-	ID        string `gorm:"column:id;primaryKey;type:varchar(255)"`
+	ID        string `gorm:"column:id;primaryKey;type:varchar(26)"`
 	TrackerID string `gorm:"column:tracker_id;type:varchar(255);index;not null"`
 	Tenant    string `gorm:"column:tenant;type:varchar(255);index;not null"`
 	VisitorID string `gorm:"column:visitor_id;type:varchar(255);index;not null"`
