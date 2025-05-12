@@ -35,3 +35,7 @@ type Content struct {
 	UpdatedAt    *time.Time `gorm:"column:updated_at;autoUpdateTime"`
 	ErrorMessage string     `gorm:"column:error_message;type:varchar(255);not null"`
 }
+
+func (Content) TableName() string {
+	return "content"
+}
