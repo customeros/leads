@@ -39,8 +39,6 @@ type dbLoggingTransport struct {
 }
 
 func (t *dbLoggingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	requestID := utils.GenerateNanoIDWithPrefix("api", 21)
-
 	// Capture request body for logging
 	var requestBodyBytes []byte
 	if req.Body != nil && req.Header.Get("Content-Type") != "multipart/form-data" {
@@ -70,7 +68,6 @@ func (t *dbLoggingTransport) RoundTrip(req *http.Request) (*http.Response, error
 		Vendor:      t.vendor,
 		Method:      req.Method,
 		URL:         req.URL.String(),
-		RequestID:   requestID,
 		RequestBody: requestBodyBytes,
 		Timestamp:   start,
 		Duration:    durationMs,

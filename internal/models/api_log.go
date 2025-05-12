@@ -15,7 +15,6 @@ type APICallLog struct {
 	Vendor       enum.APIVendor `gorm:"column:vendor;type:varchar(255);index;not null"`
 	Method       string         `gorm:"column:method;type:varchar(255);not null"`
 	URL          string         `gorm:"column:url;type:varchar(255);not null"`
-	RequestID    string         `gorm:"column:request_id;type:varchar(55);not null"`
 	RequestBody  []byte         `gorm:"column:request_body;type:bytea"`
 	Duration     int            `gorm:"column:duration;type:int;not null"`
 	StatusCode   *int           `gorm:"column:status_code;type:int;not null"`
@@ -101,7 +100,6 @@ func initAPICallLogTable(db *gorm.DB) error {
 	if err := db.Exec(`
 		CREATE INDEX IF NOT EXISTS idx_api_call_logs_vendor_timestamp ON api_call_logs (vendor, timestamp DESC);
 		CREATE INDEX IF NOT EXISTS idx_api_call_logs_status_timestamp ON api_call_logs (status_code, timestamp DESC);
-		CREATE INDEX IF NOT EXISTS idx_api_call_logs_request_id ON api_call_logs (request_id);
 		CREATE INDEX IF NOT EXISTS idx_api_call_logs_timestamp_duration ON api_call_logs (timestamp DESC, duration) 
 			WHERE duration > 1000; -- Index for slow API calls (over 1 second)
 	`).Error; err != nil {
