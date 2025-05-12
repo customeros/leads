@@ -35,8 +35,11 @@ const (
 
 	EventWebsiteCrawled Events = "website.crawled"
 
-	EventWebpageScraped  Events = "webpage.scraped"
-	EventWebpageProfiled Events = "webpage.profiled"
+	EventWebpageScraped               Events = "webpage.scraped"
+	EventRequestWebpageClassification Events = "ai.request.webpage_classification"
+	EventWebpageClassified            Events = "webpage.classified"
+	EventRequestWebpageIntent         Events = "ai.request.webpage_intent"
+	EventWebpageProfiled              Events = "webpage.profiled"
 )
 
 func (e Events) String() string {

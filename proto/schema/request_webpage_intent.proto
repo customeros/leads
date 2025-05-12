@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package leads;
+
+option go_package = "github.com/customeros/leads/proto/pb";
+
+message RequestWebpageIntent { string content_id = 1; }

@@ -121,6 +121,7 @@ func (s *scraperService) handleScrapesSuccess(ctx context.Context, domain, url, 
 	err = s.leadsDB.WriteDB.Transaction(func(tx *gorm.DB) error {
 		// create content record
 		err := s.repositories.Content.Create(ctx, &models.Content{
+			ID:      utils.GenerateNanoIDWithPrefix("page", 16),
 			Domain:  domain,
 			Url:     url,
 			Content: content,

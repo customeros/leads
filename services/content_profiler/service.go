@@ -39,7 +39,11 @@ func NewContentProfiler(
 	}
 }
 
-var SUBSCRIBED_SUBJECT = enum.EventWebpageScraped.String()
+var SUBSCRIBED_SUBJECTS = []string{
+	enum.EventWebpageScraped.String(),
+	enum.EventWebpageClassified.String(),
+	enum.EventWebpageProfiled.String(),
+}
 
 const (
 	// queue group
@@ -59,14 +63,14 @@ const (
 func (s *contentProfiler) Start(ctx context.Context) error {
 	// Create durable consumer for processing emails
 	_, err := s.natsConn.JS.AddConsumer(nats_internal.LEADS_STREAM, &nats.ConsumerConfig{
-		Durable:       CONSUMER_NAME,
-		DeliverGroup:  QUEUE_GROUP,
-		AckPolicy:     nats.AckExplicitPolicy,
-		AckWait:       ACK_WAIT,
-		MaxDeliver:    MAX_DELIVERY_ATTEMPTS,
-		FilterSubject: SUBSCRIBED_SUBJECT,
-		MaxAckPending: MAX_ACK_PENDING,
-		DeliverPolicy: nats.DeliverAllPolicy,
+		Durable:        CONSUMER_NAME,
+		DeliverGroup:   QUEUE_GROUP,
+		AckPolicy:      nats.AckExplicitPolicy,
+		AckWait:        ACK_WAIT,
+		MaxDeliver:     MAX_DELIVERY_ATTEMPTS,
+		FilterSubjects: SUBSCRIBED_SUBJECTS,
+		MaxAckPending:  MAX_ACK_PENDING,
+		DeliverPolicy:  nats.DeliverAllPolicy,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create consumer: %w", err)
@@ -74,7 +78,7 @@ func (s *contentProfiler) Start(ctx context.Context) error {
 
 	// Create pull subscription
 	sub, err := s.natsConn.JS.PullSubscribe(
-		SUBSCRIBED_SUBJECT,
+		">",
 		CONSUMER_NAME,
 		nats.Bind(nats_internal.LEADS_STREAM, CONSUMER_NAME),
 	)
@@ -113,7 +117,7 @@ func (s *contentProfiler) processBatch(ctx context.Context, sub *nats.Subscripti
 
 	for _, msg := range msgs {
 		msgCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		s.processMessage(msgCtx, msg)
+		s.routeMessage(msgCtx, msg)
 		cancel()
 	}
 }
@@ -129,7 +133,7 @@ func (s *contentProfiler) handleFetchError(err error) {
 }
 
 // processMessage processes a single email message
-func (s *contentProfiler) processMessage(ctx context.Context, msg *nats.Msg) {
+func (s *contentProfiler) routeMessage(ctx context.Context, msg *nats.Msg) {
 	ctx = utils.WithCustomContextFromNats(ctx, msg)
 	spans, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.processMessage")
 	defer spans.Finish()
@@ -139,27 +143,25 @@ func (s *contentProfiler) processMessage(ctx context.Context, msg *nats.Msg) {
 		return
 	}
 	spans.TagString("nats.subject", msg.Subject)
-	spans.TagString("nats.reply", msg.Reply)
 
-	message := &pb.WebTrackerCreated{}
-	err := proto.Unmarshal(msg.Data, message)
+	var err error
+	switch msg.Subject {
+	case enum.EventWebpageScraped.String():
+		err = s.handleWebpageScrapedEvent(ctx, msg)
+
+	case enum.EventWebpageClassified.String():
+		err = s.handleWebpageClassifiedEvent(ctx, msg)
+
+	case enum.EventWebpageProfiled.String():
+		err = s.handleWebpageProfiledEvent(ctx, msg)
+	}
+
 	if err != nil {
 		err := errors.New("failed to parse message")
 		spans.TraceError(err)
 		s.handleProcessingError(ctx, msg, err)
 		return
 	}
-
-	// Process the email
-	// TODO implement this
-	// err = s.handleNewTrackerCreated(ctx, message)
-	// if err != nil {
-	// 	if !strings.Contains(err.Error(), "skipping") {
-	// 		spans.TraceError(err)
-	// 	}
-	// 	s.handleProcessingError(ctx, msg, err)
-	// 	return
-	// }
 
 	msg.Ack()
 	return
