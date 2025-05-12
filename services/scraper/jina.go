@@ -13,8 +13,8 @@ import (
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 
+	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/clients"
-	"github.com/customeros/leads/internal/enum"
 	"github.com/customeros/leads/internal/models"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"

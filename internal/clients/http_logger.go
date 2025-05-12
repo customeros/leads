@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/customeros/leads/internal/enum"
+	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/models"
 	"github.com/customeros/leads/internal/repository"
 	"github.com/customeros/leads/internal/utils"

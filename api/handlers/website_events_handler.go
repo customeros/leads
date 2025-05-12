@@ -12,8 +12,8 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/caches"
-	"github.com/customeros/leads/internal/enum"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
 	proto_mappers "github.com/customeros/leads/proto/mappers"

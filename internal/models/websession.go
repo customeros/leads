@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/customeros/leads/internal/enum"
+	"github.com/customeros/leads/enum"
 )
 
 type WebSession struct {

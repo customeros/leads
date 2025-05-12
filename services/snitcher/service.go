@@ -9,8 +9,8 @@ import (
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/config"
-	"github.com/customeros/leads/internal/enum"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/repository"
 	"github.com/customeros/leads/internal/telemetry"

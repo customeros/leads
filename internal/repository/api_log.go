@@ -7,8 +7,8 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/database"
-	"github.com/customeros/leads/internal/enum"
 	"github.com/customeros/leads/internal/models"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"

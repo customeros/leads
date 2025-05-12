@@ -6,8 +6,8 @@ import (
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/customeros/leads/enum"
 	leads_errors "github.com/customeros/leads/errors"
-	"github.com/customeros/leads/internal/enum"
 	"github.com/customeros/leads/internal/models"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/telemetry"

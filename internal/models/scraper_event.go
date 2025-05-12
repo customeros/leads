@@ -6,7 +6,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/customeros/leads/internal/enum"
+	"github.com/customeros/leads/enum"
 )
 
 type ScraperEvent struct {

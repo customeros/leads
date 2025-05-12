@@ -9,9 +9,9 @@ import (
 
 	"github.com/nats-io/nats.go"
 
+	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/interfaces"
 	"github.com/customeros/leads/internal/database"
-	"github.com/customeros/leads/internal/enum"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/repository"
 	"github.com/customeros/leads/internal/telemetry"
