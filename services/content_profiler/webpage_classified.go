@@ -8,8 +8,8 @@ import (
 
 	leads_errors "github.com/customeros/leads/errors"
 	"github.com/customeros/leads/internal/models"
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/telemetry"
-	"github.com/customeros/leads/proto/pb"
 )
 
 func (s *contentProfiler) handleWebpageClassifiedEvent(ctx context.Context, msg *nats.Msg) error {

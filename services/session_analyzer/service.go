@@ -14,10 +14,10 @@ import (
 	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/interfaces"
 	nats_internal "github.com/customeros/leads/internal/nats"
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/repository"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
-	"github.com/customeros/leads/proto/pb"
 )
 
 type sessionAnalyzer struct {

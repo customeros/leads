@@ -14,10 +14,10 @@ import (
 
 	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/caches"
+	proto_mappers "github.com/customeros/leads/internal/proto/mappers"
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
-	proto_mappers "github.com/customeros/leads/proto/mappers"
-	"github.com/customeros/leads/proto/pb"
 	"github.com/customeros/leads/services"
 )
 

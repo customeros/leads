@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: schema/webpage.classified.proto
+// source: webpage.classified.proto
 
 package pb
 
@@ -38,7 +38,7 @@ type WebpageClassified struct {
 
 func (x *WebpageClassified) Reset() {
 	*x = WebpageClassified{}
-	mi := &file_schema_webpage_classified_proto_msgTypes[0]
+	mi := &file_webpage_classified_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -50,7 +50,7 @@ func (x *WebpageClassified) String() string {
 func (*WebpageClassified) ProtoMessage() {}
 
 func (x *WebpageClassified) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_webpage_classified_proto_msgTypes[0]
+	mi := &file_webpage_classified_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -63,7 +63,7 @@ func (x *WebpageClassified) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebpageClassified.ProtoReflect.Descriptor instead.
 func (*WebpageClassified) Descriptor() ([]byte, []int) {
-	return file_schema_webpage_classified_proto_rawDescGZIP(), []int{0}
+	return file_webpage_classified_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *WebpageClassified) GetContentId() string {
@@ -129,11 +129,11 @@ func (x *WebpageClassified) GetReferencedCustomers() []string {
 	return nil
 }
 
-var File_schema_webpage_classified_proto protoreflect.FileDescriptor
+var File_webpage_classified_proto protoreflect.FileDescriptor
 
-const file_schema_webpage_classified_proto_rawDesc = "" +
+const file_webpage_classified_proto_rawDesc = "" +
 	"\n" +
-	"\x1fschema/webpage.classified.proto\x12\x05leads\"\x81\x03\n" +
+	"\x18webpage.classified.proto\x12\x02pb\"\x81\x03\n" +
 	"\x11WebpageClassified\x12\x1d\n" +
 	"\n" +
 	"content_id\x18\x01 \x01(\tR\tcontentId\x12#\n" +
@@ -144,25 +144,25 @@ const file_schema_webpage_classified_proto_rawDesc = "" +
 	"\x11industry_vertical\x18\x06 \x01(\tR\x10industryVertical\x12&\n" +
 	"\x0fkey_pain_points\x18\a \x03(\tR\rkeyPainPoints\x12+\n" +
 	"\x11value_proposition\x18\b \x01(\tR\x10valueProposition\x121\n" +
-	"\x14referenced_customers\x18\t \x03(\tR\x13referencedCustomersB&Z$github.com/customeros/leads/proto/pbb\x06proto3"
+	"\x14referenced_customers\x18\t \x03(\tR\x13referencedCustomersB\x06Z\x04./pbb\x06proto3"
 
 var (
-	file_schema_webpage_classified_proto_rawDescOnce sync.Once
-	file_schema_webpage_classified_proto_rawDescData []byte
+	file_webpage_classified_proto_rawDescOnce sync.Once
+	file_webpage_classified_proto_rawDescData []byte
 )
 
-func file_schema_webpage_classified_proto_rawDescGZIP() []byte {
-	file_schema_webpage_classified_proto_rawDescOnce.Do(func() {
-		file_schema_webpage_classified_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_webpage_classified_proto_rawDesc), len(file_schema_webpage_classified_proto_rawDesc)))
+func file_webpage_classified_proto_rawDescGZIP() []byte {
+	file_webpage_classified_proto_rawDescOnce.Do(func() {
+		file_webpage_classified_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_webpage_classified_proto_rawDesc), len(file_webpage_classified_proto_rawDesc)))
 	})
-	return file_schema_webpage_classified_proto_rawDescData
+	return file_webpage_classified_proto_rawDescData
 }
 
-var file_schema_webpage_classified_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_schema_webpage_classified_proto_goTypes = []any{
-	(*WebpageClassified)(nil), // 0: leads.WebpageClassified
+var file_webpage_classified_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_webpage_classified_proto_goTypes = []any{
+	(*WebpageClassified)(nil), // 0: pb.WebpageClassified
 }
-var file_schema_webpage_classified_proto_depIdxs = []int32{
+var file_webpage_classified_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -170,26 +170,26 @@ var file_schema_webpage_classified_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_schema_webpage_classified_proto_init() }
-func file_schema_webpage_classified_proto_init() {
-	if File_schema_webpage_classified_proto != nil {
+func init() { file_webpage_classified_proto_init() }
+func file_webpage_classified_proto_init() {
+	if File_webpage_classified_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_webpage_classified_proto_rawDesc), len(file_schema_webpage_classified_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_webpage_classified_proto_rawDesc), len(file_webpage_classified_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_schema_webpage_classified_proto_goTypes,
-		DependencyIndexes: file_schema_webpage_classified_proto_depIdxs,
-		MessageInfos:      file_schema_webpage_classified_proto_msgTypes,
+		GoTypes:           file_webpage_classified_proto_goTypes,
+		DependencyIndexes: file_webpage_classified_proto_depIdxs,
+		MessageInfos:      file_webpage_classified_proto_msgTypes,
 	}.Build()
-	File_schema_webpage_classified_proto = out.File
-	file_schema_webpage_classified_proto_goTypes = nil
-	file_schema_webpage_classified_proto_depIdxs = nil
+	File_webpage_classified_proto = out.File
+	file_webpage_classified_proto_goTypes = nil
+	file_webpage_classified_proto_depIdxs = nil
 }

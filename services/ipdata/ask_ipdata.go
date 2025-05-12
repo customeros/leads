@@ -14,9 +14,9 @@ import (
 	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/clients"
 	"github.com/customeros/leads/internal/models"
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
-	"github.com/customeros/leads/proto/pb"
 )
 
 var knownBadResponseMessages = []string{"is a reserved IP address"}

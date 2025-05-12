@@ -22,6 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout CustomerOS
+        uses: actions/checkout@v4
+        with:
+          repository: customeros/customeros
+          path: ./customeros
+
       - name: Set up Go
         uses: ubicloud/setup-go@v5
         with:

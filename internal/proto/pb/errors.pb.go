@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: schema/errors.proto
+// source: errors.proto
 
 package pb
 
@@ -52,11 +52,11 @@ func (x ServiceName) String() string {
 }
 
 func (ServiceName) Descriptor() protoreflect.EnumDescriptor {
-	return file_schema_errors_proto_enumTypes[0].Descriptor()
+	return file_errors_proto_enumTypes[0].Descriptor()
 }
 
 func (ServiceName) Type() protoreflect.EnumType {
-	return &file_schema_errors_proto_enumTypes[0]
+	return &file_errors_proto_enumTypes[0]
 }
 
 func (x ServiceName) Number() protoreflect.EnumNumber {
@@ -65,7 +65,7 @@ func (x ServiceName) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ServiceName.Descriptor instead.
 func (ServiceName) EnumDescriptor() ([]byte, []int) {
-	return file_schema_errors_proto_rawDescGZIP(), []int{0}
+	return file_errors_proto_rawDescGZIP(), []int{0}
 }
 
 // ErrorEvent message for publishing error information
@@ -76,14 +76,14 @@ type ErrorEvent struct {
 	EmailId       string                 `protobuf:"bytes,3,opt,name=email_id,json=emailId,proto3" json:"email_id,omitempty"`
 	ErrorMessage  string                 `protobuf:"bytes,4,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
 	RawData       []byte                 `protobuf:"bytes,5,opt,name=raw_data,json=rawData,proto3" json:"raw_data,omitempty"`
-	Service       ServiceName            `protobuf:"varint,6,opt,name=service,proto3,enum=leads.ServiceName" json:"service,omitempty"`
+	Service       ServiceName            `protobuf:"varint,6,opt,name=service,proto3,enum=pb.ServiceName" json:"service,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ErrorEvent) Reset() {
 	*x = ErrorEvent{}
-	mi := &file_schema_errors_proto_msgTypes[0]
+	mi := &file_errors_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -95,7 +95,7 @@ func (x *ErrorEvent) String() string {
 func (*ErrorEvent) ProtoMessage() {}
 
 func (x *ErrorEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_errors_proto_msgTypes[0]
+	mi := &file_errors_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -108,7 +108,7 @@ func (x *ErrorEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ErrorEvent.ProtoReflect.Descriptor instead.
 func (*ErrorEvent) Descriptor() ([]byte, []int) {
-	return file_schema_errors_proto_rawDescGZIP(), []int{0}
+	return file_errors_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ErrorEvent) GetTimestamp() *timestamppb.Timestamp {
@@ -153,45 +153,45 @@ func (x *ErrorEvent) GetService() ServiceName {
 	return ServiceName_SERVICE_UNKNOWN
 }
 
-var File_schema_errors_proto protoreflect.FileDescriptor
+var File_errors_proto protoreflect.FileDescriptor
 
-const file_schema_errors_proto_rawDesc = "" +
+const file_errors_proto_rawDesc = "" +
 	"\n" +
-	"\x13schema/errors.proto\x12\x05leads\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe9\x01\n" +
+	"\ferrors.proto\x12\x02pb\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe6\x01\n" +
 	"\n" +
 	"ErrorEvent\x128\n" +
 	"\ttimestamp\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x18\n" +
 	"\asubject\x18\x02 \x01(\tR\asubject\x12\x19\n" +
 	"\bemail_id\x18\x03 \x01(\tR\aemailId\x12#\n" +
 	"\rerror_message\x18\x04 \x01(\tR\ferrorMessage\x12\x19\n" +
-	"\braw_data\x18\x05 \x01(\fR\arawData\x12,\n" +
-	"\aservice\x18\x06 \x01(\x0e2\x12.leads.ServiceNameR\aservice*C\n" +
+	"\braw_data\x18\x05 \x01(\fR\arawData\x12)\n" +
+	"\aservice\x18\x06 \x01(\x0e2\x0f.pb.ServiceNameR\aservice*C\n" +
 	"\vServiceName\x12\x13\n" +
 	"\x0fSERVICE_UNKNOWN\x10\x00\x12\x1f\n" +
-	"\x1bLEADS_PROXY_MANAGER_SERVICE\x10\x01B&Z$github.com/customeros/leads/proto/pbb\x06proto3"
+	"\x1bLEADS_PROXY_MANAGER_SERVICE\x10\x01B\x06Z\x04./pbb\x06proto3"
 
 var (
-	file_schema_errors_proto_rawDescOnce sync.Once
-	file_schema_errors_proto_rawDescData []byte
+	file_errors_proto_rawDescOnce sync.Once
+	file_errors_proto_rawDescData []byte
 )
 
-func file_schema_errors_proto_rawDescGZIP() []byte {
-	file_schema_errors_proto_rawDescOnce.Do(func() {
-		file_schema_errors_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_errors_proto_rawDesc), len(file_schema_errors_proto_rawDesc)))
+func file_errors_proto_rawDescGZIP() []byte {
+	file_errors_proto_rawDescOnce.Do(func() {
+		file_errors_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_errors_proto_rawDesc), len(file_errors_proto_rawDesc)))
 	})
-	return file_schema_errors_proto_rawDescData
+	return file_errors_proto_rawDescData
 }
 
-var file_schema_errors_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_schema_errors_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_schema_errors_proto_goTypes = []any{
-	(ServiceName)(0),              // 0: leads.ServiceName
-	(*ErrorEvent)(nil),            // 1: leads.ErrorEvent
+var file_errors_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_errors_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_errors_proto_goTypes = []any{
+	(ServiceName)(0),              // 0: pb.ServiceName
+	(*ErrorEvent)(nil),            // 1: pb.ErrorEvent
 	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
 }
-var file_schema_errors_proto_depIdxs = []int32{
-	2, // 0: leads.ErrorEvent.timestamp:type_name -> google.protobuf.Timestamp
-	0, // 1: leads.ErrorEvent.service:type_name -> leads.ServiceName
+var file_errors_proto_depIdxs = []int32{
+	2, // 0: pb.ErrorEvent.timestamp:type_name -> google.protobuf.Timestamp
+	0, // 1: pb.ErrorEvent.service:type_name -> pb.ServiceName
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -199,27 +199,27 @@ var file_schema_errors_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_schema_errors_proto_init() }
-func file_schema_errors_proto_init() {
-	if File_schema_errors_proto != nil {
+func init() { file_errors_proto_init() }
+func file_errors_proto_init() {
+	if File_errors_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_errors_proto_rawDesc), len(file_schema_errors_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_errors_proto_rawDesc), len(file_errors_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_schema_errors_proto_goTypes,
-		DependencyIndexes: file_schema_errors_proto_depIdxs,
-		EnumInfos:         file_schema_errors_proto_enumTypes,
-		MessageInfos:      file_schema_errors_proto_msgTypes,
+		GoTypes:           file_errors_proto_goTypes,
+		DependencyIndexes: file_errors_proto_depIdxs,
+		EnumInfos:         file_errors_proto_enumTypes,
+		MessageInfos:      file_errors_proto_msgTypes,
 	}.Build()
-	File_schema_errors_proto = out.File
-	file_schema_errors_proto_goTypes = nil
-	file_schema_errors_proto_depIdxs = nil
+	File_errors_proto = out.File
+	file_errors_proto_goTypes = nil
+	file_errors_proto_depIdxs = nil
 }

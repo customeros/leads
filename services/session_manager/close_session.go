@@ -10,9 +10,9 @@ import (
 
 	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/models"
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
-	"github.com/customeros/leads/proto/pb"
 )
 
 const (

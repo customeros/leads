@@ -12,9 +12,9 @@ import (
 	"github.com/customeros/leads/enum"
 	leads_errors "github.com/customeros/leads/errors"
 	"github.com/customeros/leads/internal/models"
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
-	"github.com/customeros/leads/proto/pb"
 )
 
 const (

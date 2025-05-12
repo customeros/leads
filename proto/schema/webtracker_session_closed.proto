@@ -1,6 +1,0 @@
-syntax = "proto3";
-
-package leads;
-option go_package = "github.com/customeros/leads/proto/pb";
-
-message WebTrackerSessionClosed { string session_id = 1; }

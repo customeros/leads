@@ -6,8 +6,8 @@ import (
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/telemetry"
-	"github.com/customeros/leads/proto/pb"
 )
 
 func (s *scraperService) handleNewTrackerCreated(ctx context.Context, msg *nats.Msg) error {

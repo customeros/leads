@@ -10,9 +10,9 @@ import (
 	leads_errors "github.com/customeros/leads/errors"
 	"github.com/customeros/leads/internal/models"
 	nats_internal "github.com/customeros/leads/internal/nats"
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
-	"github.com/customeros/leads/proto/pb"
 )
 
 func (s *contentProfiler) handleWebpageScrapedEvent(ctx context.Context, msg *nats.Msg) error {

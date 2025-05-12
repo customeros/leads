@@ -11,9 +11,9 @@ import (
 
 	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/models"
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
-	"github.com/customeros/leads/proto/pb"
 )
 
 const (
@@ -52,7 +52,7 @@ func (s *sessionManager) NewSession(ctx context.Context, msg *nats.Msg) {
 	span.TagString("nats.subject", msg.Subject)
 	span.TagString("nats.reply", msg.Reply)
 
-	message := &pb.WebtrackerSessionNew{}
+	message := &pb.WebtrackerSessionCreated{}
 	err := proto.Unmarshal(msg.Data, message)
 	if err != nil {
 		err := fmt.Errorf("failed to parse message: %w", err)
@@ -64,7 +64,7 @@ func (s *sessionManager) NewSession(ctx context.Context, msg *nats.Msg) {
 	s.processNewSession(ctx, message)
 }
 
-func (s *sessionManager) processNewSession(ctx context.Context, message *pb.WebtrackerSessionNew) error {
+func (s *sessionManager) processNewSession(ctx context.Context, message *pb.WebtrackerSessionCreated) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.processNewSession")
 	defer span.Finish()
 
@@ -144,7 +144,7 @@ func (s *sessionManager) checkForExistingIPRecord(ctx context.Context, ipAddress
 	return ipRecord, nil
 }
 
-func (s *sessionManager) processNewIP(ctx context.Context, message *pb.WebtrackerSessionNew) (*models.IPIntelligence, error) {
+func (s *sessionManager) processNewIP(ctx context.Context, message *pb.WebtrackerSessionCreated) (*models.IPIntelligence, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.processNewIP")
 	defer span.Finish()
 	span.LogKV("ipAddress", message.Ip)

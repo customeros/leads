@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: schema/webtracker_created.proto
+// source: webtracker_created.proto
 
 package pb
 
@@ -33,7 +33,7 @@ type WebTrackerCreated struct {
 
 func (x *WebTrackerCreated) Reset() {
 	*x = WebTrackerCreated{}
-	mi := &file_schema_webtracker_created_proto_msgTypes[0]
+	mi := &file_webtracker_created_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +45,7 @@ func (x *WebTrackerCreated) String() string {
 func (*WebTrackerCreated) ProtoMessage() {}
 
 func (x *WebTrackerCreated) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_webtracker_created_proto_msgTypes[0]
+	mi := &file_webtracker_created_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *WebTrackerCreated) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebTrackerCreated.ProtoReflect.Descriptor instead.
 func (*WebTrackerCreated) Descriptor() ([]byte, []int) {
-	return file_schema_webtracker_created_proto_rawDescGZIP(), []int{0}
+	return file_webtracker_created_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *WebTrackerCreated) GetId() string {
@@ -89,35 +89,35 @@ func (x *WebTrackerCreated) GetCnameTarget() string {
 	return ""
 }
 
-var File_schema_webtracker_created_proto protoreflect.FileDescriptor
+var File_webtracker_created_proto protoreflect.FileDescriptor
 
-const file_schema_webtracker_created_proto_rawDesc = "" +
+const file_webtracker_created_proto_rawDesc = "" +
 	"\n" +
-	"\x1fschema/webtracker_created.proto\x12\x05leads\"}\n" +
+	"\x18webtracker_created.proto\x12\x02pb\"}\n" +
 	"\x11WebTrackerCreated\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06domain\x18\x02 \x01(\tR\x06domain\x12\x1d\n" +
 	"\n" +
 	"cname_host\x18\x03 \x01(\tR\tcnameHost\x12!\n" +
-	"\fcname_target\x18\x04 \x01(\tR\vcnameTargetB&Z$github.com/customeros/leads/proto/pbb\x06proto3"
+	"\fcname_target\x18\x04 \x01(\tR\vcnameTargetB\x06Z\x04./pbb\x06proto3"
 
 var (
-	file_schema_webtracker_created_proto_rawDescOnce sync.Once
-	file_schema_webtracker_created_proto_rawDescData []byte
+	file_webtracker_created_proto_rawDescOnce sync.Once
+	file_webtracker_created_proto_rawDescData []byte
 )
 
-func file_schema_webtracker_created_proto_rawDescGZIP() []byte {
-	file_schema_webtracker_created_proto_rawDescOnce.Do(func() {
-		file_schema_webtracker_created_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_webtracker_created_proto_rawDesc), len(file_schema_webtracker_created_proto_rawDesc)))
+func file_webtracker_created_proto_rawDescGZIP() []byte {
+	file_webtracker_created_proto_rawDescOnce.Do(func() {
+		file_webtracker_created_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_webtracker_created_proto_rawDesc), len(file_webtracker_created_proto_rawDesc)))
 	})
-	return file_schema_webtracker_created_proto_rawDescData
+	return file_webtracker_created_proto_rawDescData
 }
 
-var file_schema_webtracker_created_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_schema_webtracker_created_proto_goTypes = []any{
-	(*WebTrackerCreated)(nil), // 0: leads.WebTrackerCreated
+var file_webtracker_created_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_webtracker_created_proto_goTypes = []any{
+	(*WebTrackerCreated)(nil), // 0: pb.WebTrackerCreated
 }
-var file_schema_webtracker_created_proto_depIdxs = []int32{
+var file_webtracker_created_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -125,26 +125,26 @@ var file_schema_webtracker_created_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_schema_webtracker_created_proto_init() }
-func file_schema_webtracker_created_proto_init() {
-	if File_schema_webtracker_created_proto != nil {
+func init() { file_webtracker_created_proto_init() }
+func file_webtracker_created_proto_init() {
+	if File_webtracker_created_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_webtracker_created_proto_rawDesc), len(file_schema_webtracker_created_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_webtracker_created_proto_rawDesc), len(file_webtracker_created_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_schema_webtracker_created_proto_goTypes,
-		DependencyIndexes: file_schema_webtracker_created_proto_depIdxs,
-		MessageInfos:      file_schema_webtracker_created_proto_msgTypes,
+		GoTypes:           file_webtracker_created_proto_goTypes,
+		DependencyIndexes: file_webtracker_created_proto_depIdxs,
+		MessageInfos:      file_webtracker_created_proto_msgTypes,
 	}.Build()
-	File_schema_webtracker_created_proto = out.File
-	file_schema_webtracker_created_proto_goTypes = nil
-	file_schema_webtracker_created_proto_depIdxs = nil
+	File_webtracker_created_proto = out.File
+	file_webtracker_created_proto_goTypes = nil
+	file_webtracker_created_proto_depIdxs = nil
 }
