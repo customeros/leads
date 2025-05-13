@@ -77,7 +77,7 @@ func (s *IPDataService) Unsubscribe() {
 	if s.subscription != nil {
 		s.subscription.Unsubscribe()
 		s.subscription = nil
-		log.Println("🛑 Snitcher Service unsubscribed from NATS")
+		log.Println("🛑 IPData Service unsubscribed from NATS")
 	}
 }
 
@@ -86,7 +86,7 @@ func (s *IPDataService) Stop() {
 	s.Unsubscribe()
 	if s.natsConn != nil {
 		s.natsConn.Close()
-		log.Println("⏹️ Snitcher Service stopped")
+		log.Println("⏹️ IPData Service stopped")
 	}
 	return
 }
