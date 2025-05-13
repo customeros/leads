@@ -71,6 +71,7 @@ func (r *webSessionRepository) Save(ctx context.Context, session *models.WebSess
 		Where("id = ?", session.ID).
 		Count(&count).Error
 	if err != nil {
+		spans.TraceError(err)
 		return fmt.Errorf("failed to check session existence: %w", err)
 	}
 
@@ -79,6 +80,7 @@ func (r *webSessionRepository) Save(ctx context.Context, session *models.WebSess
 		// Create
 		err = tx.Create(session).Error
 		if err != nil {
+			spans.TraceError(err)
 			return fmt.Errorf("failed to create session: %w", err)
 		}
 	} else {
@@ -87,6 +89,7 @@ func (r *webSessionRepository) Save(ctx context.Context, session *models.WebSess
 			Where("id = ?", session.ID).
 			Updates(session).Error
 		if err != nil {
+			spans.TraceError(err)
 			return fmt.Errorf("failed to update session: %w", err)
 		}
 	}
@@ -116,12 +119,16 @@ func (r *webSessionRepository) CreateWithTxn(ctx context.Context, tx *gorm.DB, s
 }
 
 func (r *webSessionRepository) GetActiveSessionsWithLookback(ctx context.Context, olderThan time.Time) ([]*models.WebSession, error) {
+	span, ctx := telemetry.StartPostgresSpan(ctx, "webSessionRepository.GetActiveSessionsWithLookback")
+	defer span.Finish()
+
 	var sessions []*models.WebSession
 
 	err := r.read.WithContext(ctx).
 		Where("is_active = ? AND timestamp < ?", true, olderThan).
 		Find(&sessions).Error
 	if err != nil {
+		span.TraceError(err)
 		return nil, fmt.Errorf("failed to get active sessions: %w", err)
 	}
 
@@ -129,12 +136,16 @@ func (r *webSessionRepository) GetActiveSessionsWithLookback(ctx context.Context
 }
 
 func (r *webSessionRepository) GetInactiveSessions(ctx context.Context) ([]*models.WebSession, error) {
+	span, ctx := telemetry.StartPostgresSpan(ctx, "webSessionRepository.GetInactiveSessions")
+	defer span.Finish()
+
 	var sessions []*models.WebSession
 
 	err := r.read.WithContext(ctx).
 		Where("is_active = ?", false).
 		Find(&sessions).Error
 	if err != nil {
+		span.TraceError(err)
 		return nil, fmt.Errorf("failed to get inactive sessions: %w", err)
 	}
 
@@ -142,12 +153,16 @@ func (r *webSessionRepository) GetInactiveSessions(ctx context.Context) ([]*mode
 }
 
 func (r *webSessionRepository) CloseSessionWithTxn(ctx context.Context, tx *gorm.DB, sessionID string) error {
+	span, ctx := telemetry.StartPostgresSpan(ctx, "webSessionRepository.CloseSessionWithTxn")
+	defer span.Finish()
+
 	result := tx.WithContext(ctx).
 		Model(&models.WebSession{}).
 		Where("id = ?", sessionID).
 		Update("is_active", false)
 
 	if result.Error != nil {
+		span.TraceError(result.Error)
 		return fmt.Errorf("failed to update session status: %w", result.Error)
 	}
 
@@ -159,6 +174,9 @@ func (r *webSessionRepository) CloseSessionWithTxn(ctx context.Context, tx *gorm
 }
 
 func (r *webSessionRepository) UpdateLastEvent(ctx context.Context, sessionID string, event enum.Events, timestamp time.Time) error {
+	span, ctx := telemetry.StartPostgresSpan(ctx, "webSessionRepository.UpdateLastEvent")
+	defer span.Finish()
+
 	result := r.read.WithContext(ctx).
 		Model(&models.WebSession{}).
 		Where("id = ?", sessionID).
@@ -168,6 +186,7 @@ func (r *webSessionRepository) UpdateLastEvent(ctx context.Context, sessionID st
 		})
 
 	if result.Error != nil {
+		span.TraceError(result.Error)
 		return fmt.Errorf("failed to update last event: %w", result.Error)
 	}
 

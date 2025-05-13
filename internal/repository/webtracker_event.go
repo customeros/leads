@@ -39,7 +39,13 @@ func (r *webTrackerEventRepository) Create(ctx context.Context, event *models.We
 		event.ID = utils.GenerateNanoIDWithPrefix("wevt", 16)
 	}
 
-	return r.write.WithContext(ctx).Create(event).Error
+	err := r.write.WithContext(ctx).Create(event).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *webTrackerEventRepository) FindBySessionID(ctx context.Context, sessionID string, limit int) ([]*models.WebTrackerEvent, error) {
@@ -52,6 +58,11 @@ func (r *webTrackerEventRepository) FindBySessionID(ctx context.Context, session
 		Order("timestamp ASC").
 		Limit(limit).
 		Find(&events).Error
+
+	if err != nil {
+		span.TraceError(err)
+		return nil, err
+	}
 
 	return events, err
 }
@@ -67,5 +78,10 @@ func (r *webTrackerEventRepository) FindByTenant(ctx context.Context, tenant str
 		Limit(limit).
 		Find(&events).Error
 
-	return events, err
+	if err != nil {
+		span.TraceError(err)
+		return nil, err
+	}
+
+	return events, nil
 }

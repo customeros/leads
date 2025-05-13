@@ -40,14 +40,26 @@ func (r *outboxRepository) Create(ctx context.Context, event *models.OutboxEvent
 	span, ctx := telemetry.StartPostgresSpan(ctx, "outboxRepository.Create")
 	defer span.Finish()
 
-	return r.write.WithContext(ctx).Create(event).Error
+	err := r.write.WithContext(ctx).Create(event).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *outboxRepository) CreateWithTxn(ctx context.Context, txn *gorm.DB, event *models.OutboxEvent) error {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "outboxRepository.CreateWithTxn")
 	defer span.Finish()
 
-	return txn.WithContext(ctx).Create(event).Error
+	err := txn.WithContext(ctx).Create(event).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *outboxRepository) GetPendingEvents(ctx context.Context, limit int) ([]*models.OutboxEvent, error) {
@@ -148,10 +160,16 @@ func (r *outboxRepository) IncrementRetryCount(ctx context.Context, id string) e
 	span, ctx := telemetry.StartPostgresSpan(ctx, "outboxRepository.IncrementRetryCount")
 	defer span.Finish()
 
-	return r.write.WithContext(ctx).
+	err := r.write.WithContext(ctx).
 		Model(&models.OutboxEvent{}).
 		Where("id = ?", id).
 		UpdateColumn("retry_count", gorm.Expr("retry_count + 1")).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *outboxRepository) DeleteProcessedEvents(ctx context.Context, olderThan time.Duration) (int64, error) {
@@ -165,5 +183,10 @@ func (r *outboxRepository) DeleteProcessedEvents(ctx context.Context, olderThan 
 			enum.OutboxCompleted, cutoffTime).
 		Delete(&models.OutboxEvent{})
 
-	return result.RowsAffected, result.Error
+	if result.Error != nil {
+		span.TraceError(result.Error)
+		return 0, result.Error
+	}
+
+	return result.RowsAffected, nil
 }
