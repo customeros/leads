@@ -29,7 +29,7 @@ func (s *ContentProfiler) handleWebpageProfiledEvent(ctx context.Context, msg *n
 	}
 
 	// update record
-	err = s.repositories.Content.Update(ctx, &models.Content{
+	err = s.repositories.Content.UpdateIntentScores(ctx, &models.Content{
 		ID:                      message.ContentId,
 		ProblemRecognitionScore: int(message.ProblemRecognitionScore),
 		SolutionResearchScore:   int(message.SolutionResearchScore),
