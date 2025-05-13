@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
 	"github.com/customeros/leads/enum"
@@ -54,9 +55,10 @@ func (r *apiCallLogRepository) GetByID(ctx context.Context, id string) (*models.
 	var log models.APICallLog
 	err := r.read.WithContext(ctx).Where("id = ?", id).First(&log).Error
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("API call log not found with ID: %s", id)
 		}
+		span.TraceError(err)
 		return nil, err
 	}
 
@@ -70,9 +72,10 @@ func (r *apiCallLogRepository) FindByRequestID(ctx context.Context, requestID st
 	var log models.APICallLog
 	err := r.read.WithContext(ctx).Where("request_id = ?", requestID).First(&log).Error
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil // Return nil, nil when not found
 		}
+		span.TraceError(err)
 		return nil, err
 	}
 
@@ -91,6 +94,7 @@ func (r *apiCallLogRepository) FindByVendor(ctx context.Context, vendor enum.API
 		Offset(offset).
 		Find(&logs).Error
 	if err != nil {
+		span.TraceError(err)
 		return nil, err
 	}
 
@@ -113,10 +117,16 @@ func (r *apiCallLogRepository) UpdateResponseData(ctx context.Context, id string
 		updates["error_message"] = errorMessage
 	}
 
-	return r.write.WithContext(ctx).
+	err := r.write.WithContext(ctx).
 		Model(&models.APICallLog{}).
 		Where("id = ?", id).
 		Updates(updates).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *apiCallLogRepository) DeleteOlderThan(ctx context.Context, age time.Duration) (int64, error) {
@@ -128,7 +138,11 @@ func (r *apiCallLogRepository) DeleteOlderThan(ctx context.Context, age time.Dur
 		Where("timestamp < ?", cutoffTime).
 		Delete(&models.APICallLog{})
 
-	return result.RowsAffected, result.Error
+	if result.Error != nil {
+		span.TraceError(result.Error)
+	}
+
+	return result.RowsAffected, nil
 }
 
 // SetupTimescaleDB initializes the TimescaleDB specifics for API call logs

@@ -50,7 +50,13 @@ func (r *contentRepo) Create(ctx context.Context, content *models.Content) error
 	span, ctx := telemetry.StartPostgresSpan(ctx, "contentRepo.Create")
 	defer span.Finish()
 
-	return r.writeDB.WithContext(ctx).Create(content).Error
+	err := r.writeDB.WithContext(ctx).Create(content).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *contentRepo) GetByDomains(ctx context.Context, domains []string) ([]models.Content, error) {
@@ -60,6 +66,7 @@ func (r *contentRepo) GetByDomains(ctx context.Context, domains []string) ([]mod
 	var contents []models.Content
 	result := r.readDB.WithContext(ctx).Where("domain IN ?", domains).Find(&contents)
 	if result.Error != nil {
+		span.TraceError(result.Error)
 		return nil, result.Error
 	}
 
@@ -76,6 +83,7 @@ func (r *contentRepo) GetByUrl(ctx context.Context, url string) (*models.Content
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
+		span.TraceError(result.Error)
 		return nil, result.Error
 	}
 	return &content, nil
@@ -124,18 +132,30 @@ func (r *contentRepo) UpdateClassificationFields(ctx context.Context, content *m
 		return nil // nothing to update
 	}
 
-	return r.writeDB.WithContext(ctx).
+	err := r.writeDB.WithContext(ctx).
 		Model(&models.Content{}).
 		Where("id = ?", content.ID).
 		Updates(updates).
 		Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *contentRepo) Update(ctx context.Context, content *models.Content) error {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "contentRepo.Update")
 	defer span.Finish()
 
-	return r.writeDB.WithContext(ctx).Save(content).Error
+	err := r.writeDB.WithContext(ctx).Save(content).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 // Delete removes a Content record from the database
@@ -143,7 +163,13 @@ func (r *contentRepo) Delete(ctx context.Context, id string) error {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "contentRepo.Delete")
 	defer span.Finish()
 
-	return r.writeDB.WithContext(ctx).Delete(&models.Content{}, "id = ?", id).Error
+	err := r.writeDB.WithContext(ctx).Delete(&models.Content{}, "id = ?", id).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 // List retrieves Content records based on filter criteria
@@ -179,5 +205,10 @@ func (r *contentRepo) List(ctx context.Context, filter ContentFilter) ([]models.
 	}
 
 	err := query.Find(&contents).Error
-	return contents, err
+	if err != nil {
+		span.TraceError(err)
+		return nil, err
+	}
+
+	return contents, nil
 }

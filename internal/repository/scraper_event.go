@@ -36,5 +36,11 @@ func (r *scraperEventRepository) Create(ctx context.Context, event *models.Scrap
 		event.ID = utils.GenerateNanoIDWithPrefix("scrp", 16)
 	}
 
-	return r.write.WithContext(ctx).Create(event).Error
+	err := r.write.WithContext(ctx).Create(event).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }

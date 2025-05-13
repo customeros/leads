@@ -37,7 +37,13 @@ func (r *ipIntelligenceRepository) Create(ctx context.Context, intel *models.IPI
 	defer span.Finish()
 	span.LogObjectAsJson("intel", intel)
 
-	return r.write.WithContext(ctx).Create(intel).Error
+	err := r.write.WithContext(ctx).Create(intel).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *ipIntelligenceRepository) FindByIP(ctx context.Context, ipAddress string) (*models.IPIntelligence, error) {
@@ -69,7 +75,13 @@ func (r *ipIntelligenceRepository) Update(ctx context.Context, intel *models.IPI
 	now := time.Now()
 	intel.UpdatedAt = &now
 
-	return r.write.WithContext(ctx).Save(intel).Error
+	err := r.write.WithContext(ctx).Save(intel).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *ipIntelligenceRepository) SetDomain(ctx context.Context, id uint, domain string) error {
@@ -77,13 +89,19 @@ func (r *ipIntelligenceRepository) SetDomain(ctx context.Context, id uint, domai
 	defer span.Finish()
 
 	now := time.Now()
-	return r.write.WithContext(ctx).
+	err := r.write.WithContext(ctx).
 		Model(&models.IPIntelligence{}).
 		Where("id = ?", id).
 		Updates(map[string]any{
 			"domain":     domain,
 			"updated_at": now,
 		}).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 func (r *ipIntelligenceRepository) SetEmailAddress(ctx context.Context, id uint, emailAddress string) error {
@@ -91,11 +109,17 @@ func (r *ipIntelligenceRepository) SetEmailAddress(ctx context.Context, id uint,
 	defer span.Finish()
 
 	now := time.Now()
-	return r.write.WithContext(ctx).
+	err := r.write.WithContext(ctx).
 		Model(&models.IPIntelligence{}).
 		Where("id = ?", id).
 		Updates(map[string]any{
 			"email_address": emailAddress,
 			"updated_at":    now,
 		}).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
