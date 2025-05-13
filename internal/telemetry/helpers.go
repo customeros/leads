@@ -32,6 +32,7 @@ const otelSpanKey contextKey = "otel_span"
 const (
 	ComponentPostgres = "postgres"
 	ComponentService  = "service"
+	ComponentListener = "listener"
 	ComponentCronJob  = "cron"
 	ComponentRest     = "rest"
 	ComponentGraphQL  = "graphql"
@@ -178,6 +179,13 @@ func StartServiceSpan(ctx context.Context, operationName string, opts ...SpanOpt
 	return spans, ctx
 }
 
+func StartListenerSpan(ctx context.Context, operationName string, opts ...SpanOptions) (*Spans, context.Context) {
+	spans, ctx := startSpan(ctx, operationName, opts...)
+	TagComponentListener(spans)
+	SetSpanKindConsumer(spans)
+	return spans, ctx
+}
+
 func StartRestSpan(ctx context.Context, operationName string, opts ...SpanOptions) (*Spans, context.Context) {
 	spans, ctx := startSpan(ctx, operationName, opts...)
 	TagComponentRest(spans)
@@ -209,6 +217,15 @@ func TagComponentService(spans *Spans) {
 	}
 	if spans.OTel != nil {
 		spans.OTel.SetAttributes(attribute.String(componentKey, ComponentService))
+	}
+}
+
+func TagComponentListener(spans *Spans) {
+	if spans == nil {
+		return
+	}
+	if spans.OTel != nil {
+		spans.OTel.SetAttributes(attribute.String(componentKey, ComponentListener))
 	}
 }
 
