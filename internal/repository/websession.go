@@ -107,6 +107,8 @@ func (r *webSessionRepository) CreateWithTxn(ctx context.Context, tx *gorm.DB, s
 		return ErrTrackerIdMissing
 	}
 	span.TagEntity(session.ID)
+	session.StartedAt = utils.NowIfZero(session.StartedAt)
+	session.LastEventAt = utils.NowIfZero(session.LastEventAt)
 
 	session.Tenant = utils.GetTenantFromContext(ctx)
 
@@ -125,7 +127,7 @@ func (r *webSessionRepository) GetActiveSessionsWithLookback(ctx context.Context
 	var sessions []*models.WebSession
 
 	err := r.read.WithContext(ctx).
-		Where("is_active = ? AND timestamp < ?", true, olderThan).
+		Where("is_active = ? AND last_event_at < ?", true, olderThan).
 		Find(&sessions).Error
 	if err != nil {
 		span.TraceError(err)

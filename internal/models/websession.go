@@ -21,7 +21,7 @@ type WebSession struct {
 
 	// Session timing
 	StartedAt       time.Time  `gorm:"column:started_at;type:timestamptz;not null;index"`
-	LastEventAt     *time.Time `gorm:"column:last_event_at;type:timestamptz;index"`
+	LastEventAt     time.Time  `gorm:"column:last_event_at;type:timestamptz;index"`
 	EndedAt         *time.Time `gorm:"column:ended_at;type:timestamptz"`
 	SessionDuration int        `gorm:"column:session_duration;type:integer"` // in seconds
 

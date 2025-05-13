@@ -137,7 +137,7 @@ func (s *webEventProcessor) newSession(ctx context.Context, webtrackerID string,
 			VisitorID:   event.VisitorId,
 			TrackerID:   webtrackerID,
 			StartedAt:   now,
-			LastEventAt: &now,
+			LastEventAt: now,
 		}
 
 		err = s.repositories.WebSession.CreateWithTxn(ctx, tx, &webSession)
