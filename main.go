@@ -79,11 +79,5 @@ func runDBMigration(config *config.Config, leadsDB, warehouseDB *database.DbConn
 		return err
 	}
 
-	log.Println("Migrating Warehouse DB...")
-	err = repository.MigrateDataWarehouse(config.DataWarehouseConfig, warehouseDB.WriteDB)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }

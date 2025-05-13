@@ -7,9 +7,11 @@ import (
 	"strings"
 
 	"github.com/nats-io/nats.go"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/customeros/leads/internal/models"
 	nats_internal "github.com/customeros/leads/internal/nats"
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/telemetry"
 )
 
@@ -29,11 +31,49 @@ func (s *OutboxProcessor) processEvent(ctx context.Context, event *models.Outbox
 		// TODO
 		return nil
 
+	case strings.HasPrefix(event.EventType.String(), "webpage"):
+		return s.processWebscraperEvent(ctx, event)
+
 	default:
 		err := errors.New("event type not implemented")
 		span.TraceError(err)
 		return err
 	}
+}
+
+func (s *OutboxProcessor) processWebscraperEvent(ctx context.Context, event *models.OutboxEvent) error {
+	span, ctx := telemetry.StartServiceSpan(ctx, "OutboxProcessor.processWebscraperEvent")
+	defer span.Finish()
+
+	scrapedEvent := &pb.WebpageScraped{}
+	err := proto.Unmarshal(event.Payload, scrapedEvent)
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	eventLog := &models.ScraperEvent{
+		ID:        event.ID,
+		Timestamp: event.CreatedAt,
+		Event:     event.EventType,
+		Publisher: event.Publisher,
+		Domain:    scrapedEvent.Url,
+		Url:       scrapedEvent.Url,
+		Payload:   event.Payload,
+	}
+
+	err = s.repositories.ScraperEvent.Create(ctx, eventLog)
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	err = s.publishEvent(ctx, event)
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+	return nil
 }
 
 func (s *OutboxProcessor) processWebTrackerEvent(ctx context.Context, event *models.OutboxEvent) error {
@@ -83,7 +123,7 @@ func (s *OutboxProcessor) publishEvent(ctx context.Context, event *models.Outbox
 	_, err := s.natsConn.JS.PublishMsg(msg)
 	if err != nil {
 		span.TraceError(err)
-		return fmt.Errorf("failed to publish stored email: %w", err)
+		return fmt.Errorf("failed to publish outbox event: %w", err)
 	}
 
 	return nil

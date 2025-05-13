@@ -8,7 +8,7 @@ import (
 
 type Content struct {
 	// Primary identification
-	ID      string         `gorm:"column:id;primaryKey;type:uuid;default:gen_random_uuid()"`
+	ID      string         `gorm:"column:id;primaryKey;type:varchar(30)"`
 	Domain  string         `gorm:"column:domain;type:varchar(255);not null"`
 	Url     string         `gorm:"column:url;type:varchar(255);not null"`
 	Content string         `gorm:"column:content;type:text;not null"`

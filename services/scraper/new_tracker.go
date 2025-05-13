@@ -20,11 +20,17 @@ func (s *scraperService) handleNewTrackerCreated(ctx context.Context, msg *nats.
 		return err
 	}
 
-	err = s.Crawl(ctx, message.Domain)
-	if err != nil {
-		span.TraceError(err)
-		return err
-	}
+	// Launch crawl in a goroutine so we can return immediately
+	go func() {
+		// Create a new context since the parent will be canceled when the function returns
+		backgroundCtx := context.Background()
+		crawlSpan, crawlCtx := telemetry.StartServiceSpan(backgroundCtx, "scraperService.backgroundCrawl")
+		defer crawlSpan.Finish()
+
+		if err := s.Crawl(crawlCtx, message.Domain); err != nil {
+			crawlSpan.TraceError(err)
+		}
+	}()
 
 	return nil
 }

@@ -15,7 +15,7 @@ type ScraperEvent struct {
 	Event        enum.Events       `gorm:"column:event;type:varchar(50);index;not null" json:"event"`
 	Publisher    enum.LeadsService `gorm:"column:publisher;type:varchar(50);index;not null" json:"publisher"`
 	Domain       string            `gorm:"column:domain;type:varchar(50);index;not null" json:"domain"`
-	Url          string            `gorm:"column:url;type:varchar(50);index" json:"url"`
+	Url          string            `gorm:"column:url;type:varchar(255);index" json:"url"`
 	Payload      []byte            `gorm:"column:payload;type:bytea" json:"-"`
 	HasError     bool              `gorm:"column:has_error;type:boolean" json:"hasError"`
 	ErrorMessage string            `gorm:"column:error_message;type:varchar(255)" json:"errorMessage"`

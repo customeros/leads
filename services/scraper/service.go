@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/customeros/leads/enum"
+	"github.com/customeros/leads/interfaces"
 	"github.com/customeros/leads/internal/config"
 	"github.com/customeros/leads/internal/database"
 	nats_internal "github.com/customeros/leads/internal/nats"
@@ -24,6 +25,7 @@ import (
 )
 
 type ScraperService interface {
+	interfaces.NatsService
 	Crawl(ctx context.Context, domain string) error
 }
 

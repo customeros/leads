@@ -101,6 +101,7 @@ func setupNATSStreams(js nats.JetStreamContext, replicas int) error {
 		"webtracker.>",
 		"proxy.>",
 		"lead.>",
+		"webpage.>",
 	}
 	return setupWorkQueueStream(js, LEADS_STREAM, persistedSubjects, replicas)
 }

@@ -10,14 +10,14 @@ import (
 )
 
 type APICallLog struct {
-	ID           string         `gorm:"column:id;primaryKey;type:varchar(25)"`
-	Timestamp    time.Time      `gorm:"column:timestamp;primaryKey;type:timestamptz;not null"`
-	Vendor       enum.APIVendor `gorm:"column:vendor;type:varchar(255);index;not null"`
+	ID           string         `gorm:"column:id;type:varchar(25);not null"`
+	Timestamp    time.Time      `gorm:"column:timestamp;type:timestamptz;not null"`
+	Vendor       enum.APIVendor `gorm:"column:vendor;type:varchar(255);not null"`
 	Method       string         `gorm:"column:method;type:varchar(255);not null"`
 	URL          string         `gorm:"column:url;type:varchar(255);not null"`
 	RequestBody  []byte         `gorm:"column:request_body;type:bytea"`
 	Duration     int            `gorm:"column:duration;type:int;not null"`
-	StatusCode   *int           `gorm:"column:status_code;type:int;not null"`
+	StatusCode   *int           `gorm:"column:status_code;type:int"`
 	ResponseBody *[]byte        `gorm:"column:response_body;type:bytea"`
 	ErrorMessage *string        `gorm:"column:error_message;type:text"`
 }
@@ -35,6 +35,9 @@ func (a *APICallLog) BeforeCreate(tx *gorm.DB) error {
 
 // CreateTable creates the api_call_logs table if it doesn't exist and sets up TimescaleDB features
 func (a *APICallLog) CreateTable(db *gorm.DB) error {
+	// Disable GORM's auto migrations for this table
+	db = db.Set("gorm:table_options", "")
+
 	// Check if table exists
 	tableExists := false
 	err := db.Raw("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'api_call_logs')").
@@ -43,9 +46,24 @@ func (a *APICallLog) CreateTable(db *gorm.DB) error {
 		return fmt.Errorf("failed to check if api_call_logs table exists: %w", err)
 	}
 
-	// Create table if it doesn't exist
+	// Create table manually to ensure proper structure for TimescaleDB
 	if !tableExists {
-		if err := db.AutoMigrate(&APICallLog{}); err != nil {
+		err := db.Exec(`
+			CREATE TABLE IF NOT EXISTS api_call_logs (
+				id VARCHAR(25) NOT NULL,
+				timestamp TIMESTAMPTZ NOT NULL,
+				vendor VARCHAR(255) NOT NULL,
+				method VARCHAR(255) NOT NULL,
+				url VARCHAR(255) NOT NULL,
+				request_body BYTEA,
+				duration INT NOT NULL,
+				status_code INT NOT NULL,
+				response_body BYTEA,
+				error_message TEXT,
+				PRIMARY KEY (id, timestamp)
+			)
+		`).Error
+		if err != nil {
 			return fmt.Errorf("failed to create api_call_logs table: %w", err)
 		}
 	}
@@ -60,50 +78,31 @@ func (a *APICallLog) CreateTable(db *gorm.DB) error {
 
 // setupAPICallLogTimescaleDB initializes the TimescaleDB specifics for the api_call_logs table
 func initAPICallLogTable(db *gorm.DB) error {
-	// Convert to hypertable - this only needs to be done once
-	if err := db.Exec(`SELECT create_hypertable('api_call_logs', 'timestamp', 
-		chunk_time_interval => INTERVAL '1 day',
-		if_not_exists => TRUE)`).Error; err != nil {
-		return err
+	// Set up TimescaleDB hypertable
+	if err := db.Exec("SELECT create_hypertable('api_call_logs', 'timestamp', if_not_exists => TRUE)").Error; err != nil {
+		return fmt.Errorf("failed to create hypertable: %w", err)
 	}
 
-	// Create continuous aggregate for hourly API call statistics
-	if err := db.Exec(`
-		CREATE MATERIALIZED VIEW IF NOT EXISTS hourly_api_call_stats
-		WITH (timescaledb.continuous) AS
-		SELECT
-			time_bucket('1 hour', timestamp) AS hour,
-			vendor,
-			method,
-			status_code,
-			avg(duration) AS avg_duration,
-			count(*) AS call_count,
-			count(CASE WHEN error_message IS NOT NULL THEN 1 END) AS error_count
-		FROM api_call_logs
-		GROUP BY hour, vendor, method, status_code
-	`).Error; err != nil {
-		return err
+	// Create indexes that include the timestamp column (required for hypertables)
+	indexes := []string{
+		// Composite index with vendor and timestamp for efficient querying
+		"CREATE INDEX IF NOT EXISTS idx_api_call_logs_vendor_timestamp ON api_call_logs (vendor, timestamp DESC)",
+		// Index for timestamp alone (useful for time-based queries)
+		"CREATE INDEX IF NOT EXISTS idx_api_call_logs_timestamp ON api_call_logs (timestamp DESC)",
+		// Composite index for ID lookups with timestamp
+		"CREATE INDEX IF NOT EXISTS idx_api_call_logs_id_timestamp ON api_call_logs (id, timestamp DESC)",
 	}
 
-	// Add refresh policy for continuous aggregate
-	if err := db.Exec(`
-		SELECT add_continuous_aggregate_policy('hourly_api_call_stats',
-			start_offset => INTERVAL '1 day',
-			end_offset => INTERVAL '1 hour',
-			schedule_interval => INTERVAL '1 hour',
-			if_not_exists => TRUE)
-	`).Error; err != nil {
-		return err
+	for _, indexSQL := range indexes {
+		if err := db.Exec(indexSQL).Error; err != nil {
+			return fmt.Errorf("failed to create index: %w", err)
+		}
 	}
 
-	// Create additional indexes for common query patterns
-	if err := db.Exec(`
-		CREATE INDEX IF NOT EXISTS idx_api_call_logs_vendor_timestamp ON api_call_logs (vendor, timestamp DESC);
-		CREATE INDEX IF NOT EXISTS idx_api_call_logs_status_timestamp ON api_call_logs (status_code, timestamp DESC);
-		CREATE INDEX IF NOT EXISTS idx_api_call_logs_timestamp_duration ON api_call_logs (timestamp DESC, duration) 
-			WHERE duration > 1000; -- Index for slow API calls (over 1 second)
-	`).Error; err != nil {
-		return err
+	// Set chunk time interval (optional, adjust as needed)
+	if err := db.Exec("SELECT set_chunk_time_interval('api_call_logs', INTERVAL '1 day')").Error; err != nil {
+		return fmt.Errorf("failed to set chunk time interval: %w", err)
 	}
+
 	return nil
 }

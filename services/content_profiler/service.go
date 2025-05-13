@@ -21,7 +21,8 @@ import (
 	"github.com/customeros/leads/internal/utils"
 )
 
-type contentProfiler struct {
+type ContentProfiler struct {
+	interfaces.NatsService
 	natsConn     *nats_internal.NATSConnections
 	leadsDB      *database.DbConnections
 	repositories *repository.Repositories
@@ -31,8 +32,8 @@ func NewContentProfiler(
 	natsConn *nats_internal.NATSConnections,
 	leadsDB *database.DbConnections,
 	repositories *repository.Repositories,
-) interfaces.NatsService {
-	return &contentProfiler{
+) *ContentProfiler {
+	return &ContentProfiler{
 		natsConn:     natsConn,
 		leadsDB:      leadsDB,
 		repositories: repositories,
@@ -60,7 +61,7 @@ const (
 )
 
 // Start begins listening for raw email events and processing them
-func (s *contentProfiler) Start(ctx context.Context) error {
+func (s *ContentProfiler) Start(ctx context.Context) error {
 	// Create durable consumer for processing emails
 	_, err := s.natsConn.JS.AddConsumer(nats_internal.LEADS_STREAM, &nats.ConsumerConfig{
 		Durable:        CONSUMER_NAME,
@@ -93,7 +94,7 @@ func (s *contentProfiler) Start(ctx context.Context) error {
 }
 
 // processRawEvents continuously processes raw email events
-func (s *contentProfiler) processRawEvents(ctx context.Context, sub *nats.Subscription) {
+func (s *ContentProfiler) processRawEvents(ctx context.Context, sub *nats.Subscription) {
 	log.Println("Content Profiler Service started")
 	for {
 		select {
@@ -107,7 +108,7 @@ func (s *contentProfiler) processRawEvents(ctx context.Context, sub *nats.Subscr
 }
 
 // processBatch fetches and processes a batch of messages
-func (s *contentProfiler) processBatch(ctx context.Context, sub *nats.Subscription) {
+func (s *ContentProfiler) processBatch(ctx context.Context, sub *nats.Subscription) {
 	// Fetch messages batch
 	msgs, err := sub.Fetch(FETCH_BATCH_SIZE, nats.MaxWait(MAX_FETCH_WAIT))
 	if err != nil {
@@ -123,7 +124,7 @@ func (s *contentProfiler) processBatch(ctx context.Context, sub *nats.Subscripti
 }
 
 // handleFetchError handles errors that occur during message fetching
-func (s *contentProfiler) handleFetchError(err error) {
+func (s *ContentProfiler) handleFetchError(err error) {
 	if errors.Is(err, nats.ErrTimeout) {
 		// No messages available, this is normal
 		return
@@ -133,7 +134,7 @@ func (s *contentProfiler) handleFetchError(err error) {
 }
 
 // processMessage processes a single email message
-func (s *contentProfiler) routeMessage(ctx context.Context, msg *nats.Msg) {
+func (s *ContentProfiler) routeMessage(ctx context.Context, msg *nats.Msg) {
 	ctx = utils.WithCustomContextFromNats(ctx, msg)
 	spans, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.processMessage")
 	defer spans.Finish()
@@ -157,18 +158,16 @@ func (s *contentProfiler) routeMessage(ctx context.Context, msg *nats.Msg) {
 	}
 
 	if err != nil {
-		err := errors.New("failed to parse message")
 		spans.TraceError(err)
 		s.handleProcessingError(ctx, msg, err)
 		return
 	}
 
 	msg.Ack()
-	return
 }
 
 // handleProcessingError deals with errors during email processing
-func (s *contentProfiler) handleProcessingError(ctx context.Context, msg *nats.Msg, err error) {
+func (s *ContentProfiler) handleProcessingError(ctx context.Context, msg *nats.Msg, err error) {
 	metadata, _ := msg.Metadata()
 
 	// Check if we should retry
@@ -183,14 +182,14 @@ func (s *contentProfiler) handleProcessingError(ctx context.Context, msg *nats.M
 }
 
 // Close gracefully shuts down the service
-func (s *contentProfiler) Stop() {
+func (s *ContentProfiler) Stop() {
 	if s.natsConn != nil {
 		s.natsConn.Close()
 	}
 	return
 }
 
-func (s *contentProfiler) publishError(ctx context.Context, msg *nats.Msg, err error) {
+func (s *ContentProfiler) publishError(ctx context.Context, msg *nats.Msg, err error) {
 	spans, ctx := telemetry.StartServiceSpan(ctx, "proxyManagerService.publishError")
 	defer spans.Finish()
 
@@ -199,7 +198,7 @@ func (s *contentProfiler) publishError(ctx context.Context, msg *nats.Msg, err e
 		Subject:      msg.Subject,
 		ErrorMessage: err.Error(),
 		RawData:      msg.Data,
-		Service:      pb.ServiceName_LEADS_PROXY_MANAGER_SERVICE,
+		Service:      pb.ServiceName_LEADS_PROXY_MANAGER_SERVICE, // TODO update name
 	}
 
 	data, err := proto.Marshal(errorEvent)
