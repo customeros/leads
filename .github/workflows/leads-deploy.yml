@@ -34,6 +34,13 @@ jobs:
         run: |
           ./deployments/runners/check-release-needed.sh
 
+      - name: Checkout CustomerOS
+        if: env.RELEASE_NEEDED == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: customeros/customeros
+          path: ./customeros
+
       - name: Set up Go
         if: env.RELEASE_NEEDED == 'true'
         uses: ubicloud/setup-go@v5
