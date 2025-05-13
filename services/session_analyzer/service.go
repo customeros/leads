@@ -126,7 +126,7 @@ func (s *sessionAnalyzer) handleFetchError(err error) {
 
 func (s *sessionAnalyzer) routeMessage(ctx context.Context, msg *nats.Msg) {
 	ctx = utils.WithCustomContextFromNats(ctx, msg)
-	spans, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.processMessage")
+	spans, ctx := telemetry.StartServiceSpan(ctx, "sessionAnalyzer.processMessage")
 	defer spans.Finish()
 
 	if msg == nil {
@@ -171,7 +171,7 @@ func (s *sessionAnalyzer) Stop() {
 }
 
 func (s *sessionAnalyzer) publishError(ctx context.Context, msg *nats.Msg, err error) {
-	spans, ctx := telemetry.StartServiceSpan(ctx, "proxyManagerService.publishError")
+	spans, ctx := telemetry.StartServiceSpan(ctx, "sessionAnalyzer.publishError")
 	defer spans.Finish()
 
 	errorEvent := &pb.ErrorEvent{

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/customeros/leads/interfaces"
 	"github.com/customeros/leads/internal/config"
@@ -30,11 +31,33 @@ type Services struct {
 }
 
 func (s *Services) Start(ctx context.Context) error {
+	services := []struct {
+		name    string
+		starter func(context.Context) error
+	}{
+		{"Session Manager Service", s.SessionManager.Start},
+	}
+
+	for _, svc := range services {
+		if err := svc.starter(ctx); err != nil {
+			return fmt.Errorf("failed to start %s service: %w", svc.name, err)
+		}
+	}
+
 	return nil
 }
 
 func (s *Services) Stop(ctx context.Context) {
-	return
+	services := []struct {
+		name    string
+		stopper func(context.Context)
+	}{
+		{"Session Manager Service", func(ctx context.Context) { s.SessionManager.Stop() }},
+	}
+
+	for _, service := range services {
+		service.stopper(ctx)
+	}
 }
 
 func InitServices(config *config.Config, leadsDB *database.DbConnections, natsConn *nats_internal.NATSConnections, repositories *repository.Repositories) *Services {

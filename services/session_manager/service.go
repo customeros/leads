@@ -57,9 +57,8 @@ const (
 	ERR_BACKOFF           = 100 * time.Millisecond
 )
 
-// Start begins listening for raw email events and processing them
 func (s *sessionManager) Start(ctx context.Context) error {
-	// Create durable consumer for processing emails
+	// Create durable consumer for processing
 	_, err := s.natsConn.JS.AddConsumer(nats_internal.LEADS_STREAM, &nats.ConsumerConfig{
 		Durable:       CONSUMER_NAME,
 		DeliverGroup:  QUEUE_GROUP,
@@ -132,7 +131,7 @@ func (s *sessionManager) handleFetchError(err error) {
 
 func (s *sessionManager) routeMessage(ctx context.Context, msg *nats.Msg) {
 	ctx = utils.WithCustomContextFromNats(ctx, msg)
-	spans, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.processMessage")
+	spans, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.routeMessage")
 	defer spans.Finish()
 
 	if msg == nil {
