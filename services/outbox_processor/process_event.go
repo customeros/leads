@@ -11,7 +11,6 @@ import (
 	"github.com/customeros/leads/internal/models"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/telemetry"
-	"github.com/customeros/leads/internal/utils"
 )
 
 func (s *OutboxProcessor) processEvent(ctx context.Context, event *models.OutboxEvent) error {
@@ -78,8 +77,7 @@ func (s *OutboxProcessor) publishEvent(ctx context.Context, event *models.Outbox
 	// Create message with headers
 	msg := nats.NewMsg(event.EventType.String())
 	msg.Data = event.Payload
-	msg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
-	msg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))
+	msg.Header.Set(nats_internal.HEADER_TENANT, event.Tenant)
 
 	// Publish to the stored subject
 	_, err := s.natsConn.JS.PublishMsg(msg)
