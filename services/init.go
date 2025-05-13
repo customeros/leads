@@ -36,6 +36,7 @@ func (s *Services) Start(ctx context.Context) error {
 		starter func(context.Context) error
 	}{
 		{"Session Manager Service", s.SessionManager.Start},
+		{"Snitcher Service", s.SnitcherService.Start},
 	}
 
 	for _, svc := range services {
@@ -53,6 +54,7 @@ func (s *Services) Stop(ctx context.Context) {
 		stopper func(context.Context)
 	}{
 		{"Session Manager Service", func(ctx context.Context) { s.SessionManager.Stop() }},
+		{"Snitcher Service", func(ctx context.Context) { s.SnitcherService.Stop() }},
 	}
 
 	for _, service := range services {
