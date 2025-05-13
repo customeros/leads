@@ -65,7 +65,12 @@ func (r *webTrackerRepository) Create(ctx context.Context, tracker *models.WebTr
 	}
 
 	result := r.write.WithContext(ctx).Create(tracker)
-	return result.Error
+	if result.Error != nil {
+		span.TraceError(result.Error)
+		return result.Error
+	}
+
+	return nil
 }
 
 func (r *webTrackerRepository) CreateWithTxn(ctx context.Context, txn *gorm.DB, tracker *models.WebTracker) error {
@@ -85,7 +90,13 @@ func (r *webTrackerRepository) CreateWithTxn(ctx context.Context, txn *gorm.DB, 
 		tracker.ID = uuid.New().String()
 	}
 
-	return txn.Create(tracker).Error
+	err := txn.Create(tracker).Error
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	return nil
 }
 
 // GetByID retrieves a WebTracker by ID
@@ -110,6 +121,7 @@ func (r *webTrackerRepository) GetByID(ctx context.Context, id string) (*models.
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, leads_errors.ErrWebtrackerNotFound
 		}
+		span.TraceError(result.Error)
 		return nil, result.Error
 	}
 	return &tracker, nil
@@ -154,8 +166,13 @@ func (r *webTrackerRepository) GetTrackers(ctx context.Context) ([]models.WebTra
 		Order("domain").
 		Find(&trackers)
 
+	if result.Error != nil {
+		span.TraceError(result.Error)
+		return nil, result.Error
+	}
+
 	span.LogKV("result.count", len(trackers))
-	return trackers, result.Error
+	return trackers, nil
 }
 
 // GetActiveTrackers retrieves all active non-archived WebTrackers
@@ -178,8 +195,13 @@ func (r *webTrackerRepository) GetActiveTrackers(ctx context.Context) ([]models.
 		Order("domain").
 		Find(&trackers)
 
+	if result.Error != nil {
+		span.TraceError(result.Error)
+		return nil, result.Error
+	}
+
 	span.LogKV("result.count", len(trackers))
-	return trackers, result.Error
+	return trackers, nil
 }
 
 // Update updates an existing WebTracker
@@ -225,10 +247,15 @@ func (r *webTrackerRepository) Update(ctx context.Context, dto dto.WebTrackerUpd
 		Where("id = ?", dto.ID).
 		Updates(updates)
 
+	if result.Error != nil {
+		span.TraceError(result.Error)
+		return result.Error
+	}
+
 	if result.RowsAffected == 0 {
 		return errors.New("webtracker not found")
 	}
-	return result.Error
+	return nil
 }
 
 // UpdateLastEventAt updates the LastEventAt timestamp for a specific tracker
@@ -300,10 +327,15 @@ func (r *webTrackerRepository) Archive(ctx context.Context, id string) error {
 			"updated_at":      now,
 		})
 
+	if result.Error != nil {
+		span.TraceError(result.Error)
+		return result.Error
+	}
+
 	if result.RowsAffected == 0 {
 		return errors.New("webtracker not found")
 	}
-	return result.Error
+	return nil
 }
 
 // Restore unarchives a WebTracker
@@ -320,10 +352,15 @@ func (r *webTrackerRepository) Restore(ctx context.Context, id string) error {
 			"updated_at":  now,
 		})
 
+	if result.Error != nil {
+		span.TraceError(result.Error)
+		return result.Error
+	}
+
 	if result.RowsAffected == 0 {
 		return errors.New("webtracker not found")
 	}
-	return result.Error
+	return nil
 }
 
 func (r *webTrackerRepository) GetCNAMEChecks(ctx context.Context) ([]models.WebTracker, error) {
@@ -340,6 +377,7 @@ func (r *webTrackerRepository) GetCNAMEChecks(ctx context.Context) ([]models.Web
 		Where("is_archived = ?", false).
 		Find(&trackers).Error
 	if err != nil {
+		span.TraceError(err)
 		return nil, err
 	}
 
@@ -359,8 +397,13 @@ func (r *webTrackerRepository) CNAMEConfiguredWithTxn(ctx context.Context, txn *
 			"cname_check_count":   0,
 		})
 
+	if result.Error != nil {
+		span.TraceError(result.Error)
+		return result.Error
+	}
+
 	if result.RowsAffected == 0 {
 		return errors.New("webtracker not found")
 	}
-	return result.Error
+	return nil
 }
