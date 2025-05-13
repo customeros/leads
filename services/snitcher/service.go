@@ -44,8 +44,10 @@ const (
 func (s *SnitcherService) Start(ctx context.Context) error {
 	// Create a queue subscription for handling synchronous requests
 	sub, err := s.natsConn.Conn.QueueSubscribe(SUBSCRIBED_SUBJECT, QUEUE_GROUP, func(msg *nats.Msg) {
-		// Create a new context for each request
-		reqCtx := utils.WithCustomContextFromNats(context.Background(), msg)
+		// First extract trace context into a new background context
+		reqCtx := telemetry.ExtractTraceContextFromNatsMsg(context.Background(), msg)
+		// Then add business context
+		reqCtx = utils.WithCustomContextFromNats(reqCtx, msg)
 		s.handleNatsMessage(reqCtx, msg)
 	})
 	if err != nil {
