@@ -149,24 +149,25 @@ func (s *sessionManager) processNewIP(ctx context.Context, message *pb.Webtracke
 	defer span.Finish()
 	span.LogKV("ipAddress", message.Ip)
 
+	// TODO alexb uncomment
 	// check if bot, return early if not trusted IP
-	userAgent := utils.ParseUserAgent(message.UserAgent)
-	isSuspicious := utils.IsSuspiciousURL(message.Referrer)
+	//userAgent := utils.ParseUserAgent(message.UserAgent)
+	//isSuspicious := utils.IsSuspiciousURL(message.Referrer)
 
-	ipProfile, err := s.profileIP(ctx, message.Ip)
-	if err != nil {
-		span.TraceError(err)
-		return nil, nil
-	}
-
-	if ipProfile != nil {
-		if ipProfile.IsThreat || userAgent.IsBot || isSuspicious {
-			span.LogKV("ip.isThreat", ipProfile.IsThreat)
-			span.LogKV("ip.isBot", userAgent.IsBot)
-			span.LogKV("ip.isSuspicious", isSuspicious)
-			return nil, nil
-		}
-	}
+	//ipProfile, err := s.profileIP(ctx, message.Ip)
+	//if err != nil {
+	//	span.TraceError(err)
+	//	return nil, nil
+	//}
+	//
+	//if ipProfile != nil {
+	//	if ipProfile.IsThreat || userAgent.IsBot || isSuspicious {
+	//		span.LogKV("ip.isThreat", ipProfile.IsThreat)
+	//		span.LogKV("ip.isBot", userAgent.IsBot)
+	//		span.LogKV("ip.isSuspicious", isSuspicious)
+	//		return nil, nil
+	//	}
+	//}
 
 	// attempt to identify
 	domain, err := s.identifyIP(ctx, message.Ip)

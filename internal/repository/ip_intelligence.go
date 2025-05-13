@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -51,9 +52,10 @@ func (r *ipIntelligenceRepository) FindByIP(ctx context.Context, ipAddress strin
 		Where("ip_address = ?", ipAddress).
 		First(&intel).Error
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil // Return nil, nil when not found
 		}
+		span.TraceError(err)
 		return nil, err
 	}
 
