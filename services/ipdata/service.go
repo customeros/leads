@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
@@ -18,10 +19,10 @@ import (
 )
 
 type IPDataService struct {
-	config        *config.IPDataConfig
-	natsConn      *nats_internal.NATSConnections
-	repositories  *repository.Repositories
-	subscriptions []*nats.Subscription
+	config       *config.IPDataConfig
+	natsConn     *nats_internal.NATSConnections
+	repositories *repository.Repositories
+	subscription *nats.Subscription
 }
 
 func NewIPDataService(
@@ -38,38 +39,54 @@ func NewIPDataService(
 
 var SUBSCRIBED_SUBJECT = enum.EventAskIPData.String()
 
+const (
+	MAX_RESPONSE_SIZE = 1 * 1024 * 1024
+	QUEUE_GROUP       = "ipdata" // Queue group for load balancing
+)
+
 // Start begins listening for  events
 func (s *IPDataService) Start(ctx context.Context) error {
-	spans, ctx := telemetry.StartServiceSpan(ctx, "IPDataService.Start")
-	defer spans.Finish()
-
-	// Create a subscription for handling requests
-	sub, err := s.natsConn.Conn.Subscribe(SUBSCRIBED_SUBJECT, func(msg *nats.Msg) {
-		s.handleNatsMessage(ctx, msg)
+	// Create a queue subscription for handling synchronous requests
+	sub, err := s.natsConn.Conn.QueueSubscribe(SUBSCRIBED_SUBJECT, QUEUE_GROUP, func(msg *nats.Msg) {
+		// First extract trace context into a new background context
+		reqCtx := telemetry.ExtractTraceContextFromNatsMsg(context.Background(), msg)
+		// Then add business context
+		reqCtx = utils.WithCustomContextFromNats(reqCtx, msg)
+		s.handleNatsMessage(reqCtx, msg)
 	})
 	if err != nil {
-		spans.TraceError(err)
-		return fmt.Errorf("failed to create subscription: %w", err)
+		return fmt.Errorf("failed to create queue subscription: %w", err)
 	}
 
-	// Keep track of subscription for cleanup
-	s.subscriptions = append(s.subscriptions, sub)
+	// Set subscription options
+	sub.SetPendingLimits(-1, -1) // No limits on pending messages
+	s.subscription = sub
 
 	// Listen for context cancellation to clean up
 	go func() {
 		<-ctx.Done()
-		for _, sub := range s.subscriptions {
-			sub.Unsubscribe()
-		}
+		s.Unsubscribe()
 	}()
 
+	log.Println("🚀 IPData Service started and listening for requests (queue group: " + QUEUE_GROUP + ")")
 	return nil
 }
 
-// Close gracefully shuts down the service
-func (s *IPDataService) Close() {
+// Unsubscribe cleans up the NATS subscription
+func (s *IPDataService) Unsubscribe() {
+	if s.subscription != nil {
+		s.subscription.Unsubscribe()
+		s.subscription = nil
+		log.Println("🛑 IPData Service unsubscribed from NATS")
+	}
+}
+
+// Stop gracefully shuts down the service
+func (s *IPDataService) Stop() {
+	s.Unsubscribe()
 	if s.natsConn != nil {
 		s.natsConn.Close()
+		log.Println("⏹️ IPData Service stopped")
 	}
 	return
 }

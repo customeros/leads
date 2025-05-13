@@ -40,6 +40,7 @@ func (s *Services) Start(ctx context.Context) error {
 		{"Content Profiler", s.ContentProfiler.Start},
 		{"Session Manager Service", s.SessionManager.Start},
 		{"Snitcher Service", s.SnitcherService.Start},
+		{"IPData Service", s.IPDataService.Start},
 		{"Scraper Service", s.ScraperService.Start},
 	}
 
@@ -60,6 +61,7 @@ func (s *Services) Stop(ctx context.Context) {
 		{"Content Profiler", func(ctx context.Context) { s.ContentProfiler.Stop() }},
 		{"Session Manager Service", func(ctx context.Context) { s.SessionManager.Stop() }},
 		{"Snitcher Service", func(ctx context.Context) { s.SnitcherService.Stop() }},
+		{"IPData Service", func(ctx context.Context) { s.IPDataService.Stop() }},
 		{"Scraper Service", func(ctx context.Context) { s.ScraperService.Stop() }},
 	}
 

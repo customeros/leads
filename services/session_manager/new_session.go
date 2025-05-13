@@ -200,10 +200,12 @@ func (s *sessionManager) identifyIP(ctx context.Context, ipAddress string) (stri
 	// Send request to service
 	msg := nats.NewMsg(enum.EventAskSnitcher.String())
 	msg.Header = nats.Header{
-		enum.TENANT_HEADER:  []string{utils.GetTenantFromContext(ctx)},
-		enum.USER_ID_HEADER: []string{utils.GetUserIdFromContext(ctx)},
+		enum.TENANT_HEADER: []string{utils.GetTenantFromContext(ctx)},
 	}
 	msg.Data = reqData
+
+	// Inject trace context into NATS message
+	telemetry.InjectTraceContextIntoNatsMsg(ctx, msg)
 
 	resp, err := s.natsConn.Conn.RequestMsg(msg, REQUEST_TIMEOUT)
 	if err != nil {
