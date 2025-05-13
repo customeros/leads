@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: schema/proxy_webtracker_cname_configured.proto
+// source: proxy_webtracker_cname_configured.proto
 
 package pb
 
@@ -33,7 +33,7 @@ type ProxyWebtrackerCnameConfigured struct {
 
 func (x *ProxyWebtrackerCnameConfigured) Reset() {
 	*x = ProxyWebtrackerCnameConfigured{}
-	mi := &file_schema_proxy_webtracker_cname_configured_proto_msgTypes[0]
+	mi := &file_proxy_webtracker_cname_configured_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +45,7 @@ func (x *ProxyWebtrackerCnameConfigured) String() string {
 func (*ProxyWebtrackerCnameConfigured) ProtoMessage() {}
 
 func (x *ProxyWebtrackerCnameConfigured) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_proxy_webtracker_cname_configured_proto_msgTypes[0]
+	mi := &file_proxy_webtracker_cname_configured_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *ProxyWebtrackerCnameConfigured) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProxyWebtrackerCnameConfigured.ProtoReflect.Descriptor instead.
 func (*ProxyWebtrackerCnameConfigured) Descriptor() ([]byte, []int) {
-	return file_schema_proxy_webtracker_cname_configured_proto_rawDescGZIP(), []int{0}
+	return file_proxy_webtracker_cname_configured_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ProxyWebtrackerCnameConfigured) GetTenant() string {
@@ -89,36 +89,36 @@ func (x *ProxyWebtrackerCnameConfigured) GetCnameTarget() string {
 	return ""
 }
 
-var File_schema_proxy_webtracker_cname_configured_proto protoreflect.FileDescriptor
+var File_proxy_webtracker_cname_configured_proto protoreflect.FileDescriptor
 
-const file_schema_proxy_webtracker_cname_configured_proto_rawDesc = "" +
+const file_proxy_webtracker_cname_configured_proto_rawDesc = "" +
 	"\n" +
-	".schema/proxy_webtracker_cname_configured.proto\x12\x05leads\"\x99\x01\n" +
+	"'proxy_webtracker_cname_configured.proto\x12\x02pb\"\x99\x01\n" +
 	"\x1eProxyWebtrackerCnameConfigured\x12\x16\n" +
 	"\x06tenant\x18\x01 \x01(\tR\x06tenant\x12\x1d\n" +
 	"\n" +
 	"tracker_id\x18\x02 \x01(\tR\ttrackerId\x12\x1d\n" +
 	"\n" +
 	"cname_host\x18\x03 \x01(\tR\tcnameHost\x12!\n" +
-	"\fcname_target\x18\x04 \x01(\tR\vcnameTargetB&Z$github.com/customeros/leads/proto/pbb\x06proto3"
+	"\fcname_target\x18\x04 \x01(\tR\vcnameTargetB\x06Z\x04./pbb\x06proto3"
 
 var (
-	file_schema_proxy_webtracker_cname_configured_proto_rawDescOnce sync.Once
-	file_schema_proxy_webtracker_cname_configured_proto_rawDescData []byte
+	file_proxy_webtracker_cname_configured_proto_rawDescOnce sync.Once
+	file_proxy_webtracker_cname_configured_proto_rawDescData []byte
 )
 
-func file_schema_proxy_webtracker_cname_configured_proto_rawDescGZIP() []byte {
-	file_schema_proxy_webtracker_cname_configured_proto_rawDescOnce.Do(func() {
-		file_schema_proxy_webtracker_cname_configured_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_proxy_webtracker_cname_configured_proto_rawDesc), len(file_schema_proxy_webtracker_cname_configured_proto_rawDesc)))
+func file_proxy_webtracker_cname_configured_proto_rawDescGZIP() []byte {
+	file_proxy_webtracker_cname_configured_proto_rawDescOnce.Do(func() {
+		file_proxy_webtracker_cname_configured_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proxy_webtracker_cname_configured_proto_rawDesc), len(file_proxy_webtracker_cname_configured_proto_rawDesc)))
 	})
-	return file_schema_proxy_webtracker_cname_configured_proto_rawDescData
+	return file_proxy_webtracker_cname_configured_proto_rawDescData
 }
 
-var file_schema_proxy_webtracker_cname_configured_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_schema_proxy_webtracker_cname_configured_proto_goTypes = []any{
-	(*ProxyWebtrackerCnameConfigured)(nil), // 0: leads.ProxyWebtrackerCnameConfigured
+var file_proxy_webtracker_cname_configured_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_proxy_webtracker_cname_configured_proto_goTypes = []any{
+	(*ProxyWebtrackerCnameConfigured)(nil), // 0: pb.ProxyWebtrackerCnameConfigured
 }
-var file_schema_proxy_webtracker_cname_configured_proto_depIdxs = []int32{
+var file_proxy_webtracker_cname_configured_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -126,26 +126,26 @@ var file_schema_proxy_webtracker_cname_configured_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_schema_proxy_webtracker_cname_configured_proto_init() }
-func file_schema_proxy_webtracker_cname_configured_proto_init() {
-	if File_schema_proxy_webtracker_cname_configured_proto != nil {
+func init() { file_proxy_webtracker_cname_configured_proto_init() }
+func file_proxy_webtracker_cname_configured_proto_init() {
+	if File_proxy_webtracker_cname_configured_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_proxy_webtracker_cname_configured_proto_rawDesc), len(file_schema_proxy_webtracker_cname_configured_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proxy_webtracker_cname_configured_proto_rawDesc), len(file_proxy_webtracker_cname_configured_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_schema_proxy_webtracker_cname_configured_proto_goTypes,
-		DependencyIndexes: file_schema_proxy_webtracker_cname_configured_proto_depIdxs,
-		MessageInfos:      file_schema_proxy_webtracker_cname_configured_proto_msgTypes,
+		GoTypes:           file_proxy_webtracker_cname_configured_proto_goTypes,
+		DependencyIndexes: file_proxy_webtracker_cname_configured_proto_depIdxs,
+		MessageInfos:      file_proxy_webtracker_cname_configured_proto_msgTypes,
 	}.Build()
-	File_schema_proxy_webtracker_cname_configured_proto = out.File
-	file_schema_proxy_webtracker_cname_configured_proto_goTypes = nil
-	file_schema_proxy_webtracker_cname_configured_proto_depIdxs = nil
+	File_proxy_webtracker_cname_configured_proto = out.File
+	file_proxy_webtracker_cname_configured_proto_goTypes = nil
+	file_proxy_webtracker_cname_configured_proto_depIdxs = nil
 }

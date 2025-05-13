@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: schema/webpage.profiled.proto
+// source: webpage.profiled.proto
 
 package pb
 
@@ -34,7 +34,7 @@ type WebpageProfiled struct {
 
 func (x *WebpageProfiled) Reset() {
 	*x = WebpageProfiled{}
-	mi := &file_schema_webpage_profiled_proto_msgTypes[0]
+	mi := &file_webpage_profiled_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -46,7 +46,7 @@ func (x *WebpageProfiled) String() string {
 func (*WebpageProfiled) ProtoMessage() {}
 
 func (x *WebpageProfiled) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_webpage_profiled_proto_msgTypes[0]
+	mi := &file_webpage_profiled_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +59,7 @@ func (x *WebpageProfiled) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebpageProfiled.ProtoReflect.Descriptor instead.
 func (*WebpageProfiled) Descriptor() ([]byte, []int) {
-	return file_schema_webpage_profiled_proto_rawDescGZIP(), []int{0}
+	return file_webpage_profiled_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *WebpageProfiled) GetContentId() string {
@@ -97,36 +97,36 @@ func (x *WebpageProfiled) GetPurchaseReadinessScore() uint32 {
 	return 0
 }
 
-var File_schema_webpage_profiled_proto protoreflect.FileDescriptor
+var File_webpage_profiled_proto protoreflect.FileDescriptor
 
-const file_schema_webpage_profiled_proto_rawDesc = "" +
+const file_webpage_profiled_proto_rawDesc = "" +
 	"\n" +
-	"\x1dschema/webpage.profiled.proto\x12\x05leads\"\x89\x02\n" +
+	"\x16webpage.profiled.proto\x12\x02pb\"\x89\x02\n" +
 	"\x0fWebpageProfiled\x12\x1d\n" +
 	"\n" +
 	"content_id\x18\x01 \x01(\tR\tcontentId\x12:\n" +
 	"\x19problem_recognition_score\x18\x02 \x01(\rR\x17problemRecognitionScore\x126\n" +
 	"\x17solution_research_score\x18\x03 \x01(\rR\x15solutionResearchScore\x12)\n" +
 	"\x10evaluation_score\x18\x04 \x01(\rR\x0fevaluationScore\x128\n" +
-	"\x18purchase_readiness_score\x18\x05 \x01(\rR\x16purchaseReadinessScoreB&Z$github.com/customeros/leads/proto/pbb\x06proto3"
+	"\x18purchase_readiness_score\x18\x05 \x01(\rR\x16purchaseReadinessScoreB\x06Z\x04./pbb\x06proto3"
 
 var (
-	file_schema_webpage_profiled_proto_rawDescOnce sync.Once
-	file_schema_webpage_profiled_proto_rawDescData []byte
+	file_webpage_profiled_proto_rawDescOnce sync.Once
+	file_webpage_profiled_proto_rawDescData []byte
 )
 
-func file_schema_webpage_profiled_proto_rawDescGZIP() []byte {
-	file_schema_webpage_profiled_proto_rawDescOnce.Do(func() {
-		file_schema_webpage_profiled_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_webpage_profiled_proto_rawDesc), len(file_schema_webpage_profiled_proto_rawDesc)))
+func file_webpage_profiled_proto_rawDescGZIP() []byte {
+	file_webpage_profiled_proto_rawDescOnce.Do(func() {
+		file_webpage_profiled_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_webpage_profiled_proto_rawDesc), len(file_webpage_profiled_proto_rawDesc)))
 	})
-	return file_schema_webpage_profiled_proto_rawDescData
+	return file_webpage_profiled_proto_rawDescData
 }
 
-var file_schema_webpage_profiled_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_schema_webpage_profiled_proto_goTypes = []any{
-	(*WebpageProfiled)(nil), // 0: leads.WebpageProfiled
+var file_webpage_profiled_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_webpage_profiled_proto_goTypes = []any{
+	(*WebpageProfiled)(nil), // 0: pb.WebpageProfiled
 }
-var file_schema_webpage_profiled_proto_depIdxs = []int32{
+var file_webpage_profiled_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -134,26 +134,26 @@ var file_schema_webpage_profiled_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_schema_webpage_profiled_proto_init() }
-func file_schema_webpage_profiled_proto_init() {
-	if File_schema_webpage_profiled_proto != nil {
+func init() { file_webpage_profiled_proto_init() }
+func file_webpage_profiled_proto_init() {
+	if File_webpage_profiled_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_webpage_profiled_proto_rawDesc), len(file_schema_webpage_profiled_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_webpage_profiled_proto_rawDesc), len(file_webpage_profiled_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_schema_webpage_profiled_proto_goTypes,
-		DependencyIndexes: file_schema_webpage_profiled_proto_depIdxs,
-		MessageInfos:      file_schema_webpage_profiled_proto_msgTypes,
+		GoTypes:           file_webpage_profiled_proto_goTypes,
+		DependencyIndexes: file_webpage_profiled_proto_depIdxs,
+		MessageInfos:      file_webpage_profiled_proto_msgTypes,
 	}.Build()
-	File_schema_webpage_profiled_proto = out.File
-	file_schema_webpage_profiled_proto_goTypes = nil
-	file_schema_webpage_profiled_proto_depIdxs = nil
+	File_webpage_profiled_proto = out.File
+	file_webpage_profiled_proto_goTypes = nil
+	file_webpage_profiled_proto_depIdxs = nil
 }

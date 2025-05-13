@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package leads;
-
-option go_package = "github.com/customeros/leads/proto/pb";
-
-message RequestWebpageClassification { string content_id = 1; }

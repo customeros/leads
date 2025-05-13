@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: schema/request_icp_profile.proto
+// source: request_icp_profile.proto
 
 package pb
 
@@ -30,7 +30,7 @@ type ICPProfileRequest struct {
 
 func (x *ICPProfileRequest) Reset() {
 	*x = ICPProfileRequest{}
-	mi := &file_schema_request_icp_profile_proto_msgTypes[0]
+	mi := &file_request_icp_profile_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *ICPProfileRequest) String() string {
 func (*ICPProfileRequest) ProtoMessage() {}
 
 func (x *ICPProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_request_icp_profile_proto_msgTypes[0]
+	mi := &file_request_icp_profile_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *ICPProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ICPProfileRequest.ProtoReflect.Descriptor instead.
 func (*ICPProfileRequest) Descriptor() ([]byte, []int) {
-	return file_schema_request_icp_profile_proto_rawDescGZIP(), []int{0}
+	return file_request_icp_profile_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ICPProfileRequest) GetDomain() string {
@@ -65,31 +65,31 @@ func (x *ICPProfileRequest) GetDomain() string {
 	return ""
 }
 
-var File_schema_request_icp_profile_proto protoreflect.FileDescriptor
+var File_request_icp_profile_proto protoreflect.FileDescriptor
 
-const file_schema_request_icp_profile_proto_rawDesc = "" +
+const file_request_icp_profile_proto_rawDesc = "" +
 	"\n" +
-	" schema/request_icp_profile.proto\x12\x05leads\"+\n" +
+	"\x19request_icp_profile.proto\x12\x02pb\"+\n" +
 	"\x11ICPProfileRequest\x12\x16\n" +
-	"\x06domain\x18\x01 \x01(\tR\x06domainB&Z$github.com/customeros/leads/proto/pbb\x06proto3"
+	"\x06domain\x18\x01 \x01(\tR\x06domainB\x06Z\x04./pbb\x06proto3"
 
 var (
-	file_schema_request_icp_profile_proto_rawDescOnce sync.Once
-	file_schema_request_icp_profile_proto_rawDescData []byte
+	file_request_icp_profile_proto_rawDescOnce sync.Once
+	file_request_icp_profile_proto_rawDescData []byte
 )
 
-func file_schema_request_icp_profile_proto_rawDescGZIP() []byte {
-	file_schema_request_icp_profile_proto_rawDescOnce.Do(func() {
-		file_schema_request_icp_profile_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_request_icp_profile_proto_rawDesc), len(file_schema_request_icp_profile_proto_rawDesc)))
+func file_request_icp_profile_proto_rawDescGZIP() []byte {
+	file_request_icp_profile_proto_rawDescOnce.Do(func() {
+		file_request_icp_profile_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_request_icp_profile_proto_rawDesc), len(file_request_icp_profile_proto_rawDesc)))
 	})
-	return file_schema_request_icp_profile_proto_rawDescData
+	return file_request_icp_profile_proto_rawDescData
 }
 
-var file_schema_request_icp_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_schema_request_icp_profile_proto_goTypes = []any{
-	(*ICPProfileRequest)(nil), // 0: leads.ICPProfileRequest
+var file_request_icp_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_request_icp_profile_proto_goTypes = []any{
+	(*ICPProfileRequest)(nil), // 0: pb.ICPProfileRequest
 }
-var file_schema_request_icp_profile_proto_depIdxs = []int32{
+var file_request_icp_profile_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -97,26 +97,26 @@ var file_schema_request_icp_profile_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_schema_request_icp_profile_proto_init() }
-func file_schema_request_icp_profile_proto_init() {
-	if File_schema_request_icp_profile_proto != nil {
+func init() { file_request_icp_profile_proto_init() }
+func file_request_icp_profile_proto_init() {
+	if File_request_icp_profile_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_request_icp_profile_proto_rawDesc), len(file_schema_request_icp_profile_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_request_icp_profile_proto_rawDesc), len(file_request_icp_profile_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_schema_request_icp_profile_proto_goTypes,
-		DependencyIndexes: file_schema_request_icp_profile_proto_depIdxs,
-		MessageInfos:      file_schema_request_icp_profile_proto_msgTypes,
+		GoTypes:           file_request_icp_profile_proto_goTypes,
+		DependencyIndexes: file_request_icp_profile_proto_depIdxs,
+		MessageInfos:      file_request_icp_profile_proto_msgTypes,
 	}.Build()
-	File_schema_request_icp_profile_proto = out.File
-	file_schema_request_icp_profile_proto_goTypes = nil
-	file_schema_request_icp_profile_proto_depIdxs = nil
+	File_request_icp_profile_proto = out.File
+	file_request_icp_profile_proto_goTypes = nil
+	file_request_icp_profile_proto_depIdxs = nil
 }

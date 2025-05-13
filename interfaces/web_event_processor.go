@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/customeros/leads/proto/pb"
+	"github.com/customeros/leads/internal/proto/pb"
 )
 
 type WebEventProcessor interface {

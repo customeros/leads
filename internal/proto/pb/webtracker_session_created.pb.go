@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: schema/webtracker_session_created.proto
+// source: webtracker_session_created.proto
 
 package pb
 
@@ -28,7 +28,7 @@ type WebtrackerSessionCreated struct {
 	TrackerId     string                 `protobuf:"bytes,2,opt,name=tracker_id,json=trackerId,proto3" json:"tracker_id,omitempty"`
 	VisitorId     string                 `protobuf:"bytes,3,opt,name=visitor_id,json=visitorId,proto3" json:"visitor_id,omitempty"`
 	Ip            string                 `protobuf:"bytes,4,opt,name=ip,proto3" json:"ip,omitempty"`
-	EventType     WebTrackerEventType    `protobuf:"varint,5,opt,name=event_type,json=eventType,proto3,enum=leads.WebTrackerEventType" json:"event_type,omitempty"`
+	EventType     WebTrackerEventType    `protobuf:"varint,5,opt,name=event_type,json=eventType,proto3,enum=pb.WebTrackerEventType" json:"event_type,omitempty"`
 	EventData     string                 `protobuf:"bytes,6,opt,name=event_data,json=eventData,proto3" json:"event_data,omitempty"`
 	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	Href          string                 `protobuf:"bytes,8,opt,name=href,proto3" json:"href,omitempty"`
@@ -41,7 +41,7 @@ type WebtrackerSessionCreated struct {
 
 func (x *WebtrackerSessionCreated) Reset() {
 	*x = WebtrackerSessionCreated{}
-	mi := &file_schema_webtracker_session_created_proto_msgTypes[0]
+	mi := &file_webtracker_session_created_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -53,7 +53,7 @@ func (x *WebtrackerSessionCreated) String() string {
 func (*WebtrackerSessionCreated) ProtoMessage() {}
 
 func (x *WebtrackerSessionCreated) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_webtracker_session_created_proto_msgTypes[0]
+	mi := &file_webtracker_session_created_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -66,7 +66,7 @@ func (x *WebtrackerSessionCreated) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebtrackerSessionCreated.ProtoReflect.Descriptor instead.
 func (*WebtrackerSessionCreated) Descriptor() ([]byte, []int) {
-	return file_schema_webtracker_session_created_proto_rawDescGZIP(), []int{0}
+	return file_webtracker_session_created_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *WebtrackerSessionCreated) GetSessionId() string {
@@ -146,11 +146,11 @@ func (x *WebtrackerSessionCreated) GetLanguage() string {
 	return ""
 }
 
-var File_schema_webtracker_session_created_proto protoreflect.FileDescriptor
+var File_webtracker_session_created_proto protoreflect.FileDescriptor
 
-const file_schema_webtracker_session_created_proto_rawDesc = "" +
+const file_webtracker_session_created_proto_rawDesc = "" +
 	"\n" +
-	"'schema/webtracker_session_created.proto\x12\x05leads\x1a\x1fgoogle/protobuf/timestamp.proto\x1a'schema/webtracker_event_type_enum.proto\"\x86\x03\n" +
+	" webtracker_session_created.proto\x12\x02pb\x1a\x1fgoogle/protobuf/timestamp.proto\x1a webtracker_event_type_enum.proto\"\x83\x03\n" +
 	"\x18WebtrackerSessionCreated\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x1d\n" +
@@ -158,9 +158,9 @@ const file_schema_webtracker_session_created_proto_rawDesc = "" +
 	"tracker_id\x18\x02 \x01(\tR\ttrackerId\x12\x1d\n" +
 	"\n" +
 	"visitor_id\x18\x03 \x01(\tR\tvisitorId\x12\x0e\n" +
-	"\x02ip\x18\x04 \x01(\tR\x02ip\x129\n" +
+	"\x02ip\x18\x04 \x01(\tR\x02ip\x126\n" +
 	"\n" +
-	"event_type\x18\x05 \x01(\x0e2\x1a.leads.WebTrackerEventTypeR\teventType\x12\x1d\n" +
+	"event_type\x18\x05 \x01(\x0e2\x17.pb.WebTrackerEventTypeR\teventType\x12\x1d\n" +
 	"\n" +
 	"event_data\x18\x06 \x01(\tR\teventData\x128\n" +
 	"\ttimestamp\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x12\n" +
@@ -169,29 +169,29 @@ const file_schema_webtracker_session_created_proto_rawDesc = "" +
 	"\n" +
 	"user_agent\x18\n" +
 	" \x01(\tR\tuserAgent\x12\x1a\n" +
-	"\blanguage\x18\v \x01(\tR\blanguageB&Z$github.com/customeros/leads/proto/pbb\x06proto3"
+	"\blanguage\x18\v \x01(\tR\blanguageB\x06Z\x04./pbb\x06proto3"
 
 var (
-	file_schema_webtracker_session_created_proto_rawDescOnce sync.Once
-	file_schema_webtracker_session_created_proto_rawDescData []byte
+	file_webtracker_session_created_proto_rawDescOnce sync.Once
+	file_webtracker_session_created_proto_rawDescData []byte
 )
 
-func file_schema_webtracker_session_created_proto_rawDescGZIP() []byte {
-	file_schema_webtracker_session_created_proto_rawDescOnce.Do(func() {
-		file_schema_webtracker_session_created_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_webtracker_session_created_proto_rawDesc), len(file_schema_webtracker_session_created_proto_rawDesc)))
+func file_webtracker_session_created_proto_rawDescGZIP() []byte {
+	file_webtracker_session_created_proto_rawDescOnce.Do(func() {
+		file_webtracker_session_created_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_webtracker_session_created_proto_rawDesc), len(file_webtracker_session_created_proto_rawDesc)))
 	})
-	return file_schema_webtracker_session_created_proto_rawDescData
+	return file_webtracker_session_created_proto_rawDescData
 }
 
-var file_schema_webtracker_session_created_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_schema_webtracker_session_created_proto_goTypes = []any{
-	(*WebtrackerSessionCreated)(nil), // 0: leads.WebtrackerSessionCreated
-	(WebTrackerEventType)(0),         // 1: leads.WebTrackerEventType
+var file_webtracker_session_created_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_webtracker_session_created_proto_goTypes = []any{
+	(*WebtrackerSessionCreated)(nil), // 0: pb.WebtrackerSessionCreated
+	(WebTrackerEventType)(0),         // 1: pb.WebTrackerEventType
 	(*timestamppb.Timestamp)(nil),    // 2: google.protobuf.Timestamp
 }
-var file_schema_webtracker_session_created_proto_depIdxs = []int32{
-	1, // 0: leads.WebtrackerSessionCreated.event_type:type_name -> leads.WebTrackerEventType
-	2, // 1: leads.WebtrackerSessionCreated.timestamp:type_name -> google.protobuf.Timestamp
+var file_webtracker_session_created_proto_depIdxs = []int32{
+	1, // 0: pb.WebtrackerSessionCreated.event_type:type_name -> pb.WebTrackerEventType
+	2, // 1: pb.WebtrackerSessionCreated.timestamp:type_name -> google.protobuf.Timestamp
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -199,27 +199,27 @@ var file_schema_webtracker_session_created_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_schema_webtracker_session_created_proto_init() }
-func file_schema_webtracker_session_created_proto_init() {
-	if File_schema_webtracker_session_created_proto != nil {
+func init() { file_webtracker_session_created_proto_init() }
+func file_webtracker_session_created_proto_init() {
+	if File_webtracker_session_created_proto != nil {
 		return
 	}
-	file_schema_webtracker_event_type_enum_proto_init()
+	file_webtracker_event_type_enum_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_webtracker_session_created_proto_rawDesc), len(file_schema_webtracker_session_created_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_webtracker_session_created_proto_rawDesc), len(file_webtracker_session_created_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_schema_webtracker_session_created_proto_goTypes,
-		DependencyIndexes: file_schema_webtracker_session_created_proto_depIdxs,
-		MessageInfos:      file_schema_webtracker_session_created_proto_msgTypes,
+		GoTypes:           file_webtracker_session_created_proto_goTypes,
+		DependencyIndexes: file_webtracker_session_created_proto_depIdxs,
+		MessageInfos:      file_webtracker_session_created_proto_msgTypes,
 	}.Build()
-	File_schema_webtracker_session_created_proto = out.File
-	file_schema_webtracker_session_created_proto_goTypes = nil
-	file_schema_webtracker_session_created_proto_depIdxs = nil
+	File_webtracker_session_created_proto = out.File
+	file_webtracker_session_created_proto_goTypes = nil
+	file_webtracker_session_created_proto_depIdxs = nil
 }

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: schema/webtracker_session_closed.proto
+// source: webtracker_session_closed.proto
 
 package pb
 
@@ -30,7 +30,7 @@ type WebTrackerSessionClosed struct {
 
 func (x *WebTrackerSessionClosed) Reset() {
 	*x = WebTrackerSessionClosed{}
-	mi := &file_schema_webtracker_session_closed_proto_msgTypes[0]
+	mi := &file_webtracker_session_closed_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *WebTrackerSessionClosed) String() string {
 func (*WebTrackerSessionClosed) ProtoMessage() {}
 
 func (x *WebTrackerSessionClosed) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_webtracker_session_closed_proto_msgTypes[0]
+	mi := &file_webtracker_session_closed_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *WebTrackerSessionClosed) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebTrackerSessionClosed.ProtoReflect.Descriptor instead.
 func (*WebTrackerSessionClosed) Descriptor() ([]byte, []int) {
-	return file_schema_webtracker_session_closed_proto_rawDescGZIP(), []int{0}
+	return file_webtracker_session_closed_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *WebTrackerSessionClosed) GetSessionId() string {
@@ -65,32 +65,32 @@ func (x *WebTrackerSessionClosed) GetSessionId() string {
 	return ""
 }
 
-var File_schema_webtracker_session_closed_proto protoreflect.FileDescriptor
+var File_webtracker_session_closed_proto protoreflect.FileDescriptor
 
-const file_schema_webtracker_session_closed_proto_rawDesc = "" +
+const file_webtracker_session_closed_proto_rawDesc = "" +
 	"\n" +
-	"&schema/webtracker_session_closed.proto\x12\x05leads\"8\n" +
+	"\x1fwebtracker_session_closed.proto\x12\x02pb\"8\n" +
 	"\x17WebTrackerSessionClosed\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionIdB&Z$github.com/customeros/leads/proto/pbb\x06proto3"
+	"session_id\x18\x01 \x01(\tR\tsessionIdB\x06Z\x04./pbb\x06proto3"
 
 var (
-	file_schema_webtracker_session_closed_proto_rawDescOnce sync.Once
-	file_schema_webtracker_session_closed_proto_rawDescData []byte
+	file_webtracker_session_closed_proto_rawDescOnce sync.Once
+	file_webtracker_session_closed_proto_rawDescData []byte
 )
 
-func file_schema_webtracker_session_closed_proto_rawDescGZIP() []byte {
-	file_schema_webtracker_session_closed_proto_rawDescOnce.Do(func() {
-		file_schema_webtracker_session_closed_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_webtracker_session_closed_proto_rawDesc), len(file_schema_webtracker_session_closed_proto_rawDesc)))
+func file_webtracker_session_closed_proto_rawDescGZIP() []byte {
+	file_webtracker_session_closed_proto_rawDescOnce.Do(func() {
+		file_webtracker_session_closed_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_webtracker_session_closed_proto_rawDesc), len(file_webtracker_session_closed_proto_rawDesc)))
 	})
-	return file_schema_webtracker_session_closed_proto_rawDescData
+	return file_webtracker_session_closed_proto_rawDescData
 }
 
-var file_schema_webtracker_session_closed_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_schema_webtracker_session_closed_proto_goTypes = []any{
-	(*WebTrackerSessionClosed)(nil), // 0: leads.WebTrackerSessionClosed
+var file_webtracker_session_closed_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_webtracker_session_closed_proto_goTypes = []any{
+	(*WebTrackerSessionClosed)(nil), // 0: pb.WebTrackerSessionClosed
 }
-var file_schema_webtracker_session_closed_proto_depIdxs = []int32{
+var file_webtracker_session_closed_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -98,26 +98,26 @@ var file_schema_webtracker_session_closed_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_schema_webtracker_session_closed_proto_init() }
-func file_schema_webtracker_session_closed_proto_init() {
-	if File_schema_webtracker_session_closed_proto != nil {
+func init() { file_webtracker_session_closed_proto_init() }
+func file_webtracker_session_closed_proto_init() {
+	if File_webtracker_session_closed_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_webtracker_session_closed_proto_rawDesc), len(file_schema_webtracker_session_closed_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_webtracker_session_closed_proto_rawDesc), len(file_webtracker_session_closed_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_schema_webtracker_session_closed_proto_goTypes,
-		DependencyIndexes: file_schema_webtracker_session_closed_proto_depIdxs,
-		MessageInfos:      file_schema_webtracker_session_closed_proto_msgTypes,
+		GoTypes:           file_webtracker_session_closed_proto_goTypes,
+		DependencyIndexes: file_webtracker_session_closed_proto_depIdxs,
+		MessageInfos:      file_webtracker_session_closed_proto_msgTypes,
 	}.Build()
-	File_schema_webtracker_session_closed_proto = out.File
-	file_schema_webtracker_session_closed_proto_goTypes = nil
-	file_schema_webtracker_session_closed_proto_depIdxs = nil
+	File_webtracker_session_closed_proto = out.File
+	file_webtracker_session_closed_proto_goTypes = nil
+	file_webtracker_session_closed_proto_depIdxs = nil
 }

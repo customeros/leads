@@ -12,10 +12,10 @@ import (
 	"github.com/customeros/leads/enum"
 	leads_errors "github.com/customeros/leads/errors"
 	"github.com/customeros/leads/internal/models"
+	proto_mappers "github.com/customeros/leads/internal/proto/mappers"
+	"github.com/customeros/leads/internal/proto/pb"
 	"github.com/customeros/leads/internal/telemetry"
 	"github.com/customeros/leads/internal/utils"
-	proto_mappers "github.com/customeros/leads/proto/mappers"
-	"github.com/customeros/leads/proto/pb"
 )
 
 func (s *webEventProcessor) Process(ctx context.Context, webtrackerID string, event *pb.WebTrackerEvent) {
@@ -90,7 +90,7 @@ func (s *webEventProcessor) newSession(ctx context.Context, webtrackerID string,
 
 	sessionID := utils.GenerateNanoIDWithPrefix("sess", 21)
 
-	webSessionEvent := &pb.WebtrackerSessionNew{
+	webSessionEvent := &pb.WebtrackerSessionCreated{
 		SessionId: sessionID,
 		TrackerId: webtrackerID,
 		VisitorId: event.VisitorId,

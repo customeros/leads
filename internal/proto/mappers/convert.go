@@ -2,7 +2,7 @@ package proto_mappers
 
 import (
 	"github.com/customeros/leads/enum"
-	"github.com/customeros/leads/proto/pb"
+	"github.com/customeros/leads/internal/proto/pb"
 )
 
 // These are the event type conversion functions from the previous answer

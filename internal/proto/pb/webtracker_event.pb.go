@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: schema/webtracker_event.proto
+// source: webtracker_event.proto
 
 package pb
 
@@ -28,7 +28,7 @@ type WebTrackerEvent struct {
 	SessionId        string                 `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	VisitorId        string                 `protobuf:"bytes,3,opt,name=visitor_id,json=visitorId,proto3" json:"visitor_id,omitempty"`
 	Ip               string                 `protobuf:"bytes,4,opt,name=ip,proto3" json:"ip,omitempty"`
-	EventType        WebTrackerEventType    `protobuf:"varint,5,opt,name=event_type,json=eventType,proto3,enum=leads.WebTrackerEventType" json:"event_type,omitempty"`
+	EventType        WebTrackerEventType    `protobuf:"varint,5,opt,name=event_type,json=eventType,proto3,enum=pb.WebTrackerEventType" json:"event_type,omitempty"`
 	EventData        string                 `protobuf:"bytes,6,opt,name=event_data,json=eventData,proto3" json:"event_data,omitempty"`
 	Timestamp        *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	Href             string                 `protobuf:"bytes,8,opt,name=href,proto3" json:"href,omitempty"`
@@ -43,7 +43,7 @@ type WebTrackerEvent struct {
 
 func (x *WebTrackerEvent) Reset() {
 	*x = WebTrackerEvent{}
-	mi := &file_schema_webtracker_event_proto_msgTypes[0]
+	mi := &file_webtracker_event_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -55,7 +55,7 @@ func (x *WebTrackerEvent) String() string {
 func (*WebTrackerEvent) ProtoMessage() {}
 
 func (x *WebTrackerEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_schema_webtracker_event_proto_msgTypes[0]
+	mi := &file_webtracker_event_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -68,7 +68,7 @@ func (x *WebTrackerEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebTrackerEvent.ProtoReflect.Descriptor instead.
 func (*WebTrackerEvent) Descriptor() ([]byte, []int) {
-	return file_schema_webtracker_event_proto_rawDescGZIP(), []int{0}
+	return file_webtracker_event_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *WebTrackerEvent) GetId() string {
@@ -162,20 +162,20 @@ func (x *WebTrackerEvent) GetScreenResolution() string {
 	return ""
 }
 
-var File_schema_webtracker_event_proto protoreflect.FileDescriptor
+var File_webtracker_event_proto protoreflect.FileDescriptor
 
-const file_schema_webtracker_event_proto_rawDesc = "" +
+const file_webtracker_event_proto_rawDesc = "" +
 	"\n" +
-	"\x1dschema/webtracker_event.proto\x12\x05leads\x1a\x1fgoogle/protobuf/timestamp.proto\x1a'schema/webtracker_event_type_enum.proto\"\xc4\x03\n" +
+	"\x16webtracker_event.proto\x12\x02pb\x1a\x1fgoogle/protobuf/timestamp.proto\x1a webtracker_event_type_enum.proto\"\xc1\x03\n" +
 	"\x0fWebTrackerEvent\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x02 \x01(\tR\tsessionId\x12\x1d\n" +
 	"\n" +
 	"visitor_id\x18\x03 \x01(\tR\tvisitorId\x12\x0e\n" +
-	"\x02ip\x18\x04 \x01(\tR\x02ip\x129\n" +
+	"\x02ip\x18\x04 \x01(\tR\x02ip\x126\n" +
 	"\n" +
-	"event_type\x18\x05 \x01(\x0e2\x1a.leads.WebTrackerEventTypeR\teventType\x12\x1d\n" +
+	"event_type\x18\x05 \x01(\x0e2\x17.pb.WebTrackerEventTypeR\teventType\x12\x1d\n" +
 	"\n" +
 	"event_data\x18\x06 \x01(\tR\teventData\x128\n" +
 	"\ttimestamp\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x12\n" +
@@ -186,29 +186,29 @@ const file_schema_webtracker_event_proto_rawDesc = "" +
 	" \x01(\tR\tuserAgent\x12\x1a\n" +
 	"\blanguage\x18\v \x01(\tR\blanguage\x12'\n" +
 	"\x0fcookies_enabled\x18\f \x01(\bR\x0ecookiesEnabled\x12+\n" +
-	"\x11screen_resolution\x18\r \x01(\tR\x10screenResolutionB&Z$github.com/customeros/leads/proto/pbb\x06proto3"
+	"\x11screen_resolution\x18\r \x01(\tR\x10screenResolutionB\x06Z\x04./pbb\x06proto3"
 
 var (
-	file_schema_webtracker_event_proto_rawDescOnce sync.Once
-	file_schema_webtracker_event_proto_rawDescData []byte
+	file_webtracker_event_proto_rawDescOnce sync.Once
+	file_webtracker_event_proto_rawDescData []byte
 )
 
-func file_schema_webtracker_event_proto_rawDescGZIP() []byte {
-	file_schema_webtracker_event_proto_rawDescOnce.Do(func() {
-		file_schema_webtracker_event_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_schema_webtracker_event_proto_rawDesc), len(file_schema_webtracker_event_proto_rawDesc)))
+func file_webtracker_event_proto_rawDescGZIP() []byte {
+	file_webtracker_event_proto_rawDescOnce.Do(func() {
+		file_webtracker_event_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_webtracker_event_proto_rawDesc), len(file_webtracker_event_proto_rawDesc)))
 	})
-	return file_schema_webtracker_event_proto_rawDescData
+	return file_webtracker_event_proto_rawDescData
 }
 
-var file_schema_webtracker_event_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_schema_webtracker_event_proto_goTypes = []any{
-	(*WebTrackerEvent)(nil),       // 0: leads.WebTrackerEvent
-	(WebTrackerEventType)(0),      // 1: leads.WebTrackerEventType
+var file_webtracker_event_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_webtracker_event_proto_goTypes = []any{
+	(*WebTrackerEvent)(nil),       // 0: pb.WebTrackerEvent
+	(WebTrackerEventType)(0),      // 1: pb.WebTrackerEventType
 	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
 }
-var file_schema_webtracker_event_proto_depIdxs = []int32{
-	1, // 0: leads.WebTrackerEvent.event_type:type_name -> leads.WebTrackerEventType
-	2, // 1: leads.WebTrackerEvent.timestamp:type_name -> google.protobuf.Timestamp
+var file_webtracker_event_proto_depIdxs = []int32{
+	1, // 0: pb.WebTrackerEvent.event_type:type_name -> pb.WebTrackerEventType
+	2, // 1: pb.WebTrackerEvent.timestamp:type_name -> google.protobuf.Timestamp
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -216,27 +216,27 @@ var file_schema_webtracker_event_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_schema_webtracker_event_proto_init() }
-func file_schema_webtracker_event_proto_init() {
-	if File_schema_webtracker_event_proto != nil {
+func init() { file_webtracker_event_proto_init() }
+func file_webtracker_event_proto_init() {
+	if File_webtracker_event_proto != nil {
 		return
 	}
-	file_schema_webtracker_event_type_enum_proto_init()
+	file_webtracker_event_type_enum_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_schema_webtracker_event_proto_rawDesc), len(file_schema_webtracker_event_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_webtracker_event_proto_rawDesc), len(file_webtracker_event_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_schema_webtracker_event_proto_goTypes,
-		DependencyIndexes: file_schema_webtracker_event_proto_depIdxs,
-		MessageInfos:      file_schema_webtracker_event_proto_msgTypes,
+		GoTypes:           file_webtracker_event_proto_goTypes,
+		DependencyIndexes: file_webtracker_event_proto_depIdxs,
+		MessageInfos:      file_webtracker_event_proto_msgTypes,
 	}.Build()
-	File_schema_webtracker_event_proto = out.File
-	file_schema_webtracker_event_proto_goTypes = nil
-	file_schema_webtracker_event_proto_depIdxs = nil
+	File_webtracker_event_proto = out.File
+	file_webtracker_event_proto_goTypes = nil
+	file_webtracker_event_proto_depIdxs = nil
 }
