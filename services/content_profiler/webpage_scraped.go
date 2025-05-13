@@ -15,7 +15,7 @@ import (
 	"github.com/customeros/leads/internal/utils"
 )
 
-func (s *contentProfiler) handleWebpageScrapedEvent(ctx context.Context, msg *nats.Msg) error {
+func (s *ContentProfiler) handleWebpageScrapedEvent(ctx context.Context, msg *nats.Msg) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.handleWebpageScrapedEvent")
 	defer span.Finish()
 
@@ -52,12 +52,12 @@ func (s *contentProfiler) handleWebpageScrapedEvent(ctx context.Context, msg *na
 	return nil
 }
 
-func (s *contentProfiler) startWebpageProfiling(ctx context.Context, webpage *models.Content) error {
+func (s *ContentProfiler) startWebpageProfiling(ctx context.Context, webpage *models.Content) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.profileWebpage")
 	defer span.Finish()
 
 	// content classification
-	err := s.requestContentClassification(ctx, webpage.ID)
+	err := s.requestContentClassification(ctx, webpage)
 	if err != nil {
 		span.TraceError(err)
 	}
@@ -71,7 +71,7 @@ func (s *contentProfiler) startWebpageProfiling(ctx context.Context, webpage *mo
 	return err
 }
 
-func (s *contentProfiler) requestWebpageIntentProfile(ctx context.Context, contentID string) error {
+func (s *ContentProfiler) requestWebpageIntentProfile(ctx context.Context, contentID string) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.requestWebpageIntentProfile")
 	defer span.Finish()
 
@@ -97,11 +97,16 @@ func (s *contentProfiler) requestWebpageIntentProfile(ctx context.Context, conte
 	return nil
 }
 
-func (s *contentProfiler) requestContentClassification(ctx context.Context, contentID string) error {
+func (s *ContentProfiler) requestContentClassification(ctx context.Context, webpage *models.Content) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.requestContentClassification")
 	defer span.Finish()
 
-	event := &pb.RequestWebpageClassification{ContentId: contentID}
+	event := &pb.RequestWebpageClassification{
+		ContentId: webpage.ID,
+		Domain:    webpage.Domain,
+		Url:       webpage.Url,
+		Content:   webpage.Content,
+	}
 
 	payload, err := proto.Marshal(event)
 	if err != nil {
@@ -123,7 +128,7 @@ func (s *contentProfiler) requestContentClassification(ctx context.Context, cont
 	return nil
 }
 
-func (s *contentProfiler) parseWebpageScrapedEvent(ctx context.Context, msg *nats.Msg) (*pb.WebpageScraped, error) {
+func (s *ContentProfiler) parseWebpageScrapedEvent(ctx context.Context, msg *nats.Msg) (*pb.WebpageScraped, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.parseWebpageScapedEvent")
 	defer span.Finish()
 

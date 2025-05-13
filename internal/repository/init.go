@@ -73,24 +73,3 @@ func MigrateLeadsDB(dbConfig *config.LeadsDatabaseConfig, leadsDB *gorm.DB) erro
 
 	return err
 }
-
-func MigrateDataWarehouse(dbConfig *config.DataWarehouseConfig, warehouseDB *gorm.DB) error {
-	db, err := warehouseDB.DB()
-	if err != nil {
-		return err
-	}
-
-	db.SetMaxOpenConns(5)
-
-	err = warehouseDB.AutoMigrate(
-		&models.APICallLog{},
-		&models.ScraperEvent{},
-		&models.WebTrackerEvent{},
-	)
-
-	db.SetMaxIdleConns(dbConfig.MaxIdleConn)
-	db.SetMaxOpenConns(dbConfig.MaxConn)
-	db.SetConnMaxLifetime(time.Duration(dbConfig.ConnMaxLifetime) * time.Minute)
-
-	return err
-}

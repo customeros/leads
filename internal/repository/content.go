@@ -16,6 +16,7 @@ type ContentRepository interface {
 	GetByDomains(ctx context.Context, domains []string) ([]models.Content, error)
 	GetByUrl(ctx context.Context, url string) (*models.Content, error)
 	Update(ctx context.Context, content *models.Content) error
+	UpdateClassificationFields(ctx context.Context, content *models.Content) error
 	Delete(ctx context.Context, id string) error
 	List(ctx context.Context, filter ContentFilter) ([]models.Content, error)
 }
@@ -78,6 +79,56 @@ func (r *contentRepo) GetByUrl(ctx context.Context, url string) (*models.Content
 		return nil, result.Error
 	}
 	return &content, nil
+}
+
+// UpdateClassificationFields updates only the specified classification fields
+func (r *contentRepo) UpdateClassificationFields(ctx context.Context, content *models.Content) error {
+	span, ctx := telemetry.StartPostgresSpan(ctx, "contentRepo.UpdateClassificationFields")
+	defer span.Finish()
+
+	if content.ID == "" {
+		err := errors.New("ContentID cannot be empty")
+		span.TraceError(err)
+		return err
+	}
+
+	// Build updates map with only non-empty fields
+	updates := make(map[string]interface{})
+
+	if content.PrimaryTopic != "" {
+		updates["primary_topic"] = content.PrimaryTopic
+	}
+	if len(content.SecondaryTopics) > 0 {
+		updates["secondary_topics"] = content.SecondaryTopics
+	}
+	if len(content.SolutionFocus) > 0 {
+		updates["solution_focus"] = content.SolutionFocus
+	}
+	if content.ContentType != "" {
+		updates["content_type"] = content.ContentType
+	}
+	if content.IndustryVertical != "" {
+		updates["industry_vertical"] = content.IndustryVertical
+	}
+	if len(content.KeyPainPoints) > 0 {
+		updates["key_pain_points"] = content.KeyPainPoints
+	}
+	if content.ValueProposition != "" {
+		updates["value_proposition"] = content.ValueProposition
+	}
+	if len(content.ReferencedCustomers) > 0 {
+		updates["referenced_customers"] = content.ReferencedCustomers
+	}
+
+	if len(updates) == 0 {
+		return nil // nothing to update
+	}
+
+	return r.writeDB.WithContext(ctx).
+		Model(&models.Content{}).
+		Where("id = ?", content.ID).
+		Updates(updates).
+		Error
 }
 
 func (r *contentRepo) Update(ctx context.Context, content *models.Content) error {

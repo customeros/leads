@@ -12,7 +12,7 @@ import (
 	"github.com/customeros/leads/internal/telemetry"
 )
 
-func (s *contentProfiler) handleWebpageProfiledEvent(ctx context.Context, msg *nats.Msg) error {
+func (s *ContentProfiler) handleWebpageProfiledEvent(ctx context.Context, msg *nats.Msg) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.handleWebpageProfiledEvent")
 	defer span.Finish()
 
@@ -44,7 +44,7 @@ func (s *contentProfiler) handleWebpageProfiledEvent(ctx context.Context, msg *n
 	return nil
 }
 
-func (s *contentProfiler) parseWebpageProfiledEvent(ctx context.Context, msg *nats.Msg) (*pb.WebpageProfiled, error) {
+func (s *ContentProfiler) parseWebpageProfiledEvent(ctx context.Context, msg *nats.Msg) (*pb.WebpageProfiled, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.parseWebpageProfiledEvent")
 	defer span.Finish()
 

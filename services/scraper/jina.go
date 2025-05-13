@@ -28,7 +28,7 @@ var (
 )
 
 func (s *scraperService) ScrapeWithJina(ctx context.Context, url string) (string, error) {
-	spans, ctx := telemetry.StartServiceSpan(ctx, "webscraperService.ScrapeWithJina")
+	spans, ctx := telemetry.StartServiceSpan(ctx, "scraperService.ScrapeWithJina")
 	defer spans.Finish()
 	spans.LogKV("url", url)
 
@@ -73,7 +73,7 @@ func (s *scraperService) ScrapeWithJina(ctx context.Context, url string) (string
 		}
 		return "", nil
 
-	case strings.Contains(contents, ""):
+	case contents == "":
 		err := s.handleScraperError(ctx, primaryDomain, cleanUrl, "no content")
 		if err != nil {
 			spans.TraceError(err)
@@ -93,7 +93,7 @@ func (s *scraperService) ScrapeWithJina(ctx context.Context, url string) (string
 }
 
 func (s *scraperService) handleScrapesSuccess(ctx context.Context, domain, url, content string, links []string) error {
-	span, ctx := telemetry.StartServiceSpan(ctx, "scraperService.handlScraperSuccess")
+	span, ctx := telemetry.StartServiceSpan(ctx, "scraperService.handleScraperSuccess")
 	defer span.Finish()
 
 	event := &pb.WebpageScraped{
@@ -166,7 +166,7 @@ func (s *scraperService) handleScraperError(ctx context.Context, domain, url, er
 }
 
 func processWebContent(ctx context.Context, content string) (string, []string) {
-	spans, ctx := telemetry.StartServiceSpan(ctx, "WebscraperService.postProcessWebContent")
+	spans, ctx := telemetry.StartServiceSpan(ctx, "scraperService.postProcessWebContent")
 	defer spans.Finish()
 
 	// extract links and save
@@ -186,7 +186,7 @@ func processWebContent(ctx context.Context, content string) (string, []string) {
 }
 
 func (s *scraperService) fetchPageWithJina(ctx context.Context, url string) (string, error) {
-	spans, ctx := telemetry.StartServiceSpan(ctx, "WebscraperService.fetchPage")
+	spans, ctx := telemetry.StartServiceSpan(ctx, "scraperService.fetchPageWithJina")
 	defer spans.Finish()
 
 	if s.config.ApiKey == "" {

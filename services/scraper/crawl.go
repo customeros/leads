@@ -33,7 +33,6 @@ func (s *scraperService) Crawl(ctx context.Context, domain string) error {
 	}
 
 	startUrl := fmt.Sprintf("https://%s", primaryDomain)
-
 	workspaceDomains := []string{primaryDomain}
 	results := make(chan string, MaxPagesToCrawl)
 	errChan := make(chan error, 1)
@@ -44,13 +43,19 @@ func (s *scraperService) Crawl(ctx context.Context, domain string) error {
 	// Start recursive crawl
 	go s.crawlRecursive(ctx, startUrl, workspaceDomains, 0, &wg, results, errChan)
 
-	// Wait for completion in separate goroutine
+	// Wait for completion
 	go func() {
 		wg.Wait()
 		close(results)
 	}()
 
-	return nil
+	// Wait for either completion or error
+	select {
+	case err := <-errChan:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 func (s *scraperService) crawlRecursive(
@@ -133,7 +138,7 @@ func shouldSkipURL(url string) bool {
 		"session", "token", "search", "filter", "sort", "page",
 		"share", "support", "help", "faq", "ticket", "contact",
 		"calendar", "date", "archive", "tag", "admin", "manage",
-		"status", "password",
+		"status", "password", "app",
 	}
 
 	lowercaseURL := strings.ToLower(url)

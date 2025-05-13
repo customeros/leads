@@ -9,6 +9,7 @@ import (
 	"github.com/customeros/leads/internal/database"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/repository"
+	"github.com/customeros/leads/services/content_profiler"
 	"github.com/customeros/leads/services/ipdata"
 	"github.com/customeros/leads/services/outbox_processor"
 	"github.com/customeros/leads/services/proxy_manager"
@@ -20,6 +21,7 @@ import (
 )
 
 type Services struct {
+	ContentProfiler   *content_profiler.ContentProfiler
 	IPDataService     *ipdata.IPDataService
 	OutboxProcessor   *outbox_processor.OutboxProcessor
 	ProxyManager      proxy_manager.ProxyManagerService
@@ -35,8 +37,10 @@ func (s *Services) Start(ctx context.Context) error {
 		name    string
 		starter func(context.Context) error
 	}{
+		{"Content Profiler", s.ContentProfiler.Start},
 		{"Session Manager Service", s.SessionManager.Start},
 		{"Snitcher Service", s.SnitcherService.Start},
+		{"Scraper Service", s.ScraperService.Start},
 	}
 
 	for _, svc := range services {
@@ -53,8 +57,10 @@ func (s *Services) Stop(ctx context.Context) {
 		name    string
 		stopper func(context.Context)
 	}{
+		{"Content Profiler", func(ctx context.Context) { s.ContentProfiler.Stop() }},
 		{"Session Manager Service", func(ctx context.Context) { s.SessionManager.Stop() }},
 		{"Snitcher Service", func(ctx context.Context) { s.SnitcherService.Stop() }},
+		{"Scraper Service", func(ctx context.Context) { s.ScraperService.Stop() }},
 	}
 
 	for _, service := range services {
@@ -64,6 +70,7 @@ func (s *Services) Stop(ctx context.Context) {
 
 func InitServices(config *config.Config, leadsDB *database.DbConnections, natsConn *nats_internal.NATSConnections, repositories *repository.Repositories) *Services {
 	return &Services{
+		ContentProfiler:   content_profiler.NewContentProfiler(natsConn, leadsDB, repositories),
 		IPDataService:     ipdata.NewIPDataService(config.IPDataConfig, natsConn, repositories),
 		OutboxProcessor:   outbox_processor.NewOutboxProcessor(natsConn, repositories),
 		ProxyManager:      proxy_manager.NewProxyManagerService(natsConn, leadsDB, repositories),

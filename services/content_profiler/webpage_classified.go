@@ -12,7 +12,7 @@ import (
 	"github.com/customeros/leads/internal/telemetry"
 )
 
-func (s *contentProfiler) handleWebpageClassifiedEvent(ctx context.Context, msg *nats.Msg) error {
+func (s *ContentProfiler) handleWebpageClassifiedEvent(ctx context.Context, msg *nats.Msg) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.handleWebpageClassifiedEvent")
 	defer span.Finish()
 
@@ -29,7 +29,7 @@ func (s *contentProfiler) handleWebpageClassifiedEvent(ctx context.Context, msg 
 	}
 
 	// update record
-	err = s.repositories.Content.Update(ctx, &models.Content{
+	err = s.repositories.Content.UpdateClassificationFields(ctx, &models.Content{
 		ID:                  message.ContentId,
 		PrimaryTopic:        message.PrimaryTopic,
 		SecondaryTopics:     message.SecondaryTopics,
@@ -48,7 +48,7 @@ func (s *contentProfiler) handleWebpageClassifiedEvent(ctx context.Context, msg 
 	return nil
 }
 
-func (s *contentProfiler) parseWebpageClassifiedEvent(ctx context.Context, msg *nats.Msg) (*pb.WebpageClassified, error) {
+func (s *ContentProfiler) parseWebpageClassifiedEvent(ctx context.Context, msg *nats.Msg) (*pb.WebpageClassified, error) {
 	span, ctx := telemetry.StartServiceSpan(ctx, "contentProfiler.parseWebpageClassifiedEvent")
 	defer span.Finish()
 
