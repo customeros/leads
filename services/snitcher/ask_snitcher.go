@@ -19,17 +19,16 @@ import (
 const IDENTITY_SOURCE = "Snitcher"
 
 func (s *SnitcherService) AskSnitcher(ctx context.Context, ip string) *pb.IPAddressIdentifyResponse {
-	spans, ctx := telemetry.StartServiceSpan(ctx, "snitcherService.AskSnitcher")
-	defer spans.Finish()
-
-	spans.LogKV("ip", ip)
+	span, ctx := telemetry.StartServiceSpan(ctx, "snitcherService.AskSnitcher")
+	defer span.Finish()
+	span.LogKV("ipAddress", ip)
 
 	response := &pb.IPAddressIdentifyResponse{}
 
 	// validate if snitcher is configured
 	if s.config.ApiKey == "" || s.config.Url == "" {
 		err := fmt.Errorf("snitcher is not configured")
-		spans.TraceError(err)
+		span.TraceError(err)
 		response.ErrorMessage = err.Error()
 		return response
 	}
@@ -41,7 +40,7 @@ func (s *SnitcherService) AskSnitcher(ctx context.Context, ip string) *pb.IPAddr
 	// Create POST request with context
 	req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("%s/company/find?ip=%s", s.config.Url, ip), nil)
 	if err != nil {
-		spans.TraceError(err)
+		span.TraceError(err)
 		err := fmt.Errorf("failed to create POST request: %w", err)
 		response.ErrorMessage = err.Error()
 		return response
@@ -54,7 +53,7 @@ func (s *SnitcherService) AskSnitcher(ctx context.Context, ip string) *pb.IPAddr
 	// Perform the request
 	resp, err := client.Do(req)
 	if err != nil {
-		spans.TraceError(err)
+		span.TraceError(err)
 		err := fmt.Errorf("failed to perform POST request: %w", err)
 		response.ErrorMessage = err.Error()
 		return response
@@ -64,26 +63,34 @@ func (s *SnitcherService) AskSnitcher(ctx context.Context, ip string) *pb.IPAddr
 	// Read response with size limit
 	responseBody, err := io.ReadAll(io.LimitReader(resp.Body, MAX_RESPONSE_SIZE))
 	if err != nil {
-		spans.TraceError(err)
+		span.TraceError(err)
 		err := fmt.Errorf("failed to read response body: %w", err)
 		response.ErrorMessage = err.Error()
 		return response
 	}
 
 	// Check status code
-	spans.LogKV("response.statusCode", resp.StatusCode)
-	if resp.StatusCode != http.StatusOK {
-		spans.LogKV("result.rawSnitcherResponse", string(responseBody))
-		err := fmt.Errorf("snitcher API returned non-200 status code: %d", resp.StatusCode)
+	span.LogKV("result.snitcher.statusCode", resp.StatusCode)
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNotFound {
+		// expected status codes 200 - company found, 404 - company not found
+		span.LogKV("result.snitcher.rawResponse", string(responseBody))
+		err := fmt.Errorf("snitcher API returned unexpected status code: %d", resp.StatusCode)
 		response.ErrorMessage = err.Error()
 		return response
+	}
+	if resp.StatusCode == http.StatusNotFound {
+		// return empty domain if company not found
+		return &pb.IPAddressIdentifyResponse{
+			IpAddress: ip,
+			Domain:    "",
+		}
 	}
 
 	// Validate and compact JSON
 	err = validateJSON(responseBody)
 	if err != nil {
-		spans.TraceError(err)
-		spans.LogKV("json.response.invalid", string(responseBody))
+		span.TraceError(err)
+		span.LogKV("result.snitcher.json.response.invalid", string(responseBody))
 		err := fmt.Errorf("failed to process JSON response: %w", err)
 		response.ErrorMessage = err.Error()
 		return response
@@ -92,8 +99,8 @@ func (s *SnitcherService) AskSnitcher(ctx context.Context, ip string) *pb.IPAddr
 	// Parse the response
 	var snitcherResponse SnitcherResponse
 	if err := json.Unmarshal(responseBody, &snitcherResponse); err != nil {
-		spans.TraceError(err)
-		spans.LogKV("json.response.parsing", string(responseBody))
+		span.TraceError(err)
+		span.LogKV("result.snitcher.json.response.parsing", string(responseBody))
 		err := fmt.Errorf("failed to parse snitcher response: %w", err)
 		response.ErrorMessage = err.Error()
 		return response
@@ -101,7 +108,7 @@ func (s *SnitcherService) AskSnitcher(ctx context.Context, ip string) *pb.IPAddr
 
 	err = s.handleSuccessResponse(ctx, ip, &snitcherResponse)
 	if err != nil {
-		spans.TraceError(err)
+		span.TraceError(err)
 		response.ErrorMessage = err.Error()
 		return response
 	}
