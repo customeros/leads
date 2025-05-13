@@ -30,6 +30,7 @@ const (
 
 	HEADER_TENANT = "X-Tenant"
 	HEADER_USERID = "X-UserId"
+	HEADER_SPANID = "X-SpanId"
 )
 
 // InitNats initializes the NATS connection and sets up streams
