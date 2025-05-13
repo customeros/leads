@@ -22,7 +22,7 @@ type Content struct {
 	IndustryVertical    string         `gorm:"column:industry_vertical;type:varchar(255)"`
 	KeyPainPoints       pq.StringArray `gorm:"column:key_pain_points;type:text[]"`
 	ValueProposition    string         `gorm:"column:value_proposition;type:varchar(255)"`
-	ReferencedCustomers pq.StringArray `gorm:"column:referencedCustomers;type:text[]"`
+	ReferencedCustomers pq.StringArray `gorm:"column:referenced_customers;type:text[]"`
 
 	// Intent signals - using integer scoring (1-4)
 	ProblemRecognitionScore int `gorm:"column:problem_recognition_score;type:smallint"`
