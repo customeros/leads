@@ -3,6 +3,7 @@ package proxy_manager
 import (
 	"context"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"math"
 	"strings"
 	"time"
@@ -115,7 +116,7 @@ func (s *proxyManagerService) handleCNAMEConfigured(ctx context.Context, tracker
 		outboxEvent := &models.OutboxEvent{
 			ID:        utils.GenerateEventID(),
 			EntityID:  tracker.ID,
-			EventType: enum.EventProxyWebtrackerCnameConfigured,
+			EventType: enums.EventProxyWebtrackerCnameConfigured,
 			Tenant:    tracker.Tenant,
 			Payload:   payload,
 			Publisher: enum.ProxyManager,

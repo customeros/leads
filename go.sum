@@ -32,6 +32,8 @@ github.com/coocood/freecache v1.2.4/go.mod h1:RBUWa/Cy+OHdfTGFEhEuE1pMCMX51Ncizj
 github.com/cpuguy83/go-md2man/v2 v2.0.5 h1:ZtcqGrnekaHpVLArFSe4HK5DoKx1T0rq2DwVB0alcyc=
 github.com/cpuguy83/go-md2man/v2 v2.0.5/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
+github.com/customeros/customeros/packages/server/enums v0.0.0-20250514170720-11697afc2afb h1:txdOWQVq8UZO9WhIMNm87SRSt7cFdwMt8D/YRHAfGRY=
+github.com/customeros/customeros/packages/server/enums v0.0.0-20250514170720-11697afc2afb/go.mod h1:igO/6ciAeYl6D3ry/oWQfh33t7hay2040PnEyXVFmZw=
 github.com/customeros/mailsherpa v0.3.9 h1:i+usip3f5A3IgryzeiYTzZWDxI1fRxp4VxXWGpTDd7c=
 github.com/customeros/mailsherpa v0.3.9/go.mod h1:3PVCXCWUQQ6lTjxFtPs4KlFKteME14hD5GFNiElB7Fk=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

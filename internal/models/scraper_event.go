@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"time"
 
 	"gorm.io/gorm"
@@ -10,15 +11,15 @@ import (
 )
 
 type ScraperEvent struct {
-	ID           string            `gorm:"column:id;type:varchar(50);primaryKey;not null" json:"id"`
-	Timestamp    time.Time         `gorm:"column:timestamp;primaryKey;type:timestamptz;not null"`
-	Event        enum.Events       `gorm:"column:event;type:varchar(50);index;not null" json:"event"`
-	Publisher    enum.LeadsService `gorm:"column:publisher;type:varchar(50);index;not null" json:"publisher"`
-	Domain       string            `gorm:"column:domain;type:varchar(50);index;not null" json:"domain"`
-	Url          string            `gorm:"column:url;type:varchar(255);index" json:"url"`
-	Payload      []byte            `gorm:"column:payload;type:bytea" json:"-"`
-	HasError     bool              `gorm:"column:has_error;type:boolean" json:"hasError"`
-	ErrorMessage string            `gorm:"column:error_message;type:varchar(255)" json:"errorMessage"`
+	ID           string              `gorm:"column:id;type:varchar(50);primaryKey;not null" json:"id"`
+	Timestamp    time.Time           `gorm:"column:timestamp;primaryKey;type:timestamptz;not null"`
+	Event        enums.NatsEventType `gorm:"column:event;type:varchar(50);index;not null" json:"event"`
+	Publisher    enum.LeadsService   `gorm:"column:publisher;type:varchar(50);index;not null" json:"publisher"`
+	Domain       string              `gorm:"column:domain;type:varchar(50);index;not null" json:"domain"`
+	Url          string              `gorm:"column:url;type:varchar(255);index" json:"url"`
+	Payload      []byte              `gorm:"column:payload;type:bytea" json:"-"`
+	HasError     bool                `gorm:"column:has_error;type:boolean" json:"hasError"`
+	ErrorMessage string              `gorm:"column:error_message;type:varchar(255)" json:"errorMessage"`
 }
 
 func (e *ScraperEvent) TableName() string {

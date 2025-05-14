@@ -2,11 +2,11 @@ package content_profiler
 
 import (
 	"context"
+	"github.com/customeros/customeros/packages/server/enums"
 
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/customeros/leads/enum"
 	leads_errors "github.com/customeros/leads/errors"
 	"github.com/customeros/leads/internal/models"
 	nats_internal "github.com/customeros/leads/internal/nats"
@@ -84,7 +84,7 @@ func (s *ContentProfiler) requestWebpageIntentProfile(ctx context.Context, conte
 	}
 
 	// Create message with headers
-	msg := nats.NewMsg(enum.EventRequestWebpageIntent.String())
+	msg := nats.NewMsg(enums.EventRequestWebpageIntent.String())
 	msg.Data = payload
 	msg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	msg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))
@@ -115,7 +115,7 @@ func (s *ContentProfiler) requestContentClassification(ctx context.Context, webp
 	}
 
 	// Create message with headers
-	msg := nats.NewMsg(enum.EventRequestWebpageClassification.String())
+	msg := nats.NewMsg(enums.EventRequestWebpageClassification.String())
 	msg.Data = payload
 	msg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	msg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))

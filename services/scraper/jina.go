@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"io"
 	"net/http"
 	"strings"
@@ -110,7 +111,7 @@ func (s *scraperService) handleScrapesSuccess(ctx context.Context, domain, url, 
 	// create outbox event
 	outbox := &models.OutboxEvent{
 		ID:        utils.GenerateEventID(),
-		EventType: enum.EventWebpageScraped,
+		EventType: enums.EventWebpageScraped,
 		EntityID:  domain,
 		Publisher: enum.ScraperService,
 		Payload:   payload,

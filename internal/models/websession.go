@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/customeros/customeros/packages/server/enums"
 	"time"
 
 	"github.com/customeros/leads/enum"
@@ -26,9 +27,9 @@ type WebSession struct {
 	SessionDuration int        `gorm:"column:session_duration;type:integer"` // in seconds
 
 	// Session metrics
-	PageviewCount   int         `gorm:"column:pageview_count;type:integer;default:0"`
-	EngagementDepth float64     `gorm:"column:engagement_depth;type:float;default:0"` // Composite score
-	LastEventType   enum.Events `gorm:"column:engagement_depth;type:float;default:0"` // Composite score
+	PageviewCount   int                 `gorm:"column:pageview_count;type:integer;default:0"`
+	EngagementDepth float64             `gorm:"column:engagement_depth;type:float;default:0"` // Composite score
+	LastEventType   enums.NatsEventType `gorm:"column:engagement_depth;type:float;default:0"` // Composite score
 
 	// Entry point attribution
 	EntryPage        string              `gorm:"column:entry_page;type:varchar(255)"`

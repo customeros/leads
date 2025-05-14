@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"log"
 	"strings"
 	"sync"
@@ -13,7 +14,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/interfaces"
 	"github.com/customeros/leads/internal/config"
 	"github.com/customeros/leads/internal/database"
@@ -53,7 +53,7 @@ func NewScraperService(
 	}
 }
 
-var SUBSCRIBED_SUBJECT = enum.EventWebtrackerCreated.String()
+var SUBSCRIBED_SUBJECT = enums.EventWebtrackerCreated.String()
 
 const (
 	// queue group
@@ -211,7 +211,7 @@ func (s *scraperService) publishError(ctx context.Context, msg *nats.Msg, err er
 	}
 
 	// Create message with headers
-	newMsg := nats.NewMsg(enum.EventLeadError.String())
+	newMsg := nats.NewMsg(enums.EventLeadError.String())
 	newMsg.Data = data
 	newMsg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	newMsg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))
