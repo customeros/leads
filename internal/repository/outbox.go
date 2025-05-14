@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"github.com/customeros/leads/internal/utils"
 	"time"
 
 	"gorm.io/gorm"
@@ -11,6 +10,7 @@ import (
 	"github.com/customeros/leads/internal/database"
 	"github.com/customeros/leads/internal/models"
 	"github.com/customeros/leads/internal/telemetry"
+	"github.com/customeros/leads/internal/utils"
 )
 
 type OutboxRepository interface {
@@ -21,7 +21,7 @@ type OutboxRepository interface {
 	MarkAsCompleted(ctx context.Context, id string) error
 	MarkAsFailed(ctx context.Context, id string, errorMessage string) error
 	IncrementRetryCount(ctx context.Context, id string) error
-	DeleteProcessedEvents(ctx context.Context, olderThan time.Duration) (int64, error)
+	DeleteProcessedEvents(ctx context.Context, olderThan time.Duration, limit int64) (int64, error)
 }
 
 type outboxRepository struct {
@@ -94,7 +94,7 @@ func (r *outboxRepository) MarkAsProcessing(ctx context.Context, id string, lock
 	result := r.write.WithContext(ctx).
 		Model(&models.OutboxEvent{}).
 		Where("id = ? AND (lock_until IS NULL OR lock_until < ?)", id, time.Now()).
-		Updates(map[string]interface{}{
+		Updates(map[string]any{
 			"status":     enum.OutboxProcessing,
 			"lock_until": lockUntil,
 		})
@@ -121,12 +121,11 @@ func (r *outboxRepository) MarkAsCompleted(ctx context.Context, id string) error
 	err := r.write.WithContext(ctx).
 		Model(&models.OutboxEvent{}).
 		Where("id = ?", id).
-		Updates(map[string]interface{}{
+		Updates(map[string]any{
 			"status":       enum.OutboxCompleted,
 			"processed_at": now,
 			"lock_until":   nil,
 		}).Error
-
 	if err != nil {
 		span.TraceError(err)
 		return err
@@ -143,12 +142,11 @@ func (r *outboxRepository) MarkAsFailed(ctx context.Context, id string, errorMes
 	err := r.write.WithContext(ctx).
 		Model(&models.OutboxEvent{}).
 		Where("id = ?", id).
-		Updates(map[string]interface{}{
+		Updates(map[string]any{
 			"status":        enum.OutboxFailed,
 			"error_message": errorMessage,
 			"lock_until":    nil,
 		}).Error
-
 	if err != nil {
 		span.TraceError(err)
 		return err
@@ -172,7 +170,7 @@ func (r *outboxRepository) IncrementRetryCount(ctx context.Context, id string) e
 	return nil
 }
 
-func (r *outboxRepository) DeleteProcessedEvents(ctx context.Context, olderThan time.Duration) (int64, error) {
+func (r *outboxRepository) DeleteProcessedEvents(ctx context.Context, olderThan time.Duration, limit int64) (int64, error) {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "outboxRepository.DeleteProcessedEvents")
 	defer span.Finish()
 
@@ -181,6 +179,7 @@ func (r *outboxRepository) DeleteProcessedEvents(ctx context.Context, olderThan 
 	result := r.write.WithContext(ctx).
 		Where("status = ? AND processed_at < ?",
 			enum.OutboxCompleted, cutoffTime).
+		Limit(int(limit)).
 		Delete(&models.OutboxEvent{})
 
 	if result.Error != nil {
