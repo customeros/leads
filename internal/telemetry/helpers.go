@@ -43,6 +43,7 @@ const (
 	SpanTagUserId    = "user.id"
 	SpanTagUserEmail = "user.email"
 	SpanTagEntityId  = "entity.id"
+	SpanTagEventType = "event.type"
 )
 
 const (
@@ -364,6 +365,15 @@ func (s *Spans) TagEntity(entityId string) {
 	}
 	if s.OTel != nil {
 		s.OTel.SetAttributes(attribute.String(SpanTagEntityId, entityId))
+	}
+}
+
+func (s *Spans) TagEventType(eventType string) {
+	if s == nil || eventType == "" {
+		return
+	}
+	if s.OTel != nil {
+		s.OTel.SetAttributes(attribute.String(SpanTagEventType, eventType))
 	}
 }
 

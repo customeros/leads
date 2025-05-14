@@ -40,8 +40,7 @@ func NewIPDataService(
 var SUBSCRIBED_SUBJECT = enum.EventAskIPData.String()
 
 const (
-	MAX_RESPONSE_SIZE = 1 * 1024 * 1024
-	QUEUE_GROUP       = "ipdata" // Queue group for load balancing
+	QUEUE_GROUP = "ipdata-queue-group" // Queue group for load balancing
 )
 
 // Start begins listening for  events

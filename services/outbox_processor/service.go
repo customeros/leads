@@ -39,6 +39,7 @@ func (p *OutboxProcessor) ProcessBatch(ctx context.Context) error {
 		span.TraceError(err)
 		return err
 	}
+	span.LogKV("events.count", len(events))
 
 	for _, event := range events {
 		// Lock the event
@@ -52,13 +53,13 @@ func (p *OutboxProcessor) ProcessBatch(ctx context.Context) error {
 		err = p.processEvent(ctx, event)
 		if err != nil {
 			// Mark as failed and increment retry count
-			p.repositories.Outbox.MarkAsFailed(ctx, event.ID, err.Error())
-			p.repositories.Outbox.IncrementRetryCount(ctx, event.ID)
+			_ = p.repositories.Outbox.MarkAsFailed(ctx, event.ID, err.Error())
+			_ = p.repositories.Outbox.IncrementRetryCount(ctx, event.ID)
 			continue
 		}
 
 		// Mark as completed
-		p.repositories.Outbox.MarkAsCompleted(ctx, event.ID)
+		_ = p.repositories.Outbox.MarkAsCompleted(ctx, event.ID)
 	}
 
 	return nil
