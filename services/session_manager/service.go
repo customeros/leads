@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"log"
 	"time"
 
 	"github.com/nats-io/nats.go"
 
-	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/interfaces"
 	"github.com/customeros/leads/internal/database"
 	nats_internal "github.com/customeros/leads/internal/nats"
@@ -41,7 +41,7 @@ func NewSessionManager(
 	}
 }
 
-var SUBSCRIBED_SUBJECT = enum.EventWebtrackerSessionCreated.String()
+var SUBSCRIBED_SUBJECT = enums.EventWebtrackerSessionCreated.String()
 
 const (
 	// queue group
@@ -142,7 +142,7 @@ func (s *sessionManager) routeMessage(ctx context.Context, msg *nats.Msg) {
 	spans.TagString("nats.reply", msg.Reply)
 
 	switch {
-	case msg.Subject == enum.EventWebtrackerSessionCreated.String():
+	case msg.Subject == enums.EventWebtrackerSessionCreated.String():
 		s.NewSession(ctx, msg)
 
 	default:

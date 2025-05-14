@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"time"
 
 	"github.com/nats-io/nats.go"
@@ -104,7 +105,7 @@ func (s *sessionManager) processNewSession(ctx context.Context, message *pb.Webt
 func (s *sessionManager) createVisitorIdentifiedEvent(ctx context.Context, event *pb.WebtrackerVisitorIdentified) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.createVisitorIdentifiedEvent")
 	defer span.Finish()
-	span.TagEventType(enum.EventWebtrackerVisitorIdentified.String())
+	span.TagEventType(enums.EventWebtrackerVisitorIdentified.String())
 
 	payload, err := proto.Marshal(event)
 	if err != nil {
@@ -114,7 +115,7 @@ func (s *sessionManager) createVisitorIdentifiedEvent(ctx context.Context, event
 
 	outbox := &models.OutboxEvent{
 		ID:        utils.GenerateEventID(),
-		EventType: enum.EventWebtrackerVisitorIdentified,
+		EventType: enums.EventWebtrackerVisitorIdentified,
 		EntityID:  event.TrackerId,
 		Publisher: enum.SessionManager,
 		Tenant:    utils.GetTenantFromContext(ctx),
@@ -199,7 +200,7 @@ func (s *sessionManager) identifyIP(ctx context.Context, ipAddress string) (stri
 	}
 
 	// Send request to service
-	msg := nats.NewMsg(enum.EventAskSnitcher.String())
+	msg := nats.NewMsg(enums.EventAskSnitcher.String())
 	msg.Header = nats.Header{
 		enum.TENANT_HEADER: []string{utils.GetTenantFromContext(ctx)},
 	}
@@ -245,7 +246,7 @@ func (s *sessionManager) profileIP(ctx context.Context, ipAddress string) (*pb.I
 	}
 
 	// Send request to service
-	msg := nats.NewMsg(enum.EventAskIPData.String())
+	msg := nats.NewMsg(enums.EventAskIPData.String())
 	msg.Header = nats.Header{
 		enum.TENANT_HEADER: []string{utils.GetTenantFromContext(ctx)},
 	}

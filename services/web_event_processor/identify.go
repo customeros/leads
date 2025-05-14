@@ -3,6 +3,7 @@ package web_event_processor
 import (
 	"context"
 	"encoding/json"
+	"github.com/customeros/customeros/packages/server/enums"
 	"strings"
 
 	"github.com/customeros/mailsherpa/mailvalidate"
@@ -63,7 +64,7 @@ func (s *webEventProcessor) createIdentifiedVisitorEvent(ctx context.Context, we
 
 	return s.repositories.Outbox.Create(ctx, &models.OutboxEvent{
 		ID:        utils.GenerateEventID(),
-		EventType: enum.EventWebtrackerVisitorIdentified,
+		EventType: enums.EventWebtrackerVisitorIdentified,
 		EntityID:  webtrackerID,
 		Publisher: enum.WebEventProcessor,
 		Tenant:    utils.GetTenantFromContext(ctx),

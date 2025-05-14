@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"time"
 
 	"google.golang.org/protobuf/proto"
@@ -119,7 +120,7 @@ func (s *webEventProcessor) newSession(ctx context.Context, webtrackerID string,
 		Publisher: enum.WebEventProcessor,
 		Tenant:    utils.GetTenantFromContext(ctx),
 		SessionID: sessionID,
-		EventType: enum.EventWebtrackerSessionCreated,
+		EventType: enums.EventWebtrackerSessionCreated,
 		Payload:   payload,
 		Status:    enum.OutboxPending,
 		CreatedAt: now,
@@ -196,16 +197,16 @@ func (s *webEventProcessor) createWebtrackerEvent(ctx context.Context, webtracke
 	return nil
 }
 
-func mapWebtrackerToLeadEvent(e enum.WebTrackerEvent) enum.Events {
+func mapWebtrackerToLeadEvent(e enum.WebTrackerEvent) enums.NatsEventType {
 	switch {
 	case e == enum.WebTrackerPageView:
-		return enum.EventWebtrackerPageView
+		return enums.EventWebtrackerPageView
 	case e == enum.WebTrackerPageExit:
-		return enum.EventWebtrackerPageExit
+		return enums.EventWebtrackerPageExit
 	case e == enum.WebTrackerClick:
-		return enum.EventWebtrackerClick
+		return enums.EventWebtrackerClick
 	case e == enum.WebTrackerIdentify:
-		return enum.EventWebtrackerVisitorIdentified
+		return enums.EventWebtrackerVisitorIdentified
 	default:
 		return ""
 	}

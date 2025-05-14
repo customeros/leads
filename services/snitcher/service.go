@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"log"
 
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/config"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/proto/pb"
@@ -33,7 +33,7 @@ func NewSnitcherService(config *config.SnitcherConfig, repos *repository.Reposit
 	}
 }
 
-var SUBSCRIBED_SUBJECT = enum.EventAskSnitcher.String()
+var SUBSCRIBED_SUBJECT = enums.EventAskSnitcher.String()
 
 const (
 	MAX_RESPONSE_SIZE = 1 * 1024 * 1024

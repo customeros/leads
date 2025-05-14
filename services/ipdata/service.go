@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"log"
 
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/config"
 	nats_internal "github.com/customeros/leads/internal/nats"
 	"github.com/customeros/leads/internal/proto/pb"
@@ -37,7 +37,7 @@ func NewIPDataService(
 	}
 }
 
-var SUBSCRIBED_SUBJECT = enum.EventAskIPData.String()
+var SUBSCRIBED_SUBJECT = enums.EventAskIPData.String()
 
 const (
 	QUEUE_GROUP = "ipdata-queue-group" // Queue group for load balancing

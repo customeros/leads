@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"log"
 	"time"
 
@@ -11,7 +12,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/interfaces"
 	"github.com/customeros/leads/internal/database"
 	nats_internal "github.com/customeros/leads/internal/nats"
@@ -41,9 +41,9 @@ func NewContentProfiler(
 }
 
 var SUBSCRIBED_SUBJECTS = []string{
-	enum.EventWebpageScraped.String(),
-	enum.EventWebpageClassified.String(),
-	enum.EventWebpageProfiled.String(),
+	enums.EventWebpageScraped.String(),
+	enums.EventWebpageClassified.String(),
+	enums.EventWebpageProfiled.String(),
 }
 
 const (
@@ -147,13 +147,13 @@ func (s *ContentProfiler) routeMessage(ctx context.Context, msg *nats.Msg) {
 
 	var err error
 	switch msg.Subject {
-	case enum.EventWebpageScraped.String():
+	case enums.EventWebpageScraped.String():
 		err = s.handleWebpageScrapedEvent(ctx, msg)
 
-	case enum.EventWebpageClassified.String():
+	case enums.EventWebpageClassified.String():
 		err = s.handleWebpageClassifiedEvent(ctx, msg)
 
-	case enum.EventWebpageProfiled.String():
+	case enums.EventWebpageProfiled.String():
 		err = s.handleWebpageProfiledEvent(ctx, msg)
 	}
 
@@ -209,7 +209,7 @@ func (s *ContentProfiler) publishError(ctx context.Context, msg *nats.Msg, err e
 	}
 
 	// Create message with headers
-	newMsg := nats.NewMsg(enum.EventLeadError.String())
+	newMsg := nats.NewMsg(enums.EventLeadError.String())
 	newMsg.Data = data
 	newMsg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	newMsg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))

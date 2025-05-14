@@ -3,6 +3,7 @@ package webtracker
 import (
 	"context"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"net"
 
 	"github.com/pkg/errors"
@@ -63,7 +64,7 @@ func (s *webtrackerService) CreateWebtracker(ctx context.Context, webtracker *mo
 		event := &models.OutboxEvent{
 			ID:        utils.GenerateEventID(),
 			EntityID:  webtracker.ID,
-			EventType: enum.EventWebtrackerCreated,
+			EventType: enums.EventWebtrackerCreated,
 			Tenant:    utils.GetTenantFromContext(ctx),
 			Payload:   eventPayload,
 			Publisher: enum.WebtrackerService,

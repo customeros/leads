@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"time"
 
 	"github.com/customeros/leads/internal/telemetry"
 
 	"gorm.io/gorm"
 
-	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/internal/database"
 	"github.com/customeros/leads/internal/models"
 	"github.com/customeros/leads/internal/utils"
@@ -22,7 +22,7 @@ type WebSessionRepository interface {
 	CreateWithTxn(ctx context.Context, tx *gorm.DB, session *models.WebSession) error
 	GetActiveSessionsWithLookback(ctx context.Context, olderThan time.Time) ([]*models.WebSession, error)
 	GetInactiveSessions(ctx context.Context) ([]*models.WebSession, error)
-	UpdateLastEvent(ctx context.Context, sessionID string, event enum.Events, timestamp time.Time) error
+	UpdateLastEvent(ctx context.Context, sessionID string, event enums.NatsEventType, timestamp time.Time) error
 	CloseSessionWithTxn(ctx context.Context, tx *gorm.DB, sessionID string) error
 	GetActiveSessionByTrackerAndVisitor(ctx context.Context, trackerID, visitorID string) (*models.WebSession, error)
 }
@@ -175,7 +175,7 @@ func (r *webSessionRepository) CloseSessionWithTxn(ctx context.Context, tx *gorm
 	return nil
 }
 
-func (r *webSessionRepository) UpdateLastEvent(ctx context.Context, sessionID string, event enum.Events, timestamp time.Time) error {
+func (r *webSessionRepository) UpdateLastEvent(ctx context.Context, sessionID string, event enums.NatsEventType, timestamp time.Time) error {
 	span, ctx := telemetry.StartPostgresSpan(ctx, "webSessionRepository.UpdateLastEvent")
 	defer span.Finish()
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"log"
 	"strings"
 	"time"
@@ -12,7 +13,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/customeros/leads/enum"
 	"github.com/customeros/leads/interfaces"
 	"github.com/customeros/leads/internal/database"
 	nats_internal "github.com/customeros/leads/internal/nats"
@@ -45,7 +45,7 @@ func NewProxyManagerService(
 	}
 }
 
-var SUBSCRIBED_SUBJECT = enum.EventWebtrackerCreated.String()
+var SUBSCRIBED_SUBJECT = enums.EventWebtrackerCreated.String()
 
 const (
 	// queue group
@@ -213,7 +213,7 @@ func (s *proxyManagerService) publishError(ctx context.Context, msg *nats.Msg, e
 	}
 
 	// Create message with headers
-	newMsg := nats.NewMsg(enum.EventLeadError.String())
+	newMsg := nats.NewMsg(enums.EventLeadError.String())
 	newMsg.Data = data
 	newMsg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	newMsg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))

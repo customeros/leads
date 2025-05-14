@@ -2,6 +2,7 @@ package session_manager
 
 import (
 	"context"
+	"github.com/customeros/customeros/packages/server/enums"
 	"time"
 
 	"go.uber.org/multierr"
@@ -64,12 +65,12 @@ func (s *sessionManager) sessionsToClose(ctx context.Context, activeSessions []*
 	sessionsToClose := make([]*models.WebSession, 0)
 
 	for _, session := range activeSessions {
-		if session.LastEventType == enum.EventWebtrackerPageExit {
+		if session.LastEventType == enums.EventWebtrackerPageExit {
 			sessionsToClose = append(sessionsToClose, session)
 		}
 
 		pageViewCutoffTime := time.Now().Add(-WebSessionTimeoutPageView)
-		if session.LastEventType != enum.EventWebtrackerPageExit && session.LastEventAt.Before(pageViewCutoffTime) {
+		if session.LastEventType != enums.EventWebtrackerPageExit && session.LastEventAt.Before(pageViewCutoffTime) {
 			sessionsToClose = append(sessionsToClose, session)
 		}
 	}
@@ -98,7 +99,7 @@ func (s *sessionManager) closeSession(ctx context.Context, session *models.WebSe
 	// write session closed event to outbox
 	outbox := &models.OutboxEvent{
 		ID:        utils.GenerateEventID(),
-		EventType: enum.EventWebtrackerSessionClosed,
+		EventType: enums.EventWebtrackerSessionClosed,
 		EntityID:  session.TrackerID,
 		Publisher: enum.SessionManager,
 		Tenant:    utils.GetTenantFromContext(ctx),
