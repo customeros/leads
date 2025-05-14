@@ -37,7 +37,7 @@ var SUBSCRIBED_SUBJECT = enum.EventAskSnitcher.String()
 
 const (
 	MAX_RESPONSE_SIZE = 1 * 1024 * 1024
-	QUEUE_GROUP       = "snitcher" // Queue group for load balancing
+	QUEUE_GROUP       = "snitcher-queue-group" // Queue group for load balancing
 )
 
 // Start begins listening for events

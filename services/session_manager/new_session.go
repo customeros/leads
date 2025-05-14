@@ -102,8 +102,9 @@ func (s *sessionManager) processNewSession(ctx context.Context, message *pb.Webt
 }
 
 func (s *sessionManager) createVisitorIdentifiedEvent(ctx context.Context, event *pb.WebtrackerVisitorIdentified) error {
-	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.publishVisitorIdentifiedEvent")
+	span, ctx := telemetry.StartServiceSpan(ctx, "sessionManager.createVisitorIdentifiedEvent")
 	defer span.Finish()
+	span.TagEventType(enum.EventWebtrackerVisitorIdentified.String())
 
 	payload, err := proto.Marshal(event)
 	if err != nil {
