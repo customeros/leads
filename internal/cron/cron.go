@@ -25,6 +25,7 @@ const (
 	GroupOutbox     = "outbox"
 	GroupProxy      = "proxy"
 	GroupWebSession = "webSession"
+	GroupWebTracker = "webTracker"
 
 	// LeaseDuration is how long a lease lasts before needing renewal
 	LeaseDuration = 15 * time.Second
@@ -180,6 +181,7 @@ func (cm *CronManager) registerJobs(c *cronv3.Cron) {
 		{
 			Name:     "check cname",
 			Schedule: cronConfig.CronScheduleCheckCNAME,
+			Group:    GroupWebTracker,
 			HandlerFunc: func(ctx context.Context) {
 				cm.services.ProxyManager.CheckCNAME(ctx)
 			},
@@ -187,6 +189,7 @@ func (cm *CronManager) registerJobs(c *cronv3.Cron) {
 		{
 			Name:     "close web sessions",
 			Schedule: cronConfig.CronScheduleProcessWebSessions,
+			Group:    GroupWebSession,
 			HandlerFunc: func(ctx context.Context) {
 				cm.services.SessionManager.ProcessActiveSessions(ctx)
 			},
@@ -194,8 +197,17 @@ func (cm *CronManager) registerJobs(c *cronv3.Cron) {
 		{
 			Name:     "outbox",
 			Schedule: cronConfig.CronScheduleProcessOutboxEvents,
+			Group:    GroupOutbox,
 			HandlerFunc: func(ctx context.Context) {
 				_ = cm.services.OutboxProcessor.ProcessBatch(ctx)
+			},
+		},
+		{
+			Name:     "outbox_cleaner",
+			Schedule: cronConfig.CronScheduleOutboxCleanup,
+			Group:    GroupOutbox,
+			HandlerFunc: func(ctx context.Context) {
+				_ = cm.services.OutboxProcessor.Cleanup(ctx)
 			},
 		},
 		// Add more jobs here following the same pattern
