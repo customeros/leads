@@ -19,6 +19,7 @@ func (s *OutboxProcessor) processEvent(ctx context.Context, event *models.Outbox
 	span, ctx := telemetry.StartServiceSpan(ctx, "OutboxProcessor.processEvent")
 	defer span.Finish()
 	span.TagEventType(event.EventType.String())
+	span.TagEntity(event.ID)
 
 	switch {
 	case strings.HasPrefix(event.EventType.String(), "webtracker"):
@@ -81,6 +82,7 @@ func (s *OutboxProcessor) processWebTrackerEvent(ctx context.Context, event *mod
 	span, ctx := telemetry.StartServiceSpan(ctx, "OutboxProcessor.processWebTrackerEvent")
 	defer span.Finish()
 	span.TagEventType(event.EventType.String())
+	span.TagEntity(event.ID)
 
 	// write event to data warehouse
 	eventLog := &models.WebTrackerEvent{
@@ -116,6 +118,7 @@ func (s *OutboxProcessor) publishEvent(ctx context.Context, event *models.Outbox
 	span, ctx := telemetry.StartServiceSpan(ctx, "OutboxProcessor.publishEvent")
 	defer span.Finish()
 	span.TagEventType(event.EventType.String())
+	span.TagEntity(event.ID)
 
 	// Create message with headers
 	msg := nats.NewMsg(event.EventType.String())

@@ -3,6 +3,7 @@ package outbox_processor
 import (
 	"context"
 	"github.com/customeros/leads/internal/telemetry"
+	"github.com/customeros/leads/internal/utils"
 	"time"
 
 	nats_internal "github.com/customeros/leads/internal/nats"
@@ -42,24 +43,27 @@ func (p *OutboxProcessor) ProcessBatch(ctx context.Context) error {
 	span.LogKV("events.count", len(events))
 
 	for _, event := range events {
+		innerCtx := utils.WithCustomContext(ctx, &utils.CustomContext{
+			Tenant: event.Tenant,
+		})
 		// Lock the event
-		err = p.repositories.Outbox.MarkAsProcessing(ctx, event.ID, EVENT_LOCK_TIMEOUT)
+		err = p.repositories.Outbox.MarkAsProcessing(innerCtx, event.ID, EVENT_LOCK_TIMEOUT)
 		if err != nil {
 			// Another worker might have picked it up
 			continue
 		}
 
 		// Process the event
-		err = p.processEvent(ctx, event)
+		err = p.processEvent(innerCtx, event)
 		if err != nil {
 			// Mark as failed and increment retry count
-			_ = p.repositories.Outbox.MarkAsFailed(ctx, event.ID, err.Error())
-			_ = p.repositories.Outbox.IncrementRetryCount(ctx, event.ID)
+			_ = p.repositories.Outbox.MarkAsFailed(innerCtx, event.ID, err.Error())
+			_ = p.repositories.Outbox.IncrementRetryCount(innerCtx, event.ID)
 			continue
 		}
 
 		// Mark as completed
-		_ = p.repositories.Outbox.MarkAsCompleted(ctx, event.ID)
+		_ = p.repositories.Outbox.MarkAsCompleted(innerCtx, event.ID)
 	}
 
 	return nil
