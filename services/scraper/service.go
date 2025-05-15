@@ -215,7 +215,7 @@ func (s *scraperService) publishError(ctx context.Context, msg *nats.Msg, err er
 	}
 
 	// Create message with headers
-	newMsg := nats.NewMsg(msg.Subject)
+	newMsg := nats.NewMsg(nats_internal.DLQ_PREFIX + msg.Subject)
 	newMsg.Data = data
 	newMsg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	newMsg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"log"
 	"strings"
 	"time"
@@ -198,7 +199,7 @@ func (s *icpService) publishError(ctx context.Context, msg *nats.Msg, err error)
 	}
 
 	// Create message with headers
-	newMsg := nats.NewMsg(msg.Subject)
+	newMsg := nats.NewMsg(nats_internal.DLQ_PREFIX + msg.Subject)
 	newMsg.Data = data
 	newMsg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	newMsg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))
