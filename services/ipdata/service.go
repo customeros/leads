@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+
 	"github.com/customeros/customeros/packages/server/enums"
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
-	"log"
 
 	"github.com/customeros/leads/internal/config"
 	nats_internal "github.com/customeros/leads/internal/nats"
@@ -108,7 +109,7 @@ func (s *IPDataService) handleNatsMessage(ctx context.Context, msg *nats.Msg) {
 
 	resp := &pb.IPAddressVerifyResponse{}
 
-	request := &pb.IPAddressIdentifyRequest{}
+	request := &pb.IPAddressVerifyRequest{}
 	err := proto.Unmarshal(msg.Data, request)
 	if err != nil {
 		errMsg := "Failed to parse request"
