@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"strings"
 
 	"github.com/nats-io/nats.go"
@@ -70,7 +71,7 @@ func (s *OutboxProcessor) processWebscraperEvent(ctx context.Context, event *mod
 		return err
 	}
 
-	err = s.publishEvent(ctx, event)
+	err = s.publishEvent(ctx, event, enums.StreamWeb)
 	if err != nil {
 		span.TraceError(err)
 		return err
@@ -104,7 +105,7 @@ func (s *OutboxProcessor) processWebTrackerEvent(ctx context.Context, event *mod
 
 	// determine if event needs to be published
 	if !strings.HasPrefix(event.EventType.String(), "webtracker.event") {
-		err = s.publishEvent(ctx, event)
+		err = s.publishEvent(ctx, event, enums.StreamWebtracker)
 		if err != nil {
 			span.TraceError(err)
 			return err
@@ -114,7 +115,7 @@ func (s *OutboxProcessor) processWebTrackerEvent(ctx context.Context, event *mod
 	return nil
 }
 
-func (s *OutboxProcessor) publishEvent(ctx context.Context, event *models.OutboxEvent) error {
+func (s *OutboxProcessor) publishEvent(ctx context.Context, event *models.OutboxEvent, stream enums.NatsStream) error {
 	span, ctx := telemetry.StartServiceSpan(ctx, "OutboxProcessor.publishEvent")
 	defer span.Finish()
 	span.TagEventType(event.EventType.String())
@@ -125,8 +126,14 @@ func (s *OutboxProcessor) publishEvent(ctx context.Context, event *models.Outbox
 	msg.Data = event.Payload
 	msg.Header.Set(nats_internal.HEADER_TENANT, event.Tenant)
 
+	streamConn, err := s.natsConn.GetNatsConnection(stream)
+	if err != nil {
+		span.TraceError(err)
+		return fmt.Errorf("failed to get nats connection for stream %s: %w", stream, err)
+	}
+
 	// Publish to the stored subject
-	_, err := s.natsConn.JS.PublishMsg(msg)
+	_, err = streamConn.JS.PublishMsg(msg)
 	if err != nil {
 		span.TraceError(err)
 		return fmt.Errorf("failed to publish outbox event: %w", err)

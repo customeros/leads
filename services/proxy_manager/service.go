@@ -63,8 +63,12 @@ const (
 
 // Start begins listening for raw email events and processing them
 func (s *proxyManagerService) Start(ctx context.Context) error {
+	webtrackerConn, err := s.natsConn.GetNatsConnection(enums.StreamWebtracker)
+	if err != nil {
+		return fmt.Errorf("failed to get NATS connection: %w", err)
+	}
 	// Create durable consumer for processing emails
-	_, err := s.natsConn.JS.AddConsumer(nats_internal.LEADS_STREAM, &nats.ConsumerConfig{
+	_, err = webtrackerConn.JS.AddConsumer(enums.StreamWebtracker.String(), &nats.ConsumerConfig{
 		Durable:       CONSUMER_NAME,
 		DeliverGroup:  QUEUE_GROUP,
 		AckPolicy:     nats.AckExplicitPolicy,
@@ -79,10 +83,10 @@ func (s *proxyManagerService) Start(ctx context.Context) error {
 	}
 
 	// Create pull subscription
-	sub, err := s.natsConn.JS.PullSubscribe(
+	sub, err := webtrackerConn.JS.PullSubscribe(
 		SUBSCRIBED_SUBJECT,
 		CONSUMER_NAME,
-		nats.Bind(nats_internal.LEADS_STREAM, CONSUMER_NAME),
+		nats.Bind(enums.StreamWebtracker.String(), CONSUMER_NAME),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create subscription: %w", err)
@@ -213,13 +217,20 @@ func (s *proxyManagerService) publishError(ctx context.Context, msg *nats.Msg, e
 	}
 
 	// Create message with headers
-	newMsg := nats.NewMsg(enums.EventLeadError.String())
+	newMsg := nats.NewMsg(nats_internal.DLQ_PREFIX + msg.Subject)
 	newMsg.Data = data
 	newMsg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	newMsg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))
 
+	dlqConn, err := s.natsConn.GetNatsConnection(enums.StreamDLQ)
+	if err != nil {
+		spans.TraceError(err)
+		log.Printf("Failed to get DLQ connection: %v", err)
+		return
+	}
+
 	// Publish to the stored subject
-	_, err = s.natsConn.JS.PublishMsg(newMsg)
+	_, err = dlqConn.JS.PublishMsg(newMsg)
 	if err != nil {
 		spans.TraceError(err)
 		return

@@ -198,13 +198,19 @@ func (s *icpService) publishError(ctx context.Context, msg *nats.Msg, err error)
 	}
 
 	// Create message with headers
-	newMsg := nats.NewMsg(enum.EventLeadError.String())
+	newMsg := nats.NewMsg(msg.Subject)
 	newMsg.Data = data
 	newMsg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	newMsg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))
 
+	dlqConn, err := s.natsConn.GetNatsConnection(enums.StreamWebtracker)
+	if err != nil {
+		spans.TraceError(err)
+		return
+	}
+
 	// Publish to the stored subject
-	_, err = s.natsConn.JS.PublishMsg(newMsg)
+	_, err = dlqConn.JS.PublishMsg(newMsg)
 	if err != nil {
 		spans.TraceError(err)
 		return

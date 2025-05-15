@@ -58,8 +58,12 @@ const (
 )
 
 func (s *sessionManager) Start(ctx context.Context) error {
+	webtrackerConn, err := s.natsConn.GetNatsConnection(enums.StreamWebtracker)
+	if err != nil {
+		return fmt.Errorf("failed to get NATS connection: %w", err)
+	}
 	// Create durable consumer for processing
-	_, err := s.natsConn.JS.AddConsumer(nats_internal.LEADS_STREAM, &nats.ConsumerConfig{
+	_, err = webtrackerConn.JS.AddConsumer(enums.StreamWebtracker.String(), &nats.ConsumerConfig{
 		Durable:       CONSUMER_NAME,
 		DeliverGroup:  QUEUE_GROUP,
 		AckPolicy:     nats.AckExplicitPolicy,
@@ -74,10 +78,10 @@ func (s *sessionManager) Start(ctx context.Context) error {
 	}
 
 	// Create pull subscription
-	sub, err := s.natsConn.JS.PullSubscribe(
+	sub, err := webtrackerConn.JS.PullSubscribe(
 		SUBSCRIBED_SUBJECT,
 		CONSUMER_NAME,
-		nats.Bind(nats_internal.LEADS_STREAM, CONSUMER_NAME),
+		nats.Bind(enums.StreamWebtracker.String(), CONSUMER_NAME),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create subscription: %w", err)

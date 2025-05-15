@@ -62,8 +62,12 @@ const (
 
 // Start begins listening for raw email events and processing them
 func (s *ContentProfiler) Start(ctx context.Context) error {
+	webNatsConn, err := s.natsConn.GetNatsConnection(enums.StreamWeb)
+	if err != nil {
+		return fmt.Errorf("failed to get NATS connection: %w", err)
+	}
 	// Create durable consumer for processing emails
-	_, err := s.natsConn.JS.AddConsumer(nats_internal.LEADS_STREAM, &nats.ConsumerConfig{
+	_, err = webNatsConn.JS.AddConsumer(enums.StreamWeb.String(), &nats.ConsumerConfig{
 		Durable:        CONSUMER_NAME,
 		DeliverGroup:   QUEUE_GROUP,
 		AckPolicy:      nats.AckExplicitPolicy,
@@ -78,10 +82,10 @@ func (s *ContentProfiler) Start(ctx context.Context) error {
 	}
 
 	// Create pull subscription
-	sub, err := s.natsConn.JS.PullSubscribe(
+	sub, err := webNatsConn.JS.PullSubscribe(
 		">",
 		CONSUMER_NAME,
-		nats.Bind(nats_internal.LEADS_STREAM, CONSUMER_NAME),
+		nats.Bind(enums.StreamWeb.String(), CONSUMER_NAME),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create subscription: %w", err)
@@ -177,7 +181,7 @@ func (s *ContentProfiler) handleProcessingError(ctx context.Context, msg *nats.M
 	} else {
 		// Max retries reached, acknowledge but publish to dead letter
 		msg.Ack()
-		s.publishError(ctx, msg, err)
+		s.publishDLQ(ctx, msg, err)
 	}
 }
 
@@ -189,7 +193,7 @@ func (s *ContentProfiler) Stop() {
 	return
 }
 
-func (s *ContentProfiler) publishError(ctx context.Context, msg *nats.Msg, err error) {
+func (s *ContentProfiler) publishDLQ(ctx context.Context, msg *nats.Msg, err error) {
 	spans, ctx := telemetry.StartServiceSpan(ctx, "proxyManagerService.publishError")
 	defer spans.Finish()
 
@@ -209,13 +213,19 @@ func (s *ContentProfiler) publishError(ctx context.Context, msg *nats.Msg, err e
 	}
 
 	// Create message with headers
-	newMsg := nats.NewMsg(enums.EventLeadError.String())
+	newMsg := nats.NewMsg(nats_internal.DLQ_PREFIX + msg.Subject)
 	newMsg.Data = data
 	newMsg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	newMsg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))
 
+	dlqConn, err := s.natsConn.GetNatsConnection(enums.StreamDLQ)
+	if err != nil {
+		spans.TraceError(err)
+		return
+	}
+
 	// Publish to the stored subject
-	_, err = s.natsConn.JS.PublishMsg(newMsg)
+	_, err = dlqConn.JS.PublishMsg(newMsg)
 	if err != nil {
 		spans.TraceError(err)
 		return

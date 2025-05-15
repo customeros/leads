@@ -5,10 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/customeros/customeros/packages/server/enums"
-	"log"
-
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
+	"log"
 
 	"github.com/customeros/leads/internal/config"
 	nats_internal "github.com/customeros/leads/internal/nats"
@@ -45,8 +44,13 @@ const (
 
 // Start begins listening for  events
 func (s *IPDataService) Start(ctx context.Context) error {
+	requestConn, err := s.natsConn.GetNatsConnection(enums.StreamRequest)
+	if err != nil {
+		return fmt.Errorf("failed to get NATS connection: %w", err)
+	}
+
 	// Create a queue subscription for handling synchronous requests
-	sub, err := s.natsConn.Conn.QueueSubscribe(SUBSCRIBED_SUBJECT, QUEUE_GROUP, func(msg *nats.Msg) {
+	sub, err := requestConn.Conn.QueueSubscribe(SUBSCRIBED_SUBJECT, QUEUE_GROUP, func(msg *nats.Msg) {
 		// First extract trace context into a new background context
 		reqCtx := telemetry.ExtractTraceContextFromNatsMsg(context.Background(), msg)
 		// Then add business context
