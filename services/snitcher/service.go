@@ -42,8 +42,12 @@ const (
 
 // Start begins listening for events
 func (s *SnitcherService) Start(ctx context.Context) error {
+	requestConn, err := s.natsConn.GetNatsConnection(enums.StreamRequest)
+	if err != nil {
+		return fmt.Errorf("failed to get NATS connection: %w", err)
+	}
 	// Create a queue subscription for handling synchronous requests
-	sub, err := s.natsConn.Conn.QueueSubscribe(SUBSCRIBED_SUBJECT, QUEUE_GROUP, func(msg *nats.Msg) {
+	sub, err := requestConn.Conn.QueueSubscribe(SUBSCRIBED_SUBJECT, QUEUE_GROUP, func(msg *nats.Msg) {
 		// First extract trace context into a new background context
 		reqCtx := telemetry.ExtractTraceContextFromNatsMsg(context.Background(), msg)
 		// Then add business context

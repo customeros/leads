@@ -34,6 +34,10 @@ github.com/cpuguy83/go-md2man/v2 v2.0.5/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46t
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/customeros/customeros/packages/server/enums v0.0.0-20250514170720-11697afc2afb h1:txdOWQVq8UZO9WhIMNm87SRSt7cFdwMt8D/YRHAfGRY=
 github.com/customeros/customeros/packages/server/enums v0.0.0-20250514170720-11697afc2afb/go.mod h1:igO/6ciAeYl6D3ry/oWQfh33t7hay2040PnEyXVFmZw=
+github.com/customeros/customeros/packages/server/enums v0.0.0-20250515100812-3e581f66d131 h1:9rOFXw6+L5ExOIOTwiicvhyr40CV1mOPJ+b0PuQIcRI=
+github.com/customeros/customeros/packages/server/enums v0.0.0-20250515100812-3e581f66d131/go.mod h1:igO/6ciAeYl6D3ry/oWQfh33t7hay2040PnEyXVFmZw=
+github.com/customeros/customeros/packages/server/enums v0.0.0-20250515113935-e339eb93f019 h1:99V6fAgtJNsCxOMi2Km4siENofiitvFW2PbnNSHyuFQ=
+github.com/customeros/customeros/packages/server/enums v0.0.0-20250515113935-e339eb93f019/go.mod h1:igO/6ciAeYl6D3ry/oWQfh33t7hay2040PnEyXVFmZw=
 github.com/customeros/mailsherpa v0.3.9 h1:i+usip3f5A3IgryzeiYTzZWDxI1fRxp4VxXWGpTDd7c=
 github.com/customeros/mailsherpa v0.3.9/go.mod h1:3PVCXCWUQQ6lTjxFtPs4KlFKteME14hD5GFNiElB7Fk=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

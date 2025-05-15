@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/customeros/customeros/packages/server/enums"
 	"log"
 	"net/http"
 	"os"
@@ -59,7 +60,7 @@ func NewServer(cfg *config.Config, leadsDB *database.DbConnections, warehouseDB 
 	}
 
 	// Initialize NATS Streams
-	natsConn, err := nats_internal.InitNats(cfg.NATSConfig, cfg.AppConfig.Environment)
+	natsConn, err := nats_internal.InitNats(cfg.NATSConfig, cfg.AppConfig.Environment, enums.GetAllStreams())
 	if err != nil {
 		log.Fatalf("Failed to initialize NATS: %v", err)
 	}

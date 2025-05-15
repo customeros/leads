@@ -209,7 +209,13 @@ func (s *sessionManager) identifyIP(ctx context.Context, ipAddress string) (stri
 
 	msg.Data = reqData
 
-	resp, err := s.natsConn.Conn.RequestMsg(msg, REQUEST_TIMEOUT)
+	requestConn, err := s.natsConn.GetNatsConnection(enums.StreamRequest)
+	if err != nil {
+		span.TraceError(err)
+		return "", fmt.Errorf("failed to get nats connection for stream %s: %w", enums.StreamRequest, err)
+	}
+
+	resp, err := requestConn.Conn.RequestMsg(msg, REQUEST_TIMEOUT)
 	if err != nil {
 		span.TraceError(err)
 		return "", err
@@ -255,7 +261,13 @@ func (s *sessionManager) profileIP(ctx context.Context, ipAddress string) (*pb.I
 
 	msg.Data = reqData
 
-	resp, err := s.natsConn.Conn.RequestMsg(msg, REQUEST_TIMEOUT)
+	requestConn, err := s.natsConn.GetNatsConnection(enums.StreamRequest)
+	if err != nil {
+		span.TraceError(err)
+		return nil, fmt.Errorf("failed to get nats connection for stream %s: %w", enums.StreamRequest, err)
+	}
+
+	resp, err := requestConn.Conn.RequestMsg(msg, REQUEST_TIMEOUT)
 	if err != nil {
 		span.TraceError(err)
 		return nil, err

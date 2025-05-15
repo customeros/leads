@@ -89,7 +89,13 @@ func (s *ContentProfiler) requestWebpageIntentProfile(ctx context.Context, conte
 	msg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	msg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))
 
-	_, err = s.natsConn.JS.PublishMsg(msg)
+	requestConn, err := s.natsConn.GetNatsConnection(enums.StreamRequest)
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	_, err = requestConn.JS.PublishMsg(msg)
 	if err != nil {
 		span.TraceError(err)
 		return err
@@ -120,7 +126,13 @@ func (s *ContentProfiler) requestContentClassification(ctx context.Context, webp
 	msg.Header.Set(nats_internal.HEADER_TENANT, utils.GetTenantFromContext(ctx))
 	msg.Header.Set(nats_internal.HEADER_USERID, utils.GetUserIdFromContext(ctx))
 
-	_, err = s.natsConn.JS.PublishMsg(msg)
+	requestConn, err := s.natsConn.GetNatsConnection(enums.StreamRequest)
+	if err != nil {
+		span.TraceError(err)
+		return err
+	}
+
+	_, err = requestConn.JS.PublishMsg(msg)
 	if err != nil {
 		span.TraceError(err)
 		return err
