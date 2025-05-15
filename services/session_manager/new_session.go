@@ -2,9 +2,9 @@ package session_manager
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/customeros/customeros/packages/server/enums"
+	"github.com/pkg/errors"
 	"time"
 
 	"github.com/nats-io/nats.go"
@@ -256,21 +256,20 @@ func (s *sessionManager) profileIP(ctx context.Context, ipAddress string) (*pb.I
 	msg.Header = nats.Header{
 		enum.TENANT_HEADER: []string{utils.GetTenantFromContext(ctx)},
 	}
-	// Inject trace context into NATS message
 	telemetry.InjectTraceContextIntoNatsMsg(ctx, msg)
-
 	msg.Data = reqData
 
 	requestConn, err := s.natsConn.GetNatsConnection(enums.StreamRequest)
 	if err != nil {
-		span.TraceError(err)
-		return nil, fmt.Errorf("failed to get nats connection for stream %s: %w", enums.StreamRequest, err)
+		wrapErr := fmt.Errorf("failed to get nats connection for stream %s: %w", enums.StreamRequest, err)
+		span.TraceError(wrapErr)
+		return nil, wrapErr
 	}
 
 	resp, err := requestConn.Conn.RequestMsg(msg, REQUEST_TIMEOUT)
 	if err != nil {
-		span.TraceError(err)
-		return nil, err
+		span.TraceError(errors.Wrap(err, "Nats request failed"))
+		return nil, errors.Wrap(err, "Nats request failed")
 	}
 
 	// Unmarshal response
