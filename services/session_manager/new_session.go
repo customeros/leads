@@ -276,8 +276,16 @@ func (s *sessionManager) profileIP(ctx context.Context, ipAddress string) (*pb.I
 		return nil, errors.Wrap(err, "Nats request failed")
 	}
 
+	span.LogKV("response_received", "true")
+	span.LogKV("response_subject", resp.Subject)
+	span.LogKV("response_reply", resp.Reply)
+	span.LogKV("response_header", fmt.Sprintf("%+v", resp.Header))
 	span.LogKV("response_data_length", len(resp.Data))
 	span.LogKV("response_data_hex", fmt.Sprintf("%x", resp.Data))
+
+	// Try to decode the response data as a string first to see what we got
+	responseStr := string(resp.Data)
+	span.LogKV("response_as_string", responseStr)
 
 	// Unmarshal response
 	response := &pb.IPAddressVerifyResponse{}
