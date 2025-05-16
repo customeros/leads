@@ -41,9 +41,10 @@ var jobLocks = struct {
 	locks map[string]*sync.Mutex
 }{
 	locks: map[string]*sync.Mutex{
-		GroupOutbox:     {},
-		GroupProxy:      {},
-		GroupWebSession: {},
+		GroupOutbox:     &sync.Mutex{},
+		GroupProxy:      &sync.Mutex{},
+		GroupWebSession: &sync.Mutex{},
+		GroupWebTracker: &sync.Mutex{},
 	},
 }
 
@@ -229,8 +230,17 @@ func (cm *CronManager) registerJobs(c *cronv3.Cron) {
 
 				// Apply lock if group is specified
 				if j.Group != "" {
-					jobLocks.locks[j.Group].Lock()
-					defer jobLocks.locks[j.Group].Unlock()
+					jobLocks.Lock()
+					lock, exists := jobLocks.locks[j.Group]
+					jobLocks.Unlock()
+
+					if !exists {
+						cm.log.Errorf("No lock found for group %s", j.Group)
+						return
+					}
+
+					lock.Lock()
+					defer lock.Unlock()
 				}
 
 				j.HandlerFunc(ctx)
