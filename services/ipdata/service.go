@@ -130,6 +130,7 @@ func (s *IPDataService) handleNatsMessage(ctx context.Context, msg *nats.Msg) {
 	}
 
 	spans.LogKV("response", fmt.Sprintf("%+v", resp))
+
 	s.sendResponse(ctx, msg, resp)
 }
 
@@ -137,13 +138,24 @@ func (s *IPDataService) sendResponse(ctx context.Context, req *nats.Msg, resp *p
 	spans, _ := telemetry.StartServiceSpan(ctx, "IPDataService.sendResponse")
 	defer spans.Finish()
 
+	if req.Reply == "" {
+		spans.TraceError(errors.New("no reply subject provided"))
+		return
+	}
+
 	respMessage, err := proto.Marshal(resp)
 	if err != nil {
 		spans.TraceError(err)
 		return
 	}
-	err = req.Respond(respMessage)
+
+	responseMsg := nats.NewMsg(req.Reply)
+	responseMsg.Data = respMessage
+	responseMsg.Header = req.Header // Copy headers from request
+
+	err = req.RespondMsg(responseMsg)
 	if err != nil {
 		spans.TraceError(err)
+		return
 	}
 }
