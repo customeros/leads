@@ -41,10 +41,10 @@ var jobLocks = struct {
 	locks map[string]*sync.Mutex
 }{
 	locks: map[string]*sync.Mutex{
-		GroupOutbox:     &sync.Mutex{},
-		GroupProxy:      &sync.Mutex{},
-		GroupWebSession: &sync.Mutex{},
-		GroupWebTracker: &sync.Mutex{},
+		GroupOutbox:     {},
+		GroupProxy:      {},
+		GroupWebSession: {},
+		GroupWebTracker: {},
 	},
 }
 
