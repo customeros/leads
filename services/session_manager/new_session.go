@@ -3,9 +3,10 @@ package session_manager
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/customeros/customeros/packages/server/enums"
 	"github.com/pkg/errors"
-	"time"
 
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
@@ -247,9 +248,12 @@ func (s *sessionManager) profileIP(ctx context.Context, ipAddress string) (*pb.I
 
 	reqData, err := proto.Marshal(request)
 	if err != nil {
-		span.TraceError(err)
+		span.TraceError(errors.Wrap(err, "failed to marshal request"))
 		return nil, err
 	}
+
+	span.LogKV("request_data_length", len(reqData))
+	span.LogKV("request_data_hex", fmt.Sprintf("%x", reqData))
 
 	// Send request to service
 	msg := nats.NewMsg(enums.EventAskIPData.String())
@@ -272,12 +276,16 @@ func (s *sessionManager) profileIP(ctx context.Context, ipAddress string) (*pb.I
 		return nil, errors.Wrap(err, "Nats request failed")
 	}
 
+	span.LogKV("response_data_length", len(resp.Data))
+	span.LogKV("response_data_hex", fmt.Sprintf("%x", resp.Data))
+
 	// Unmarshal response
 	response := &pb.IPAddressVerifyResponse{}
 	if err := proto.Unmarshal(resp.Data, response); err != nil {
-		span.TraceError(err)
+		span.TraceError(errors.Wrap(err, "failed to unmarshal response"))
 		return nil, err
 	}
 
+	span.LogKV("response", fmt.Sprintf("%+v", response))
 	return response, nil
 }
