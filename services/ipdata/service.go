@@ -106,25 +106,30 @@ func (s *IPDataService) handleNatsMessage(ctx context.Context, msg *nats.Msg) {
 	}
 	spans.TagString("nats.subject", msg.Subject)
 	spans.TagString("nats.reply", msg.Reply)
+	spans.LogKV("request_data_length", len(msg.Data))
+	spans.LogKV("request_data_hex", fmt.Sprintf("%x", msg.Data))
 
 	resp := &pb.IPAddressVerifyResponse{}
 
 	request := &pb.IPAddressVerifyRequest{}
 	err := proto.Unmarshal(msg.Data, request)
 	if err != nil {
-		errMsg := "Failed to parse request"
+		errMsg := fmt.Sprintf("Failed to parse request: %v, data length: %d", err, len(msg.Data))
+		spans.LogKV("unmarshal_error", errMsg)
 		resp.ErrorMessage = errMsg
-		s.sendResponse(ctx, msg, resp)
 		spans.TraceError(err)
+		s.sendResponse(ctx, msg, resp)
 		return
 	}
 
+	spans.LogKV("request_ip", request.IpAddress)
 	resp = s.AskIPData(ctx, request.IpAddress)
 	if resp == nil {
 		spans.TraceError(errors.New("empty response"))
 		return
 	}
 
+	spans.LogKV("response", fmt.Sprintf("%+v", resp))
 	s.sendResponse(ctx, msg, resp)
 }
 
