@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/customeros/customeros/packages/server/enums"
 	"log"
+
+	"github.com/customeros/customeros/packages/server/enums"
 
 	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
@@ -101,6 +102,8 @@ func (s *SnitcherService) handleNatsMessage(ctx context.Context, msg *nats.Msg) 
 		return
 	}
 
+	spans.LogKV("response", fmt.Sprintf("%+v", resp))
+
 	s.sendResponse(ctx, msg, resp)
 }
 
@@ -119,7 +122,11 @@ func (s *SnitcherService) sendResponse(ctx context.Context, req *nats.Msg, resp 
 		return
 	}
 
-	err = req.Respond(respMessage)
+	responseMsg := nats.NewMsg(req.Reply)
+	responseMsg.Data = respMessage
+	responseMsg.Header = req.Header // Copy headers from request
+
+	err = req.RespondMsg(responseMsg)
 	if err != nil {
 		spans.TraceError(err)
 	}
