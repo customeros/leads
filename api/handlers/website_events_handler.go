@@ -73,8 +73,10 @@ func (h *WebsiteEventsHandler) Handle() gin.HandlerFunc {
 		}
 
 		origin := c.GetHeader("Origin")
+		span.TagString("origin", origin)
+
 		if h.shouldIgnoreOrigin(origin) {
-			span.LogKV("ignored_origin", origin, "reason", "origin pattern ignored")
+			span.LogKV("result", "origin pattern ignored")
 			c.JSON(http.StatusOK, gin.H{"ignored": "true", "reason": "origin pattern ignored"})
 			return
 		}
