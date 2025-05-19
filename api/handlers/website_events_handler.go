@@ -51,6 +51,16 @@ type WebTrackerEvent struct {
 	ScreenResolution string               `json:"screenResolution"`
 }
 
+func (h *WebsiteEventsHandler) shouldIgnoreOrigin(origin string) bool {
+	// Check for HubSpot preview domain pattern (e.g. 123456789.hubspotpreview-na1.com)
+	if matched := utils.MatchPattern(origin, `^\d+\.hubspotpreview-[a-z0-9]+\.com$`); matched {
+		return true
+	}
+
+	// Add more patterns here
+	return false
+}
+
 func (h *WebsiteEventsHandler) Handle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		span, ctx := telemetry.StartRestSpan(c.Request.Context(), "WebsiteEventsHandler.Handle")
@@ -62,7 +72,14 @@ func (h *WebsiteEventsHandler) Handle() gin.HandlerFunc {
 			return
 		}
 
-		tenant, webtrackerID, err := h.getTenantAndTrackerID(ctx, c.GetHeader("Origin"))
+		origin := c.GetHeader("Origin")
+		if h.shouldIgnoreOrigin(origin) {
+			span.LogKV("ignored_origin", origin, "reason", "origin pattern ignored")
+			c.JSON(http.StatusOK, gin.H{"ignored": "true", "reason": "origin pattern ignored"})
+			return
+		}
+
+		tenant, webtrackerID, err := h.getTenantAndTrackerID(ctx, origin)
 		if err != nil {
 			span.TraceError(err)
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
