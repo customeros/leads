@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"regexp"
 	"unicode/utf8"
 )
 
@@ -43,4 +44,13 @@ func IsStringInSlice(s string, slice []string) bool {
 		}
 	}
 	return false
+}
+
+// MatchPattern checks if a string matches a given regex pattern
+func MatchPattern(s, pattern string) bool {
+	matched, err := regexp.MatchString(pattern, s)
+	if err != nil {
+		return false
+	}
+	return matched
 }
