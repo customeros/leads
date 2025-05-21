@@ -9,7 +9,7 @@ require (
 	github.com/customeros/customeros/packages/server/enums v0.0.0-20250515113935-e339eb93f019
 	github.com/customeros/mailsherpa v0.3.9
 	github.com/gin-contrib/cors v1.7.5
-	github.com/gin-gonic/gin v1.10.0
+	github.com/gin-gonic/gin v1.10.1
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
