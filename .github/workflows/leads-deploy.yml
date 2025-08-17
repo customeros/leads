@@ -26,7 +26,7 @@ jobs:
     runs-on: ubicloud-standard-2
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -36,7 +36,7 @@ jobs:
 
       - name: Checkout CustomerOS
         if: env.RELEASE_NEEDED == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: customeros/customeros
           path: ./customeros
@@ -105,7 +105,7 @@ jobs:
 
       - name: Checkout cloud repo
         if: env.RELEASE_NEEDED == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ env.CLOUD_REPO }}
           token: ${{ secrets.CLOUD_REPO_KEY }}

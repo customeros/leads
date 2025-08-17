@@ -20,10 +20,10 @@ jobs:
     runs-on: ubicloud-standard-2
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Checkout CustomerOS
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: customeros/customeros
           path: ./customeros
